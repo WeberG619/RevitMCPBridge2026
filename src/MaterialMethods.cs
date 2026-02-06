@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Visual;
 using Autodesk.Revit.UI;
 using Newtonsoft.Json.Linq;
 using RevitMCPBridge;
@@ -1547,6 +1548,221 @@ namespace RevitMCPBridge2026
                         newAssetId = (int)newAsset.Id.Value,
                         newAssetName = newAsset.Name,
                         message = "Appearance asset duplicated successfully"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                {
+                    success = false,
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
+
+        /// <summary>
+        /// Modifies an appearance asset's color/tint (limited support in Revit 2026)
+        /// </summary>
+        public static string ModifyAppearanceAssetColor(UIApplication uiApp, JObject parameters)
+        {
+            // Note: AppearanceAssetEditScope is internal in Revit 2026 API
+            // This method returns information about the limitation
+            return Newtonsoft.Json.JsonConvert.SerializeObject(new
+            {
+                success = false,
+                error = "ModifyAppearanceAssetColor is not fully supported in Revit 2026 API",
+                note = "AppearanceAssetEditScope is internal/protected in Revit 2026",
+                workaround = "Use CreateMaterialWithAppearance to duplicate an existing appearance asset, then manually adjust colors in Revit UI if needed",
+                recommendation = "Choose a base appearance asset that closely matches your desired color"
+            });
+        }
+
+        /// <summary>
+        /// Gets detailed information about an appearance asset including its properties
+        /// </summary>
+        public static string GetAppearanceAssetDetails(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+
+                if (parameters["assetId"] == null)
+                {
+                    return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        error = "assetId is required"
+                    });
+                }
+
+                int assetIdInt = parameters["assetId"].ToObject<int>();
+                AppearanceAssetElement assetElem = doc.GetElement(new ElementId(assetIdInt)) as AppearanceAssetElement;
+
+                if (assetElem == null)
+                {
+                    return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        error = "Appearance asset not found"
+                    });
+                }
+
+                Asset renderingAsset = assetElem.GetRenderingAsset();
+                var properties = new List<object>();
+
+                if (renderingAsset != null)
+                {
+                    for (int i = 0; i < renderingAsset.Size; i++)
+                    {
+                        AssetProperty prop = renderingAsset[i];
+                        if (prop != null)
+                        {
+                            object value = null;
+                            string typeStr = prop.Type.ToString();
+
+                            try
+                            {
+                                // Read-only access to properties using type checking
+                                // Revit 2026 API changed - use 'is' pattern matching instead of AssetPropertyType enum
+                                if (prop is AssetPropertyDoubleArray4d colorProp)
+                                {
+                                    var vals = colorProp.GetValueAsDoubles();
+                                    value = new { r = (int)(vals[0] * 255), g = (int)(vals[1] * 255), b = (int)(vals[2] * 255), a = vals[3] };
+                                }
+                                else if (prop is AssetPropertyDouble doubleProp)
+                                {
+                                    value = doubleProp.Value;
+                                }
+                                else if (prop is AssetPropertyString stringProp)
+                                {
+                                    value = stringProp.Value;
+                                }
+                                else if (prop is AssetPropertyInteger intProp)
+                                {
+                                    value = intProp.Value;
+                                }
+                                else if (prop is AssetPropertyBoolean boolProp)
+                                {
+                                    value = boolProp.Value;
+                                }
+                            }
+                            catch { }
+
+                            properties.Add(new
+                            {
+                                name = prop.Name,
+                                type = typeStr,
+                                value = value
+                            });
+                        }
+                    }
+                }
+
+                return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    assetId = assetIdInt,
+                    assetName = assetElem.Name,
+                    propertyCount = properties.Count,
+                    properties = properties
+                });
+            }
+            catch (Exception ex)
+            {
+                return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                {
+                    success = false,
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+        }
+
+        /// <summary>
+        /// Creates a complete material with appearance asset in one call
+        /// </summary>
+        public static string CreateMaterialWithAppearance(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+
+                if (parameters["materialName"] == null)
+                {
+                    return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        error = "materialName is required"
+                    });
+                }
+
+                string materialName = parameters["materialName"].ToString();
+
+                // Get color
+                byte red = 128, green = 128, blue = 128;
+                if (parameters["color"] != null)
+                {
+                    var colorArray = parameters["color"].ToObject<int[]>();
+                    red = (byte)colorArray[0];
+                    green = (byte)colorArray[1];
+                    blue = (byte)colorArray[2];
+                }
+
+                // Get base appearance asset to duplicate (optional)
+                int? baseAssetId = parameters["baseAppearanceAssetId"]?.ToObject<int>();
+
+                using (var trans = new Transaction(doc, "Create Material With Appearance"))
+                {
+                    trans.Start();
+                    var failureOptions = trans.GetFailureHandlingOptions();
+                    failureOptions.SetFailuresPreprocessor(new WarningSwallower());
+                    trans.SetFailureHandlingOptions(failureOptions);
+
+                    // Create the material
+                    ElementId materialId = Material.Create(doc, materialName);
+                    Material material = doc.GetElement(materialId) as Material;
+
+                    // Set graphic color
+                    material.Color = new Color(red, green, blue);
+
+                    ElementId newAssetId = ElementId.InvalidElementId;
+
+                    // If base asset provided, duplicate it and modify color
+                    if (baseAssetId.HasValue)
+                    {
+                        AppearanceAssetElement baseAsset = doc.GetElement(new ElementId(baseAssetId.Value)) as AppearanceAssetElement;
+                        if (baseAsset != null)
+                        {
+                            // Duplicate the appearance asset
+                            string assetName = materialName + "_Appearance";
+                            AppearanceAssetElement newAsset = baseAsset.Duplicate(assetName);
+                            newAssetId = newAsset.Id;
+
+                            // Assign to material
+                            material.AppearanceAssetId = newAssetId;
+
+                            // Enable render appearance for shading
+                            material.UseRenderAppearanceForShading = true;
+                        }
+                    }
+
+                    trans.Commit();
+
+                    // Note: AppearanceAssetEditScope is internal/protected in Revit 2026 API
+                    // Color modification of appearance assets must be done manually in Revit UI
+                    // The duplicated appearance asset inherits the base asset's appearance
+
+                    return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                    {
+                        success = true,
+                        materialId = (int)materialId.Value,
+                        materialName = material.Name,
+                        appearanceAssetId = newAssetId != ElementId.InvalidElementId ? (int?)newAssetId.Value : null,
+                        graphicColor = new { r = red, g = green, b = blue },
+                        useRenderAppearanceForShading = material.UseRenderAppearanceForShading,
+                        message = "Material with appearance created successfully"
                     });
                 }
             }

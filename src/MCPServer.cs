@@ -646,6 +646,9 @@ namespace RevitMCPBridge
             _methodRegistry["getAppearanceAssets"] = RevitMCPBridge2026.MaterialMethods.GetAppearanceAssets;
             _methodRegistry["createAppearanceAsset"] = RevitMCPBridge2026.MaterialMethods.CreateAppearanceAsset;
             _methodRegistry["duplicateAppearanceAsset"] = RevitMCPBridge2026.MaterialMethods.DuplicateAppearanceAsset;
+            _methodRegistry["modifyAppearanceAssetColor"] = RevitMCPBridge2026.MaterialMethods.ModifyAppearanceAssetColor;
+            _methodRegistry["getAppearanceAssetDetails"] = RevitMCPBridge2026.MaterialMethods.GetAppearanceAssetDetails;
+            _methodRegistry["createMaterialWithAppearance"] = RevitMCPBridge2026.MaterialMethods.CreateMaterialWithAppearance;
             _methodRegistry["getMaterialByName"] = RevitMCPBridge2026.MaterialMethods.GetMaterialByName;
             _methodRegistry["isMaterialInUse"] = RevitMCPBridge2026.MaterialMethods.IsMaterialInUse;
 
@@ -1127,6 +1130,14 @@ namespace RevitMCPBridge
             _methodRegistry["setViewStyle"] = ViewportCaptureMethods.SetViewStyle;
             _methodRegistry["listViews"] = ViewportCaptureMethods.ListViews;
             _methodRegistry["create3DView"] = ViewportCaptureMethods.Create3DView;
+
+            // ============================================
+            // SCENE ANALYSIS METHODS (4 methods)
+            // ============================================
+            _methodRegistry["getVisibleElements"] = SceneAnalysisMethods.GetVisibleElements;
+            _methodRegistry["getViewMaterials"] = SceneAnalysisMethods.GetViewMaterials;
+            _methodRegistry["getSceneDescription"] = SceneAnalysisMethods.GetSceneDescription;
+            _methodRegistry["exportViewForRender"] = SceneAnalysisMethods.ExportViewForRender;
 
             // ============================================
             // CAPABILITY SYSTEM METHODS (11 methods)
@@ -3680,6 +3691,12 @@ namespace RevitMCPBridge
                         return await ExecuteInRevitContext(uiApp => RevitMCPBridge2026.MaterialMethods.DeleteMaterial(uiApp, parameters));
                     case "duplicateAppearanceAsset":
                         return await ExecuteInRevitContext(uiApp => RevitMCPBridge2026.MaterialMethods.DuplicateAppearanceAsset(uiApp, parameters));
+                    case "modifyAppearanceAssetColor":
+                        return await ExecuteInRevitContext(uiApp => RevitMCPBridge2026.MaterialMethods.ModifyAppearanceAssetColor(uiApp, parameters));
+                    case "getAppearanceAssetDetails":
+                        return await ExecuteInRevitContext(uiApp => RevitMCPBridge2026.MaterialMethods.GetAppearanceAssetDetails(uiApp, parameters));
+                    case "createMaterialWithAppearance":
+                        return await ExecuteInRevitContext(uiApp => RevitMCPBridge2026.MaterialMethods.CreateMaterialWithAppearance(uiApp, parameters));
                     case "duplicateMaterial":
                         return await ExecuteInRevitContext(uiApp => RevitMCPBridge2026.MaterialMethods.DuplicateMaterial(uiApp, parameters));
                     case "exportMaterial":
@@ -3967,6 +3984,19 @@ namespace RevitMCPBridge
 
                     case "create3DView":
                         return await ExecuteInRevitContext(uiApp => ViewportCaptureMethods.Create3DView(uiApp, parameters));
+
+                    // Scene Analysis Methods (AI Rendering)
+                    case "getVisibleElements":
+                        return await ExecuteInRevitContext(uiApp => SceneAnalysisMethods.GetVisibleElements(uiApp, parameters));
+
+                    case "getViewMaterials":
+                        return await ExecuteInRevitContext(uiApp => SceneAnalysisMethods.GetViewMaterials(uiApp, parameters));
+
+                    case "getSceneDescription":
+                        return await ExecuteInRevitContext(uiApp => SceneAnalysisMethods.GetSceneDescription(uiApp, parameters));
+
+                    case "exportViewForRender":
+                        return await ExecuteInRevitContext(uiApp => SceneAnalysisMethods.ExportViewForRender(uiApp, parameters));
 
                     // AI Rendering Methods
                     case "submitRender":
