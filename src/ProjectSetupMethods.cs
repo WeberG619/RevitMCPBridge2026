@@ -191,26 +191,46 @@ namespace RevitMCPBridge
                     }
                 }
 
-                // Note: NewProjectDocument creates the document but doesn't automatically make it active
-                // The document is created successfully and can be accessed via uiApp.Application.Documents
+                // Save to temp file and reopen to make it the active document
+                // NewProjectDocument creates the document but doesn't activate it in the UI
+                var tempDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "RevitMCP");
+                System.IO.Directory.CreateDirectory(tempDir);
+                var tempPath = System.IO.Path.Combine(tempDir,
+                    "Project_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".rvt");
 
-                // Get info about the new document
+                // Get info before saving (in case close clears it)
                 var levels = new FilteredElementCollector(newDoc)
                     .OfClass(typeof(Level))
                     .Cast<Level>()
                     .Select(l => new { id = (int)l.Id.Value, name = l.Name, elevation = l.Elevation })
                     .ToList();
+                var docTitle = newDoc.Title;
+                var projName = newDoc.ProjectInformation?.Name ?? projectName;
+
+                try
+                {
+                    // Save, close, and reopen to activate
+                    newDoc.SaveAs(tempPath, new SaveAsOptions { OverwriteExistingFile = true });
+                    newDoc.Close(false);
+                    uiApp.OpenAndActivateDocument(tempPath);
+                }
+                catch (Exception saveEx)
+                {
+                    // If save/reopen fails, document still exists — just not active
+                    System.Diagnostics.Debug.WriteLine($"CreateNewProject save/reopen: {saveEx.Message}");
+                }
 
                 return JsonConvert.SerializeObject(new
                 {
                     success = true,
-                    projectName = newDoc.ProjectInformation?.Name ?? projectName,
-                    documentTitle = newDoc.Title,
+                    projectName = projName,
+                    documentTitle = docTitle,
+                    filePath = tempPath,
                     isMetric = useMetric,
                     usedTemplate = !string.IsNullOrEmpty(templatePath),
                     levels = levels,
                     levelCount = levels.Count,
-                    message = "New project created successfully. It is now the active document."
+                    message = "New project created and activated successfully."
                 });
             }
             catch (Exception ex)

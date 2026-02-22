@@ -3976,5 +3976,209 @@ namespace RevitMCPBridge
         }
 
         #endregion
+
+        #region NWC Export and Batch Image Export
+
+        /// <summary>
+        /// Export model to Navisworks NWC format.
+        /// </summary>
+        public static string ExportToNWC(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument?.Document;
+                if (doc == null)
+                    return JsonConvert.SerializeObject(new { success = false, error = "No active document" });
+
+                var outputFolder = parameters["outputFolder"]?.ToString();
+                if (string.IsNullOrEmpty(outputFolder))
+                {
+                    outputFolder = System.IO.Path.GetDirectoryName(doc.PathName);
+                    if (string.IsNullOrEmpty(outputFolder))
+                        return JsonConvert.SerializeObject(new { success = false, error = "outputFolder required (document not saved)" });
+                }
+
+                if (!System.IO.Directory.Exists(outputFolder))
+                    System.IO.Directory.CreateDirectory(outputFolder);
+
+                var fileName = parameters["fileName"]?.ToString()
+                    ?? System.IO.Path.GetFileNameWithoutExtension(doc.PathName);
+
+                // Check if NavisworksExportOptions is available
+                var options = new NavisworksExportOptions();
+
+                // Configure export settings
+                var exportScope = parameters["scope"]?.ToString()?.ToLower();
+                if (exportScope == "view")
+                {
+                    var viewId = parameters["viewId"]?.Value<int>();
+                    if (viewId.HasValue)
+                    {
+                        options.ExportScope = NavisworksExportScope.View;
+                        options.ViewId = new ElementId(viewId.Value);
+                    }
+                }
+                else
+                {
+                    options.ExportScope = NavisworksExportScope.Model;
+                }
+
+                options.ExportLinks = parameters["exportLinks"]?.Value<bool>() ?? false;
+                options.ExportRoomAsAttribute = parameters["exportRoomAttributes"]?.Value<bool>() ?? true;
+                options.ExportRoomGeometry = parameters["exportRoomGeometry"]?.Value<bool>() ?? false;
+                options.ConvertElementProperties = parameters["convertProperties"]?.Value<bool>() ?? true;
+                options.DivideFileIntoLevels = parameters["divideByLevels"]?.Value<bool>() ?? true;
+                options.ExportUrls = false;
+                options.FindMissingMaterials = true;
+
+                doc.Export(outputFolder, fileName, options);
+
+                var fullPath = System.IO.Path.Combine(outputFolder, fileName + ".nwc");
+
+                return JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    filePath = fullPath,
+                    fileName = fileName + ".nwc",
+                    fileExists = System.IO.File.Exists(fullPath),
+                    message = $"Exported to {fullPath}"
+                });
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new
+                {
+                    success = false,
+                    error = ex.Message,
+                    hint = ex.Message.Contains("Navisworks") ?
+                        "Navisworks exporter add-in may not be installed" : null
+                });
+            }
+        }
+
+        /// <summary>
+        /// Batch export view/sheet images (PNG/JPEG) for review or markup.
+        /// </summary>
+        public static string BatchExportImages(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument?.Document;
+                if (doc == null)
+                    return JsonConvert.SerializeObject(new { success = false, error = "No active document" });
+
+                var outputFolder = parameters["outputFolder"]?.ToString();
+                if (string.IsNullOrEmpty(outputFolder))
+                    return JsonConvert.SerializeObject(new { success = false, error = "outputFolder is required" });
+
+                if (!System.IO.Directory.Exists(outputFolder))
+                    System.IO.Directory.CreateDirectory(outputFolder);
+
+                var format = parameters["format"]?.ToString()?.ToUpper() ?? "PNG";
+                var pixelSize = parameters["pixelSize"]?.Value<int>() ?? 1920;
+                var exportType = parameters["exportType"]?.ToString()?.ToLower() ?? "sheets";
+
+                // Collect views to export
+                var viewsToExport = new List<View>();
+
+                if (exportType == "sheets")
+                {
+                    var sheetNumbers = parameters["sheetNumbers"]?.ToObject<string[]>();
+                    var sheets = new FilteredElementCollector(doc)
+                        .OfClass(typeof(ViewSheet))
+                        .Cast<ViewSheet>()
+                        .Where(s => !s.IsPlaceholder);
+
+                    if (sheetNumbers != null && sheetNumbers.Length > 0)
+                        sheets = sheets.Where(s => sheetNumbers.Contains(s.SheetNumber));
+
+                    viewsToExport.AddRange(sheets);
+                }
+                else if (exportType == "views")
+                {
+                    var viewIds = parameters["viewIds"]?.ToObject<int[]>();
+                    if (viewIds != null)
+                    {
+                        foreach (var id in viewIds)
+                        {
+                            var view = doc.GetElement(new ElementId(id)) as View;
+                            if (view != null) viewsToExport.Add(view);
+                        }
+                    }
+                }
+
+                if (viewsToExport.Count == 0)
+                    return JsonConvert.SerializeObject(new { success = false, error = "No views/sheets found to export" });
+
+                var imageType = format == "JPEG" || format == "JPG"
+                    ? ImageFileType.JPEGLossless
+                    : ImageFileType.PNG;
+
+                var results = new List<object>();
+                var successCount = 0;
+
+                foreach (var view in viewsToExport)
+                {
+                    try
+                    {
+                        var viewName = view is ViewSheet sheet
+                            ? $"{sheet.SheetNumber} - {sheet.Name}"
+                            : view.Name;
+
+                        // Clean filename
+                        var safeName = string.Join("_",
+                            viewName.Split(System.IO.Path.GetInvalidFileNameChars()));
+
+                        var exportOptions = new ImageExportOptions
+                        {
+                            ZoomType = ZoomFitType.FitToPage,
+                            PixelSize = pixelSize,
+                            FilePath = System.IO.Path.Combine(outputFolder, safeName),
+                            HLRandWFViewsFileType = imageType,
+                            ShadowViewsFileType = imageType,
+                            ExportRange = ExportRange.SetOfViews
+                        };
+                        exportOptions.SetViewsAndSheets(new List<ElementId> { view.Id });
+
+                        doc.ExportImage(exportOptions);
+
+                        var extension = format == "JPEG" || format == "JPG" ? ".jpg" : ".png";
+                        results.Add(new
+                        {
+                            viewName,
+                            fileName = safeName + extension,
+                            success = true
+                        });
+                        successCount++;
+                    }
+                    catch (Exception ex)
+                    {
+                        results.Add(new
+                        {
+                            viewName = view.Name,
+                            success = false,
+                            error = ex.Message
+                        });
+                    }
+                }
+
+                return JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    outputFolder,
+                    format,
+                    totalRequested = viewsToExport.Count,
+                    successCount,
+                    errorCount = viewsToExport.Count - successCount,
+                    results
+                });
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+            }
+        }
+
+        #endregion
     }
 }

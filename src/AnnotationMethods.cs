@@ -96,13 +96,17 @@ namespace RevitMCPBridge2026
                     // Get reference from element
                     Reference reference = new Reference(referenceElement);
 
-                    // Create keynote tag
+                    // Create keynote tag - use MULTICATEGORY for keynote tags
+                    var tagMode = parameters["tagMode"]?.ToString()?.ToLower() == "category"
+                        ? TagMode.TM_ADDBY_CATEGORY
+                        : TagMode.TM_ADDBY_MULTICATEGORY;
+
                     IndependentTag keynote = IndependentTag.Create(
                         doc,
                         view.Id,
                         reference,
                         true,
-                        TagMode.TM_ADDBY_CATEGORY,
+                        tagMode,
                         TagOrientation.Horizontal,
                         location
                     );
@@ -2408,13 +2412,67 @@ namespace RevitMCPBridge2026
                 int familyIdInt = parameters["familyId"].ToObject<int>();
                 ElementId familyId = new ElementId(familyIdInt);
 
-                // Note: Legend component creation API is limited in Revit 2026
-                // Legend components are typically created through UI by dragging families into legend views
-                return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                var x = parameters["x"]?.Value<double>() ?? 0;
+                var y = parameters["y"]?.Value<double>() ?? 0;
+                var position = new XYZ(x, y, 0);
+
+                // Get the family symbol (type) to place
+                var typeId = parameters["typeId"]?.Value<int>();
+                FamilySymbol symbol = null;
+
+                if (typeId.HasValue)
                 {
-                    success = false,
-                    error = "PlaceLegendComponent is not fully supported in Revit 2026 API - legend components are typically created through the UI. Use GetLegendComponents to retrieve existing legend components."
-                });
+                    symbol = doc.GetElement(new ElementId(typeId.Value)) as FamilySymbol;
+                }
+                else
+                {
+                    // Try to find a symbol from the given family
+                    var family = doc.GetElement(familyId) as Family;
+                    if (family != null)
+                    {
+                        var symbolIds = family.GetFamilySymbolIds();
+                        if (symbolIds.Count > 0)
+                        {
+                            symbol = doc.GetElement(symbolIds.First()) as FamilySymbol;
+                        }
+                    }
+                    else
+                    {
+                        // familyId might be a symbol ID directly
+                        symbol = doc.GetElement(familyId) as FamilySymbol;
+                    }
+                }
+
+                if (symbol == null)
+                {
+                    return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        error = "Could not resolve family symbol. Provide typeId or a valid familyId."
+                    });
+                }
+
+                using (var trans = new Transaction(doc, "Place Legend Component"))
+                {
+                    trans.Start();
+
+                    if (!symbol.IsActive) symbol.Activate();
+
+                    // Place in legend view using NewFamilyInstance
+                    var instance = doc.Create.NewFamilyInstance(
+                        position, symbol, legendView);
+
+                    trans.Commit();
+
+                    return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                    {
+                        success = true,
+                        elementId = (int)instance.Id.Value,
+                        familyName = symbol.Family?.Name,
+                        typeName = symbol.Name,
+                        position = new { x, y }
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -3414,6 +3472,179 @@ namespace RevitMCPBridge2026
                     error = ex.Message,
                     stackTrace = ex.StackTrace
                 });
+            }
+        }
+
+        #endregion
+
+        #region Legend Text and Keynote Schedule Methods
+
+        /// <summary>
+        /// Add text note(s) to a legend view at specified positions.
+        /// Used to build legends with title, labels, and descriptions.
+        /// </summary>
+        public static string AddTextToLegend(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+
+                var legendViewId = parameters["legendViewId"]?.Value<int>();
+                if (legendViewId == null)
+                    return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = false, error = "legendViewId is required" });
+
+                var view = doc.GetElement(new ElementId(legendViewId.Value)) as View;
+                if (view == null || view.ViewType != ViewType.Legend)
+                    return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = false, error = "Not a valid legend view" });
+
+                var textEntries = parameters["entries"]?.ToObject<JArray>();
+                if (textEntries == null || textEntries.Count == 0)
+                    return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = false, error = "entries array is required" });
+
+                // Get or find text note type
+                var textTypeId = parameters["textTypeId"]?.Value<int>();
+                TextNoteType noteType = null;
+                if (textTypeId.HasValue)
+                {
+                    noteType = doc.GetElement(new ElementId(textTypeId.Value)) as TextNoteType;
+                }
+                if (noteType == null)
+                {
+                    noteType = new FilteredElementCollector(doc)
+                        .OfClass(typeof(TextNoteType))
+                        .Cast<TextNoteType>()
+                        .FirstOrDefault();
+                }
+                if (noteType == null)
+                    return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = false, error = "No text note type found" });
+
+                var results = new List<object>();
+
+                using (var trans = new Transaction(doc, "Add Text to Legend"))
+                {
+                    trans.Start();
+
+                    foreach (JObject entry in textEntries)
+                    {
+                        var text = entry["text"]?.ToString();
+                        if (string.IsNullOrEmpty(text)) continue;
+
+                        var x = entry["x"]?.Value<double>() ?? 0;
+                        var y = entry["y"]?.Value<double>() ?? 0;
+                        var position = new XYZ(x, y, 0);
+
+                        // Allow per-entry text type override
+                        var entryTypeId = entry["textTypeId"]?.Value<int>();
+                        var entryType = noteType;
+                        if (entryTypeId.HasValue)
+                        {
+                            var customType = doc.GetElement(new ElementId(entryTypeId.Value)) as TextNoteType;
+                            if (customType != null) entryType = customType;
+                        }
+
+                        var textNote = TextNote.Create(doc, view.Id, position, text, entryType.Id);
+                        results.Add(new
+                        {
+                            id = (int)textNote.Id.Value,
+                            text,
+                            x, y
+                        });
+                    }
+
+                    trans.Commit();
+                }
+
+                return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    legendViewId = legendViewId.Value,
+                    count = results.Count,
+                    textNotes = results
+                });
+            }
+            catch (Exception ex)
+            {
+                return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Create a keynote schedule (keynote legend) that lists all keynotes used in the project.
+        /// </summary>
+        public static string CreateKeynoteSchedule(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+
+                var scheduleName = parameters["name"]?.ToString() ?? "Keynote Legend";
+
+                // Check if schedule already exists
+                var existing = new FilteredElementCollector(doc)
+                    .OfClass(typeof(ViewSchedule))
+                    .Cast<ViewSchedule>()
+                    .FirstOrDefault(s => s.Name == scheduleName);
+
+                if (existing != null)
+                {
+                    return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                    {
+                        success = true,
+                        alreadyExists = true,
+                        scheduleId = (int)existing.Id.Value,
+                        name = existing.Name,
+                        message = "Schedule already exists"
+                    });
+                }
+
+                using (var trans = new Transaction(doc, "Create Keynote Schedule"))
+                {
+                    trans.Start();
+
+                    // Create a multi-category schedule filtering to keynotes
+                    var schedule = ViewSchedule.CreateSchedule(doc,
+                        new ElementId(BuiltInCategory.OST_KeynoteTags));
+
+                    if (schedule == null)
+                    {
+                        trans.RollBack();
+                        return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                        {
+                            success = false,
+                            error = "Failed to create keynote schedule"
+                        });
+                    }
+
+                    schedule.Name = scheduleName;
+
+                    // Add keynote fields
+                    var definition = schedule.Definition;
+                    var schedulableFields = definition.GetSchedulableFields();
+
+                    foreach (var field in schedulableFields)
+                    {
+                        var fieldName = field.GetName(doc);
+                        if (fieldName == "Keynote Text" || fieldName == "Key Value" ||
+                            fieldName == "Keynote Number")
+                        {
+                            definition.AddField(field);
+                        }
+                    }
+
+                    trans.Commit();
+
+                    return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                    {
+                        success = true,
+                        scheduleId = (int)schedule.Id.Value,
+                        name = schedule.Name,
+                        fieldCount = definition.GetFieldCount()
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Newtonsoft.Json.JsonConvert.SerializeObject(new { success = false, error = ex.Message });
             }
         }
 

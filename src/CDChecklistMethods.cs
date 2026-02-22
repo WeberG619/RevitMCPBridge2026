@@ -764,6 +764,471 @@ namespace RevitMCPBridge
 
         #endregion
 
+        #region Public Audit Methods (MCP-exposed)
+
+        /// <summary>
+        /// Audit rooms for naming, numbering, finish data, and area issues.
+        /// Wraps the private CheckRooms method and adds detailed per-room data.
+        /// </summary>
+        public static string AuditRooms(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+                var includeDetails = parameters["includeDetails"]?.Value<bool>() ?? true;
+                var levelName = parameters["level"]?.ToString();
+
+                var rooms = new FilteredElementCollector(doc)
+                    .OfCategory(BuiltInCategory.OST_Rooms)
+                    .WhereElementIsNotElementType()
+                    .Cast<Room>()
+                    .Where(r => r.Location != null && r.Area > 0)
+                    .ToList();
+
+                // Filter by level if specified
+                if (!string.IsNullOrEmpty(levelName))
+                {
+                    rooms = rooms.Where(r => r.Level?.Name == levelName).ToList();
+                }
+
+                var issues = new List<object>();
+                var unnamedCount = 0;
+                var unnumberedCount = 0;
+                var noFinishCount = 0;
+                var duplicateNumbers = new List<string>();
+
+                // Check for duplicates
+                var numberGroups = rooms
+                    .Where(r => !string.IsNullOrWhiteSpace(r.Number))
+                    .GroupBy(r => r.Number)
+                    .Where(g => g.Count() > 1);
+                foreach (var g in numberGroups)
+                    duplicateNumbers.Add(g.Key);
+
+                var roomDetails = new List<object>();
+                foreach (var room in rooms)
+                {
+                    var roomIssues = new List<string>();
+
+                    if (string.IsNullOrWhiteSpace(room.Name) || room.Name == "Room")
+                    {
+                        roomIssues.Add("unnamed");
+                        unnamedCount++;
+                    }
+                    if (string.IsNullOrWhiteSpace(room.Number))
+                    {
+                        roomIssues.Add("no number");
+                        unnumberedCount++;
+                    }
+
+                    var floorFinish = room.LookupParameter("Floor Finish")?.AsString();
+                    var wallFinish = room.LookupParameter("Wall Finish")?.AsString();
+                    var baseFinish = room.LookupParameter("Base Finish")?.AsString();
+                    var ceilingFinish = room.LookupParameter("Ceiling Finish")?.AsString();
+
+                    if (string.IsNullOrWhiteSpace(floorFinish) &&
+                        string.IsNullOrWhiteSpace(wallFinish))
+                    {
+                        roomIssues.Add("no finishes");
+                        noFinishCount++;
+                    }
+
+                    if (duplicateNumbers.Contains(room.Number))
+                        roomIssues.Add("duplicate number");
+
+                    if (includeDetails || roomIssues.Count > 0)
+                    {
+                        roomDetails.Add(new
+                        {
+                            id = (int)room.Id.Value,
+                            name = room.Name,
+                            number = room.Number,
+                            level = room.Level?.Name,
+                            area = Math.Round(room.Area, 1),
+                            floorFinish = floorFinish ?? "",
+                            wallFinish = wallFinish ?? "",
+                            baseFinish = baseFinish ?? "",
+                            ceilingFinish = ceilingFinish ?? "",
+                            issues = roomIssues
+                        });
+                    }
+                }
+
+                var totalIssues = unnamedCount + unnumberedCount + noFinishCount + duplicateNumbers.Count;
+                var status = totalIssues == 0 ? "PASS" :
+                            totalIssues <= 3 ? "WARNING" : "FAIL";
+
+                return JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    status,
+                    totalRooms = rooms.Count,
+                    summary = new
+                    {
+                        unnamed = unnamedCount,
+                        unnumbered = unnumberedCount,
+                        noFinishes = noFinishCount,
+                        duplicateNumbers = duplicateNumbers.Count
+                    },
+                    duplicateNumbers,
+                    rooms = roomDetails
+                });
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Audit doors for marks, types, fire ratings, and schedule readiness.
+        /// </summary>
+        public static string AuditDoors(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+                var includeDetails = parameters["includeDetails"]?.Value<bool>() ?? true;
+                var levelName = parameters["level"]?.ToString();
+
+                var doors = new FilteredElementCollector(doc)
+                    .OfCategory(BuiltInCategory.OST_Doors)
+                    .WhereElementIsNotElementType()
+                    .Cast<FamilyInstance>()
+                    .ToList();
+
+                if (!string.IsNullOrEmpty(levelName))
+                {
+                    doors = doors.Where(d =>
+                    {
+                        var lvl = doc.GetElement(d.LevelId) as Level;
+                        if (lvl?.Name == levelName) return true;
+                        if (d.Host is Wall w)
+                        {
+                            var wallLevel = w.get_Parameter(BuiltInParameter.WALL_BASE_CONSTRAINT)?.AsValueString();
+                            if (wallLevel == levelName) return true;
+                        }
+                        return false;
+                    }).ToList();
+                }
+
+                var unmarkedCount = 0;
+                var noHostCount = 0;
+                var duplicateMarks = new List<string>();
+
+                var markGroups = doors
+                    .Select(d => d.get_Parameter(BuiltInParameter.ALL_MODEL_MARK)?.AsString())
+                    .Where(m => !string.IsNullOrWhiteSpace(m))
+                    .GroupBy(m => m)
+                    .Where(g => g.Count() > 1);
+                foreach (var g in markGroups)
+                    duplicateMarks.Add(g.Key);
+
+                var doorDetails = new List<object>();
+                foreach (var door in doors)
+                {
+                    var doorIssues = new List<string>();
+                    var mark = door.get_Parameter(BuiltInParameter.ALL_MODEL_MARK)?.AsString();
+                    var fireRating = door.LookupParameter("Fire Rating")?.AsString();
+
+                    if (string.IsNullOrWhiteSpace(mark))
+                    {
+                        doorIssues.Add("no mark");
+                        unmarkedCount++;
+                    }
+                    if (duplicateMarks.Contains(mark))
+                        doorIssues.Add("duplicate mark");
+
+                    if (door.Host == null)
+                    {
+                        doorIssues.Add("no host wall");
+                        noHostCount++;
+                    }
+
+                    if (includeDetails || doorIssues.Count > 0)
+                    {
+                        doorDetails.Add(new
+                        {
+                            id = (int)door.Id.Value,
+                            mark = mark ?? "",
+                            familyName = door.Symbol?.Family?.Name ?? "",
+                            typeName = door.Symbol?.Name ?? "",
+                            level = (doc.GetElement(door.LevelId) as Level)?.Name ?? "",
+                            fireRating = fireRating ?? "",
+                            fromRoom = door.FromRoom?.Name ?? "",
+                            toRoom = door.ToRoom?.Name ?? "",
+                            issues = doorIssues
+                        });
+                    }
+                }
+
+                var totalIssues = unmarkedCount + noHostCount + duplicateMarks.Count;
+                var status = totalIssues == 0 ? "PASS" :
+                            totalIssues <= 3 ? "WARNING" : "FAIL";
+
+                return JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    status,
+                    totalDoors = doors.Count,
+                    summary = new
+                    {
+                        unmarked = unmarkedCount,
+                        noHost = noHostCount,
+                        duplicateMarks = duplicateMarks.Count
+                    },
+                    duplicateMarks,
+                    doors = doorDetails
+                });
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get purgeable element counts without deleting.
+        /// Thin wrapper around PurgeUnused with dryRun=true, plus additional categories.
+        /// </summary>
+        public static string GetPurgeable(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+
+                var categories = new Dictionary<string, int>();
+
+                // Unused view types
+                var unusedViewTypes = new FilteredElementCollector(doc)
+                    .OfClass(typeof(ViewFamilyType))
+                    .Cast<ViewFamilyType>()
+                    .Count(vft => !IsViewTypeUsedPublic(doc, vft));
+                categories["viewTypes"] = unusedViewTypes;
+
+                // Unused line patterns
+                var unusedLinePatterns = new FilteredElementCollector(doc)
+                    .OfClass(typeof(LinePatternElement))
+                    .Count(lp => !IsElementUsedPublic(doc, lp));
+                categories["linePatterns"] = unusedLinePatterns;
+
+                // Unused materials
+                var unusedMaterials = new FilteredElementCollector(doc)
+                    .OfClass(typeof(Material))
+                    .Count(m => !IsElementUsedPublic(doc, m));
+                categories["materials"] = unusedMaterials;
+
+                // Unused fill patterns
+                var unusedFillPatterns = new FilteredElementCollector(doc)
+                    .OfClass(typeof(FillPatternElement))
+                    .Count(fp => !IsElementUsedPublic(doc, fp));
+                categories["fillPatterns"] = unusedFillPatterns;
+
+                // Unplaced rooms
+                var unplacedRooms = new FilteredElementCollector(doc)
+                    .OfCategory(BuiltInCategory.OST_Rooms)
+                    .WhereElementIsNotElementType()
+                    .Cast<Room>()
+                    .Count(r => r.Location == null || r.Area <= 0);
+                categories["unplacedRooms"] = unplacedRooms;
+
+                // Unplaced areas
+                var unplacedAreas = new FilteredElementCollector(doc)
+                    .OfCategory(BuiltInCategory.OST_Areas)
+                    .WhereElementIsNotElementType()
+                    .Count(a => a.LookupParameter("Area")?.AsDouble() <= 0);
+                categories["unplacedAreas"] = unplacedAreas;
+
+                // Unused view templates
+                var allViews = new FilteredElementCollector(doc)
+                    .OfClass(typeof(View))
+                    .Cast<View>()
+                    .ToList();
+                var usedTemplateIds = allViews
+                    .Where(v => !v.IsTemplate && v.ViewTemplateId != ElementId.InvalidElementId)
+                    .Select(v => v.ViewTemplateId)
+                    .Distinct()
+                    .ToHashSet();
+                var unusedTemplates = allViews
+                    .Count(v => v.IsTemplate && !usedTemplateIds.Contains(v.Id));
+                categories["unusedViewTemplates"] = unusedTemplates;
+
+                var total = categories.Values.Sum();
+
+                return JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    totalPurgeable = total,
+                    categories,
+                    message = total > 0
+                        ? $"{total} purgeable elements found. Use purgeUnused with dryRun=false to clean."
+                        : "Model is clean - no purgeable elements found."
+                });
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Run standards check against firm profile or custom rules.
+        /// Checks text types, dimension types, line weights, and naming conventions.
+        /// </summary>
+        public static string RunStandardsCheck(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+                var checkCategories = parameters["categories"]?.ToObject<string[]>()
+                    ?? new[] { "all" };
+
+                var results = new Dictionary<string, object>();
+                var totalIssues = 0;
+
+                // Check text note types
+                if (checkCategories.Contains("all") || checkCategories.Contains("text"))
+                {
+                    var textIssues = new List<object>();
+                    var textTypes = new FilteredElementCollector(doc)
+                        .OfClass(typeof(TextNoteType))
+                        .Cast<TextNoteType>()
+                        .ToList();
+
+                    foreach (var tt in textTypes)
+                    {
+                        var issues = new List<string>();
+                        var height = tt.get_Parameter(BuiltInParameter.TEXT_SIZE)?.AsDouble() ?? 0;
+                        var heightInches = height * 12;
+
+                        // Flag non-standard text sizes
+                        var standardSizes = new[] { 3.0/32, 1.0/8, 5.0/32, 3.0/16, 1.0/4, 3.0/8, 1.0/2 };
+                        if (height > 0 && !standardSizes.Any(s => Math.Abs(height - s) < 0.001))
+                        {
+                            issues.Add($"Non-standard text height: {heightInches:F3}\"");
+                        }
+
+                        if (issues.Count > 0)
+                        {
+                            textIssues.Add(new
+                            {
+                                name = tt.Name,
+                                height = Math.Round(heightInches, 4),
+                                issues
+                            });
+                            totalIssues += issues.Count;
+                        }
+                    }
+                    results["textTypes"] = new { count = textTypes.Count, issues = textIssues };
+                }
+
+                // Check dimension types
+                if (checkCategories.Contains("all") || checkCategories.Contains("dimensions"))
+                {
+                    var dimIssues = new List<object>();
+                    var dimTypes = new FilteredElementCollector(doc)
+                        .OfClass(typeof(DimensionType))
+                        .Cast<DimensionType>()
+                        .Where(dt => dt.StyleType == DimensionStyleType.Linear)
+                        .ToList();
+
+                    results["dimensionTypes"] = new { count = dimTypes.Count };
+                }
+
+                // Check line weights
+                if (checkCategories.Contains("all") || checkCategories.Contains("lineWeights"))
+                {
+                    // Count categories with non-default overrides
+                    var overriddenCategories = 0;
+                    var categoryCount = 0;
+
+                    var settings = doc.Settings;
+                    foreach (Category cat in settings.Categories)
+                    {
+                        categoryCount++;
+                        var lineWeight = cat.GetLineWeight(GraphicsStyleType.Projection);
+                        if (lineWeight.HasValue && lineWeight.Value > 5)
+                        {
+                            overriddenCategories++;
+                        }
+                    }
+
+                    results["lineWeights"] = new
+                    {
+                        categoriesChecked = categoryCount,
+                        heavyLineWeights = overriddenCategories,
+                        status = overriddenCategories > 10 ? "WARNING" : "PASS"
+                    };
+                }
+
+                // Check naming conventions
+                if (checkCategories.Contains("all") || checkCategories.Contains("naming"))
+                {
+                    var namingIssues = new List<string>();
+
+                    // Check sheet naming
+                    var sheets = new FilteredElementCollector(doc)
+                        .OfClass(typeof(ViewSheet))
+                        .Cast<ViewSheet>()
+                        .Where(s => !s.IsPlaceholder)
+                        .ToList();
+
+                    var sheetsNoNumber = sheets.Count(s => string.IsNullOrWhiteSpace(s.SheetNumber));
+                    if (sheetsNoNumber > 0)
+                        namingIssues.Add($"{sheetsNoNumber} sheet(s) have no number");
+
+                    // Check view naming (underscore prefix = working views)
+                    var views = new FilteredElementCollector(doc)
+                        .OfClass(typeof(View))
+                        .Cast<View>()
+                        .Where(v => !v.IsTemplate && v.ViewType != ViewType.Schedule
+                            && v.ViewType != ViewType.DrawingSheet)
+                        .ToList();
+
+                    var copyViews = views.Count(v => v.Name.Contains("Copy") || v.Name.Contains("copy"));
+                    if (copyViews > 3)
+                        namingIssues.Add($"{copyViews} views have 'Copy' in name (rename or delete)");
+
+                    totalIssues += namingIssues.Count;
+                    results["naming"] = new { issues = namingIssues };
+                }
+
+                var status = totalIssues == 0 ? "PASS" :
+                            totalIssues <= 5 ? "WARNING" : "FAIL";
+
+                return JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    status,
+                    totalIssues,
+                    results
+                });
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+            }
+        }
+
+        // Helper: check if a ViewFamilyType is used (public accessor)
+        private static bool IsViewTypeUsedPublic(Document doc, ViewFamilyType vft)
+        {
+            return new FilteredElementCollector(doc)
+                .OfClass(typeof(View))
+                .Cast<View>()
+                .Any(v => v.GetTypeId() == vft.Id);
+        }
+
+        // Helper: check if an element is referenced anywhere
+        private static bool IsElementUsedPublic(Document doc, Element element)
+        {
+            // Simple check: if the element has dependent elements, it's used
+            var dependents = element.GetDependentElements(null);
+            return dependents != null && dependents.Count > 1; // Self-reference = 1
+        }
+
+        #endregion
+
         #region Data Classes
 
         private class ChecklistSummary

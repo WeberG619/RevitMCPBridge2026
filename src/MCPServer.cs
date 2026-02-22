@@ -286,6 +286,8 @@ namespace RevitMCPBridge
             _methodRegistry["setProjectInfo"] = DocumentMethods.SetProjectInfo;
             _methodRegistry["enableWorksharing"] = DocumentMethods.EnableWorksharing;
             _methodRegistry["exportToIFC"] = DocumentMethods.ExportToIFC;
+            _methodRegistry["exportToNWC"] = DocumentMethods.ExportToNWC;
+            _methodRegistry["batchExportImages"] = DocumentMethods.BatchExportImages;
             _methodRegistry["switchDocument"] = DocumentMethods.SwitchDocument;
 
             // DWG Export Methods (Critical CD Methods)
@@ -365,6 +367,10 @@ namespace RevitMCPBridge
             _methodRegistry["setViewRange"] = VisionMethods.SetViewRange;
             _methodRegistry["isolateElements"] = VisionMethods.IsolateElements;
             _methodRegistry["set3DSectionBox"] = VisionMethods.Set3DSectionBox;
+
+            // Spatial Query Methods (markup-to-model pipeline)
+            _methodRegistry["findElementsNearPoint"] = VisionMethods.FindElementsNearPoint;
+            _methodRegistry["getViewCoordinateInfo"] = VisionMethods.GetViewCoordinateInfo;
 
             // Transaction Control Methods
             _methodRegistry["startTransactionGroup"] = TransactionMethods.StartTransactionGroup;
@@ -805,6 +811,8 @@ namespace RevitMCPBridge
             _methodRegistry["createMatchline"] = RevitMCPBridge2026.AnnotationMethods.CreateMatchline;
             _methodRegistry["getMatchlinesInView"] = RevitMCPBridge2026.AnnotationMethods.GetMatchlinesInView;
             _methodRegistry["placeLegendComponent"] = RevitMCPBridge2026.AnnotationMethods.PlaceLegendComponent;
+            _methodRegistry["addTextToLegend"] = RevitMCPBridge2026.AnnotationMethods.AddTextToLegend;
+            _methodRegistry["createKeynoteSchedule"] = RevitMCPBridge2026.AnnotationMethods.CreateKeynoteSchedule;
             _methodRegistry["getAllAnnotationsInView"] = RevitMCPBridge2026.AnnotationMethods.GetAllAnnotationsInView;
             _methodRegistry["deleteAnnotation"] = RevitMCPBridge2026.AnnotationMethods.DeleteAnnotation;
             _methodRegistry["addAnnotationLeader"] = RevitMCPBridge2026.AnnotationMethods.AddAnnotationLeader;
@@ -985,9 +993,13 @@ namespace RevitMCPBridge
             _methodRegistry["generateComplianceReport"] = ComplianceMethods.GenerateComplianceReport;
 
             // ============================================
-            // CD CHECKLIST METHODS (1 method)
+            // CD CHECKLIST & QC METHODS (5 methods)
             // ============================================
             _methodRegistry["runCDChecklist"] = CDChecklistMethods.RunCDChecklist;
+            _methodRegistry["auditRooms"] = CDChecklistMethods.AuditRooms;
+            _methodRegistry["auditDoors"] = CDChecklistMethods.AuditDoors;
+            _methodRegistry["getPurgeable"] = CDChecklistMethods.GetPurgeable;
+            _methodRegistry["runStandardsCheck"] = CDChecklistMethods.RunStandardsCheck;
 
             // ============================================
             // VIEW ANNOTATION METHODS (47 methods)

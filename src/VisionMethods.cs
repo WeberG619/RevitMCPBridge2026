@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -731,6 +732,254 @@ namespace RevitMCPBridge
             catch
             {
                 return null;
+            }
+        }
+
+        #endregion
+
+        #region Spatial Query Methods
+
+        /// <summary>
+        /// Find all elements near a given XY point within a specified radius.
+        /// Used to map markup locations to Revit model elements.
+        /// </summary>
+        public static string FindElementsNearPoint(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+
+                var x = parameters["x"]?.Value<double>();
+                var y = parameters["y"]?.Value<double>();
+                if (x == null || y == null)
+                    return JsonConvert.SerializeObject(new { success = false, error = "x and y coordinates are required" });
+
+                var z = parameters["z"]?.Value<double>() ?? 0;
+                var radius = parameters["radius"]?.Value<double>() ?? 3.0; // 3 feet default
+                var center = new XYZ(x.Value, y.Value, z);
+
+                // Optional category filter
+                var categoryFilter = parameters["category"]?.ToString();
+                var viewId = parameters["viewId"]?.Value<int>();
+                var maxResults = parameters["maxResults"]?.Value<int>() ?? 20;
+
+                // Build collector - optionally scoped to a view
+                FilteredElementCollector collector;
+                if (viewId.HasValue)
+                {
+                    collector = new FilteredElementCollector(doc, new ElementId(viewId.Value));
+                }
+                else
+                {
+                    collector = new FilteredElementCollector(doc);
+                }
+
+                // Apply category filter if specified
+                if (!string.IsNullOrEmpty(categoryFilter))
+                {
+                    BuiltInCategory bic;
+                    if (Enum.TryParse("OST_" + categoryFilter, out bic))
+                    {
+                        collector = collector.OfCategory(bic);
+                    }
+                }
+
+                // Only non-type elements
+                collector = collector.WhereElementIsNotElementType();
+
+                // Use bounding box filter for rough spatial query
+                var min = new XYZ(x.Value - radius, y.Value - radius, z - 20);
+                var max = new XYZ(x.Value + radius, y.Value + radius, z + 20);
+                var outline = new Outline(min, max);
+                var bbFilter = new BoundingBoxIntersectsFilter(outline);
+                collector = collector.WherePasses(bbFilter);
+
+                var results = new List<object>();
+
+                foreach (var element in collector)
+                {
+                    // Skip non-visible categories
+                    if (element.Category == null) continue;
+
+                    // Get element location
+                    double elemX = 0, elemY = 0, elemZ = 0;
+                    double distance = double.MaxValue;
+                    var location = element.Location;
+
+                    if (location is LocationPoint lp)
+                    {
+                        elemX = lp.Point.X;
+                        elemY = lp.Point.Y;
+                        elemZ = lp.Point.Z;
+                        distance = center.DistanceTo(lp.Point);
+                    }
+                    else if (location is LocationCurve lc)
+                    {
+                        var midpoint = lc.Curve.Evaluate(0.5, true);
+                        elemX = midpoint.X;
+                        elemY = midpoint.Y;
+                        elemZ = midpoint.Z;
+                        // Distance to nearest point on curve
+                        var result = lc.Curve.Project(center);
+                        if (result != null)
+                            distance = result.Distance;
+                        else
+                            distance = center.DistanceTo(midpoint);
+                    }
+                    else
+                    {
+                        // Use bounding box center
+                        var bbox = element.get_BoundingBox(null);
+                        if (bbox != null)
+                        {
+                            var bboxCenter = (bbox.Min + bbox.Max) / 2;
+                            elemX = bboxCenter.X;
+                            elemY = bboxCenter.Y;
+                            elemZ = bboxCenter.Z;
+                            distance = center.DistanceTo(bboxCenter);
+                        }
+                        else continue;
+                    }
+
+                    if (distance > radius) continue;
+
+                    var elemInfo = new Dictionary<string, object>
+                    {
+                        ["id"] = (int)element.Id.Value,
+                        ["category"] = element.Category.Name,
+                        ["name"] = element.Name,
+                        ["distance"] = Math.Round(distance, 3),
+                        ["location"] = new { x = Math.Round(elemX, 3), y = Math.Round(elemY, 3), z = Math.Round(elemZ, 3) }
+                    };
+
+                    // Add type-specific info
+                    if (element is FamilyInstance fi)
+                    {
+                        elemInfo["familyName"] = fi.Symbol?.Family?.Name ?? "";
+                        elemInfo["typeName"] = fi.Symbol?.Name ?? "";
+                        var mark = fi.get_Parameter(BuiltInParameter.ALL_MODEL_MARK)?.AsString();
+                        if (!string.IsNullOrEmpty(mark)) elemInfo["mark"] = mark;
+                    }
+                    else if (element is Wall wall)
+                    {
+                        elemInfo["wallType"] = wall.WallType?.Name ?? "";
+                        elemInfo["length"] = Math.Round(wall.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH)?.AsDouble() ?? 0, 2);
+                    }
+                    else if (element is Room room)
+                    {
+                        elemInfo["roomName"] = room.Name;
+                        elemInfo["roomNumber"] = room.Number;
+                        elemInfo["area"] = Math.Round(room.Area, 1);
+                    }
+
+                    results.Add(elemInfo);
+                }
+
+                // Sort by distance, limit results
+                var sorted = results
+                    .OrderBy(r => ((dynamic)r)["distance"])
+                    .Take(maxResults)
+                    .ToList();
+
+                return JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    searchPoint = new { x = x.Value, y = y.Value, z },
+                    radius,
+                    count = sorted.Count,
+                    elements = sorted
+                });
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get view coordinate system info needed for PDF-to-Revit coordinate mapping.
+        /// Returns crop region bounds, scale, and coordinate transform.
+        /// </summary>
+        public static string GetViewCoordinateInfo(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+                var viewId = parameters["viewId"]?.Value<int>();
+
+                View view;
+                if (viewId.HasValue)
+                {
+                    view = doc.GetElement(new ElementId(viewId.Value)) as View;
+                    if (view == null)
+                        return JsonConvert.SerializeObject(new { success = false, error = "View not found" });
+                }
+                else
+                {
+                    view = doc.ActiveView;
+                }
+
+                var result = new Dictionary<string, object>
+                {
+                    ["viewId"] = (int)view.Id.Value,
+                    ["viewName"] = view.Name,
+                    ["viewType"] = view.ViewType.ToString(),
+                    ["scale"] = view.Scale
+                };
+
+                // Crop region
+                if (view.CropBoxActive)
+                {
+                    var cropBox = view.CropBox;
+                    result["cropBox"] = new
+                    {
+                        min = new { x = Math.Round(cropBox.Min.X, 4), y = Math.Round(cropBox.Min.Y, 4), z = Math.Round(cropBox.Min.Z, 4) },
+                        max = new { x = Math.Round(cropBox.Max.X, 4), y = Math.Round(cropBox.Max.Y, 4), z = Math.Round(cropBox.Max.Z, 4) },
+                        width = Math.Round(cropBox.Max.X - cropBox.Min.X, 4),
+                        height = Math.Round(cropBox.Max.Y - cropBox.Min.Y, 4)
+                    };
+
+                    // Transform (view to model coordinates)
+                    var transform = cropBox.Transform;
+                    result["transform"] = new
+                    {
+                        origin = new { x = Math.Round(transform.Origin.X, 4), y = Math.Round(transform.Origin.Y, 4), z = Math.Round(transform.Origin.Z, 4) },
+                        basisX = new { x = Math.Round(transform.BasisX.X, 6), y = Math.Round(transform.BasisX.Y, 6), z = Math.Round(transform.BasisX.Z, 6) },
+                        basisY = new { x = Math.Round(transform.BasisY.X, 6), y = Math.Round(transform.BasisY.Y, 6), z = Math.Round(transform.BasisY.Z, 6) }
+                    };
+                }
+
+                // View outline (screen-space bounds)
+                var outline = view.Outline;
+                result["outline"] = new
+                {
+                    min = new { u = Math.Round(outline.Min.U, 4), v = Math.Round(outline.Min.V, 4) },
+                    max = new { u = Math.Round(outline.Max.U, 4), v = Math.Round(outline.Max.V, 4) }
+                };
+
+                // Level info for floor plans
+                if (view is ViewPlan viewPlan)
+                {
+                    var level = viewPlan.GenLevel;
+                    if (level != null)
+                    {
+                        result["level"] = new
+                        {
+                            name = level.Name,
+                            elevation = Math.Round(level.Elevation, 4)
+                        };
+                    }
+                }
+
+                return JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    viewInfo = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
             }
         }
 
