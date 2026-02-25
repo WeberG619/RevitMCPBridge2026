@@ -9,6 +9,7 @@ using Autodesk.Revit.UI.Selection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using RevitMCPBridge.Helpers;
 
 namespace RevitMCPBridge
 {
@@ -71,7 +72,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error getting selection");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -184,7 +185,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error waiting for selection");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -244,7 +245,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error selecting elements");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -323,7 +324,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error highlighting elements");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -357,7 +358,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error clearing selection");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -422,7 +423,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error picking point");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -490,7 +491,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error picking edge");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -552,7 +553,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error picking face");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -652,7 +653,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error zooming to elements");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 

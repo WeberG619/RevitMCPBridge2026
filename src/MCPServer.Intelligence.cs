@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using RevitMCPBridge.Helpers;
 
 namespace RevitMCPBridge
 {
@@ -74,11 +75,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error getting pre-execution intelligence");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -273,11 +270,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error executing workflow");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 

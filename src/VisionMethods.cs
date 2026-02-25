@@ -10,6 +10,7 @@ using Autodesk.Revit.UI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using RevitMCPBridge.Helpers;
 
 namespace RevitMCPBridge
 {
@@ -80,7 +81,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error exporting view image");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -150,7 +151,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error getting view extents");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -210,7 +211,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error setting element visibility");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -277,7 +278,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error setting category visibility");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -341,7 +342,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error getting visible elements");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -419,7 +420,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error setting graphics override");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -473,7 +474,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error getting view range");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -538,7 +539,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error setting view range");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -606,7 +607,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error isolating elements");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -676,7 +677,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error setting section box");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -892,7 +893,7 @@ namespace RevitMCPBridge
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -979,7 +980,7 @@ namespace RevitMCPBridge
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 

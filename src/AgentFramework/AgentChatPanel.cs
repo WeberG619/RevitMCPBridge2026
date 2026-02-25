@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Autodesk.Revit.UI;
 using RevitMCPBridge; // For VerificationResult
+using RevitMCPBridge.Helpers;
 
 namespace RevitMCPBridge2026.AgentFramework
 {
@@ -932,7 +933,7 @@ namespace RevitMCPBridge2026.AgentFramework
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1311,11 +1312,7 @@ namespace RevitMCPBridge2026.AgentFramework
                 }
                 catch (Exception ex)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = $"File operation failed: {ex.Message}"
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -1351,7 +1348,7 @@ namespace RevitMCPBridge2026.AgentFramework
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1391,7 +1388,7 @@ namespace RevitMCPBridge2026.AgentFramework
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1441,7 +1438,7 @@ namespace RevitMCPBridge2026.AgentFramework
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1513,7 +1510,7 @@ namespace RevitMCPBridge2026.AgentFramework
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1573,7 +1570,7 @@ namespace RevitMCPBridge2026.AgentFramework
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1619,7 +1616,7 @@ namespace RevitMCPBridge2026.AgentFramework
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1675,7 +1672,7 @@ namespace RevitMCPBridge2026.AgentFramework
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1713,7 +1710,7 @@ namespace RevitMCPBridge2026.AgentFramework
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1764,11 +1761,7 @@ namespace RevitMCPBridge2026.AgentFramework
                 }
                 catch (Exception ex)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = $"Memory operation failed: {ex.Message}"
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }

@@ -6,6 +6,7 @@ using Autodesk.Revit.UI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RevitMCPBridge;
+using RevitMCPBridge.Helpers;
 
 namespace RevitMCPBridge2026
 {
@@ -324,12 +325,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -413,12 +409,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -672,12 +663,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -735,12 +721,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -826,12 +807,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -974,12 +950,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1287,12 +1258,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1443,12 +1409,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1510,12 +1471,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1605,12 +1561,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1802,12 +1753,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1955,12 +1901,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -2069,12 +2010,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -2180,12 +2116,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -2290,12 +2221,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -2371,12 +2297,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -2497,12 +2418,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -2575,12 +2491,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -2800,12 +2711,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -2907,12 +2813,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -3187,12 +3088,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -3264,12 +3160,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -3348,12 +3239,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -3551,12 +3437,7 @@ namespace RevitMCPBridge2026
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 

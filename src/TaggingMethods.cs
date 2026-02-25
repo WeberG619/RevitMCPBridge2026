@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using RevitMCPBridge2026;
+using RevitMCPBridge.Helpers;
 
 namespace RevitMCPBridge
 {
@@ -88,11 +89,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error tagging door");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -163,11 +160,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error tagging room");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -248,11 +241,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error tagging wall");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -358,11 +347,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error tagging element");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -449,11 +434,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error batch tagging doors");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -535,11 +516,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error batch tagging rooms");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -610,11 +587,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error getting tags in view");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -663,11 +636,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error deleting tag");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -715,7 +684,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error getting tag info");
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
     }

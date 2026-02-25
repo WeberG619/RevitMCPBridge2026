@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using RevitMCPBridge2026;
+using RevitMCPBridge.Helpers;
 
 namespace RevitMCPBridge
 {
@@ -132,11 +133,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error creating linear dimension");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -203,11 +200,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error creating aligned dimension");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -647,11 +640,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error batch dimensioning walls");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -842,11 +831,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error batch dimensioning doors");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -913,11 +898,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error getting dimensions in view");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -966,11 +947,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error deleting dimension");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1323,12 +1300,7 @@ namespace RevitMCPBridge
                 Log.Error($"Error creating custom dimension string: {ex.Message}");
                 Log.Error($"Stack trace: {ex.StackTrace}");
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1538,12 +1510,7 @@ namespace RevitMCPBridge
                 Log.Error($"Error in BatchDimensionGrids: {ex.Message}");
                 Log.Error($"Stack trace: {ex.StackTrace}");
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1667,7 +1634,7 @@ namespace RevitMCPBridge
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1783,7 +1750,7 @@ namespace RevitMCPBridge
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -1915,7 +1882,7 @@ namespace RevitMCPBridge
             }
             catch (Exception ex)
             {
-                return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -2031,11 +1998,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error getting dimension types");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -2228,11 +2191,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error getting dimension segments");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -2510,12 +2469,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error creating custom dimension string");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -2714,11 +2668,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error modifying dimension text");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -2851,11 +2801,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error finding dimensions by element");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -2938,11 +2884,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error setting dimension type");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -3115,11 +3057,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error adding segment to dimension");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -3270,11 +3208,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error removing segment from dimension");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 

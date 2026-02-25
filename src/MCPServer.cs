@@ -12,6 +12,7 @@ using Serilog;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using RevitMCPBridge.Helpers;
 
 namespace RevitMCPBridge
 {
@@ -4953,12 +4954,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error in callMCPMethod passthrough");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = $"callMCPMethod failed: {ex.Message}",
-                    stackTrace = ex.StackTrace
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -5115,11 +5111,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error in GetProjectInfo");
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -5159,11 +5151,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error in GetOpenDocuments");
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -5250,11 +5238,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error in SetActiveDocument");
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -5336,12 +5320,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error in OpenProject");
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message,
-                        stackTrace = ex.StackTrace
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -5446,12 +5425,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error in CloseProject");
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message,
-                        stackTrace = ex.StackTrace
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -5533,12 +5507,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error in SaveProject");
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message,
-                        stackTrace = ex.StackTrace
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -5618,12 +5587,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error in SaveProjectAs");
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message,
-                        stackTrace = ex.StackTrace
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -5671,11 +5635,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error setting dialog handler");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -5709,11 +5669,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error getting dialog history");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -5737,11 +5693,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error clearing dialog history");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return ResponseBuilder.FromException(ex).Build();
             }
         }
 
@@ -5857,11 +5809,7 @@ namespace RevitMCPBridge
                 }
                 catch (Exception ex)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -5951,11 +5899,7 @@ namespace RevitMCPBridge
                 }
                 catch (Exception ex)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -6009,11 +5953,7 @@ namespace RevitMCPBridge
                 }
                 catch (Exception ex)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -6114,11 +6054,7 @@ namespace RevitMCPBridge
                 }
                 catch (Exception ex)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -6217,11 +6153,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error exporting view image");
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -6272,11 +6204,7 @@ namespace RevitMCPBridge
                 }
                 catch (Exception ex)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -6352,11 +6280,7 @@ namespace RevitMCPBridge
                 }
                 catch (Exception ex)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -6456,11 +6380,7 @@ namespace RevitMCPBridge
                 }
                 catch (Exception ex)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -6550,11 +6470,7 @@ namespace RevitMCPBridge
                 }
                 catch (Exception ex)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -6684,11 +6600,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error getting text elements");
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -6829,11 +6741,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error creating text note");
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -6905,11 +6813,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error modifying text note");
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -6980,11 +6884,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error deleting text note");
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -7084,11 +6984,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error changing text note type");
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = ex.Message
-                    });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -7178,7 +7074,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error finding text notes by content");
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -7267,7 +7163,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error in batch update text notes");
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -7365,7 +7261,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error in find and replace text");
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -7435,7 +7331,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error getting text statistics");
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -7481,7 +7377,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error getting legends");
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -7513,7 +7409,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error creating legend");
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -7561,7 +7457,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error getting schedules");
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -7635,7 +7531,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error getting schedule data");
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -7684,7 +7580,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error updating schedule cell");
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -7730,7 +7626,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error getting all sheets");
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -7794,7 +7690,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error getting unplaced views");
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -7835,7 +7731,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error getting empty sheets");
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -7909,7 +7805,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error validating text sizes");
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -7952,7 +7848,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error getting project warnings");
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }
@@ -8024,7 +7920,7 @@ namespace RevitMCPBridge
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error running QC checks");
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             });
         }

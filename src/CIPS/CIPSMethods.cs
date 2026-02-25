@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using RevitMCPBridge.CIPS.Models;
 using RevitMCPBridge.CIPS.Services;
 using Serilog;
+using RevitMCPBridge.Helpers;
 
 namespace RevitMCPBridge.CIPS
 {
@@ -73,7 +74,7 @@ namespace RevitMCPBridge.CIPS
                 }
                 catch (Exception ex)
                 {
-                    return JsonConvert.SerializeObject(new { success = false, error = ex.Message });
+                    return ResponseBuilder.FromException(ex).Build();
                 }
             };
 
