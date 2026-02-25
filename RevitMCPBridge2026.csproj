@@ -33,7 +33,8 @@
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!-- Local Revit references (used when Revit is installed) -->
+  <ItemGroup Condition="Exists('C:\Program Files\Autodesk\Revit 2026\RevitAPI.dll')">
     <Reference Include="RevitAPI">
       <HintPath>C:\Program Files\Autodesk\Revit 2026\RevitAPI.dll</HintPath>
       <Private>False</Private>
@@ -46,6 +47,11 @@
       <HintPath>C:\Program Files\Autodesk\Revit 2026\AdWindows.dll</HintPath>
       <Private>False</Private>
     </Reference>
+  </ItemGroup>
+
+  <!-- NuGet Revit API stubs (used in CI where Revit is not installed) -->
+  <ItemGroup Condition="!Exists('C:\Program Files\Autodesk\Revit 2026\RevitAPI.dll')">
+    <PackageReference Include="Revit_All_Main_Versions_API_x64" Version="2026.0.0" />
   </ItemGroup>
 
   <ItemGroup>
