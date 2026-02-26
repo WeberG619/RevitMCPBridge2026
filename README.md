@@ -10,13 +10,19 @@
     <a href="#autonomy-levels">Autonomy Levels</a>
   </p>
   <p align="center">
+    <a href="https://github.com/WeberG619/RevitMCPBridge2026/stargazers"><img src="https://img.shields.io/github/stars/WeberG619/RevitMCPBridge2026?style=social" alt="Stars"></a>
     <img src="https://img.shields.io/badge/endpoints-705%2B-brightgreen" alt="Endpoints">
     <img src="https://img.shields.io/badge/C%23-.NET%204.8-blue" alt=".NET">
     <img src="https://img.shields.io/badge/Revit-2025%20%7C%202026-orange" alt="Revit">
     <img src="https://img.shields.io/badge/knowledge-113%20files-purple" alt="Knowledge">
-    <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
+    <img src="https://img.shields.io/github/license/WeberG619/RevitMCPBridge2026" alt="License">
+    <a href="https://github.com/WeberG619/RevitMCPBridge2026/releases"><img src="https://img.shields.io/github/v/release/WeberG619/RevitMCPBridge2026" alt="Release"></a>
   </p>
 </p>
+
+---
+
+> **Coming from [revit-mcp](https://github.com/SamuraiBuddha/revit-mcp)?** That project was archived on Feb 26, 2026. RevitMCPBridge2026 is the actively maintained alternative with 705+ endpoints, named pipe communication (no crashes), and a 113-file architectural knowledge base. See [Quick Start](#quick-start) to get running in minutes.
 
 ---
 
@@ -27,6 +33,17 @@ RevitMCPBridge is a Revit add-in that exposes the entire Revit API through the M
 **For AEC professionals:** Your AI assistant can now open your Revit model and actually *do things* — create walls, place doors, generate sheets, check code compliance, produce construction documents.
 
 **For developers:** 705+ typed endpoints with parameter validation, transaction management, and structured error responses. Connect any language that can write to a named pipe.
+
+## Why Named Pipes Instead of HTTP?
+
+Revit is single-threaded. Every API call must execute on the main UI thread.
+
+| Approach | What Happens Under Load |
+|---|---|
+| **HTTP server** | Competes for the main thread. Multiple concurrent AI requests cause timeouts, dropped connections, and crashes. |
+| **Named pipes** | Uses Revit's own `ExternalEvent` queue. Requests are serialized through the same mechanism Revit uses internally. Zero thread contention, zero crashes. |
+
+Every other Revit MCP implementation uses HTTP. They work for simple demos but break under real workloads. Named pipes are why this bridge can handle 705+ endpoints reliably.
 
 ## Before and After
 
@@ -325,6 +342,18 @@ python tests/smoke_test.py
 | Operation failed | Check that a document is open. Verify element IDs exist. |
 | Timeout | Close any blocking Revit dialogs. Click in the drawing area. |
 
+## Comparison with Other Revit MCP Implementations
+
+| Feature | RevitMCPBridge2026 | revit-mcp (archived) | revit-mcp-commandset (archived) |
+|---|---|---|---|
+| **Status** | Active | Archived Feb 2026 | Archived Feb 2025 |
+| **Endpoints** | 705+ | ~30 | ~50 |
+| **Transport** | Named pipes | HTTP | HTTP |
+| **Revit versions** | 2025, 2026 | 2025 | 2025 |
+| **Knowledge base** | 113 files | None | None |
+| **Autonomy levels** | 5 (basic → full) | 1 | 1 |
+| **Transaction safety** | Built-in | Manual | Manual |
+
 ## License
 
 MIT License. See [LICENSE](LICENSE).
@@ -334,6 +363,10 @@ MIT License. See [LICENSE](LICENSE).
 **Weber Gouin** — [BIM Ops Studio](https://bimopsstudio.com)
 
 The first open-source bridge connecting AI to Autodesk Revit through the Model Context Protocol.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. Issues and PRs welcome.
 
 ---
 
