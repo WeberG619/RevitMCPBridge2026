@@ -33,6 +33,7 @@ namespace RevitMCPBridge
         /// - REVIT_CONSTRAINT: Revit rule violation (transaction, element constraints)
         /// - TOOL_BUG: Exception or edge case in existing tool
         /// </summary>
+        [MCPMethod("classifyFailure", Category = "Capability", Description = "Classify a task failure into one of five categories")]
         public static string ClassifyFailure(UIApplication uiApp, JObject parameters)
         {
             try
@@ -267,6 +268,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Proposes a new tool specification based on a capability gap.
         /// </summary>
+        [MCPMethod("proposeToolSpec", Category = "Capability", Description = "Propose a new tool specification based on a capability gap")]
         public static string ProposeToolSpec(UIApplication uiApp, JObject parameters)
         {
             try
@@ -344,6 +346,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Approves a proposed tool specification, moving it to the approved folder.
         /// </summary>
+        [MCPMethod("approveToolSpec", Category = "Capability", Description = "Approve a proposed tool specification, moving it to the approved folder")]
         public static string ApproveToolSpec(UIApplication uiApp, JObject parameters)
         {
             try
@@ -405,6 +408,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Lists all tool specifications by status.
         /// </summary>
+        [MCPMethod("listToolSpecs", Category = "Capability", Description = "List all tool specifications by status")]
         public static string ListToolSpecs(UIApplication uiApp, JObject parameters)
         {
             try
@@ -465,6 +469,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Gets a specific tool specification by name.
         /// </summary>
+        [MCPMethod("getToolSpec", Category = "Capability", Description = "Get a specific tool specification by name")]
         public static string GetToolSpec(UIApplication uiApp, JObject parameters)
         {
             try
@@ -517,6 +522,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Gets the method registry with tier metadata.
         /// </summary>
+        [MCPMethod("getMethodRegistry", Category = "Capability", Description = "Get the method registry with tier metadata")]
         public static string GetMethodRegistry(UIApplication uiApp, JObject parameters)
         {
             try
@@ -576,6 +582,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Rebuilds the method registry from source files.
         /// </summary>
+        [MCPMethod("rebuildMethodRegistry", Category = "Capability", Description = "Rebuild the method registry from source files")]
         public static string RebuildMethodRegistry(UIApplication uiApp, JObject parameters)
         {
             try
@@ -612,6 +619,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Creates a test artifact for a method.
         /// </summary>
+        [MCPMethod("createTestArtifact", Category = "Capability", Description = "Create a test artifact for a method")]
         public static string CreateTestArtifact(UIApplication uiApp, JObject parameters)
         {
             try
@@ -673,6 +681,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Runs a test from a test artifact - actually executes the method and validates results.
         /// </summary>
+        [MCPMethod("runTest", Category = "Capability", Description = "Run a test from a test artifact and validate results")]
         public static string RunTest(UIApplication uiApp, JObject parameters)
         {
             try
@@ -930,6 +939,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Lists test artifacts for a method or all methods.
         /// </summary>
+        [MCPMethod("listTests", Category = "Capability", Description = "List test artifacts for a method or all methods")]
         public static string ListTests(UIApplication uiApp, JObject parameters)
         {
             try
@@ -999,6 +1009,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Gets the overall status of the capability system.
         /// </summary>
+        [MCPMethod("getCapabilityStatus", Category = "Capability", Description = "Get the overall status of the capability system")]
         public static string GetCapabilityStatus(UIApplication uiApp, JObject parameters)
         {
             try

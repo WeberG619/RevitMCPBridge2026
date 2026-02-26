@@ -19,6 +19,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a new level at specified elevation
         /// </summary>
+        [MCPMethod("createLevel", Category = "Level", Description = "Create a new level at a specified elevation")]
         public static string CreateLevel(UIApplication uiApp, JObject parameters)
         {
             try
@@ -62,6 +63,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all levels in the model
         /// </summary>
+        [MCPMethod("getLevels", Category = "Level", Description = "Get all levels in the model ordered by elevation")]
         public static string GetLevels(UIApplication uiApp, JObject parameters)
         {
             try
@@ -96,6 +98,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get a specific level by name or ID
         /// </summary>
+        [MCPMethod("getLevel", Category = "Level", Description = "Get a specific level by name or element ID")]
         public static string GetLevel(UIApplication uiApp, JObject parameters)
         {
             try
@@ -141,6 +144,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Rename a level
         /// </summary>
+        [MCPMethod("renameLevel", Category = "Level", Description = "Rename a level to a new name")]
         public static string RenameLevel(UIApplication uiApp, JObject parameters)
         {
             try
@@ -188,6 +192,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set level elevation
         /// </summary>
+        [MCPMethod("setLevelElevation", Category = "Level", Description = "Set the elevation of a level")]
         public static string SetLevelElevation(UIApplication uiApp, JObject parameters)
         {
             try
@@ -236,6 +241,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a level
         /// </summary>
+        [MCPMethod("deleteLevel", Category = "Level", Description = "Delete a level from the model by element ID")]
         public static string DeleteLevel(UIApplication uiApp, JObject parameters)
         {
             try
@@ -271,6 +277,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create multiple levels at regular intervals
         /// </summary>
+        [MCPMethod("createLevelArray", Category = "Level", Description = "Create multiple levels at regular floor-height intervals")]
         public static string CreateLevelArray(UIApplication uiApp, JObject parameters)
         {
             try
@@ -325,6 +332,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get level by elevation (finds closest level)
         /// </summary>
+        [MCPMethod("getLevelByElevation", Category = "Level", Description = "Get the level closest to a specified elevation, with optional tolerance check")]
         public static string GetLevelByElevation(UIApplication uiApp, JObject parameters)
         {
             try
@@ -375,6 +383,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get elements on a specific level
         /// </summary>
+        [MCPMethod("getElementsOnLevel", Category = "Level", Description = "Get all elements associated with a specific level, optionally filtered by category")]
         public static string GetElementsOnLevel(UIApplication uiApp, JObject parameters)
         {
             try
@@ -444,6 +453,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Copy elements from one level to another
         /// </summary>
+        [MCPMethod("copyElementsToLevel", Category = "Level", Description = "Copy elements from a source level to a target level with elevation offset")]
         public static string CopyElementsToLevel(UIApplication uiApp, JObject parameters)
         {
             try

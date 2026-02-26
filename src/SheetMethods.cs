@@ -194,6 +194,7 @@ namespace RevitMCPBridge
         /// MCP method to switch to a specific view or sheet.
         /// This is useful for showing the user what's being worked on.
         /// </summary>
+        [MCPMethod("switchToView", "switchToSheet", Category = "Sheet", Description = "Switch the active view to a specific view or sheet")]
         public static string SwitchToViewMCP(UIApplication uiApp, JObject parameters)
         {
             try
@@ -232,6 +233,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a new sheet
         /// </summary>
+        [MCPMethod("createSheet", Category = "Sheet", Description = "Create a new sheet in the project")]
         public static string CreateSheet(UIApplication uiApp, JObject parameters)
         {
             try
@@ -524,6 +526,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// MCP-accessible method to get printable area of a sheet
         /// </summary>
+        [MCPMethod("getSheetPrintableArea", Category = "Sheet", Description = "Get the printable area of a sheet")]
         public static string GetSheetPrintableAreaMCP(UIApplication uiApp, JObject parameters)
         {
             try
@@ -575,6 +578,7 @@ namespace RevitMCPBridge
         /// Place a view on a sheet
         /// Accepts either "location" array [x,y] OR separate "x"/"y" params
         /// </summary>
+        [MCPMethod("placeViewOnSheet", Category = "Sheet", Description = "Place a view onto a sheet at a specified location")]
         public static string PlaceViewOnSheet(UIApplication uiApp, JObject parameters)
         {
             try
@@ -860,6 +864,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all sheets in the project
         /// </summary>
+        [MCPMethod("getAllSheets", "getSheets", Category = "Sheet", Description = "Get all sheets in the project")]
         public static string GetAllSheets(UIApplication uiApp, JObject parameters)
         {
             try
@@ -893,6 +898,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get viewports on a sheet
         /// </summary>
+        [MCPMethod("getViewportsOnSheet", Category = "Sheet", Description = "Get all viewports placed on a sheet")]
         public static string GetViewportsOnSheet(UIApplication uiApp, JObject parameters)
         {
             try
@@ -949,6 +955,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Modify sheet properties
         /// </summary>
+        [MCPMethod("modifySheetProperties", Category = "Sheet", Description = "Modify properties of an existing sheet")]
         public static string ModifySheetProperties(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1035,6 +1042,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Move viewport on sheet - tries multiple approaches for reliable positioning
         /// </summary>
+        [MCPMethod("moveViewport", Category = "Sheet", Description = "Move a viewport to a new position on a sheet")]
         public static string MoveViewport(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1168,6 +1176,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a sheet
         /// </summary>
+        [MCPMethod("deleteSheet", Category = "Sheet", Description = "Delete a sheet from the project")]
         public static string DeleteSheet(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1204,6 +1213,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Remove viewport from sheet
         /// </summary>
+        [MCPMethod("removeViewport", Category = "Sheet", Description = "Remove a viewport from a sheet")]
         public static string RemoveViewport(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1240,6 +1250,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all titleblock types
         /// </summary>
+        [MCPMethod("getTitleblockTypes", Category = "Sheet", Description = "Get all titleblock types available in the project")]
         public static string GetTitleblockTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1275,6 +1286,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Duplicate a sheet
         /// </summary>
+        [MCPMethod("duplicateSheet", Category = "Sheet", Description = "Duplicate an existing sheet")]
         public static string DuplicateSheet(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1375,6 +1387,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set viewport type
         /// </summary>
+        [MCPMethod("setViewportType", Category = "Sheet", Description = "Set the viewport type for a viewport on a sheet")]
         public static string SetViewportType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1422,6 +1435,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get viewport label offset (position of view title relative to viewport)
         /// </summary>
+        [MCPMethod("getViewportLabelOffset", Category = "Sheet", Description = "Get the label offset for a viewport on a sheet")]
         public static string GetViewportLabelOffset(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1470,6 +1484,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set viewport label offset (move view title position)
         /// </summary>
+        [MCPMethod("setViewportLabelOffset", Category = "Sheet", Description = "Set the label offset position for a viewport on a sheet")]
         public static string SetViewportLabelOffset(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1548,6 +1563,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Renumber sheets
         /// </summary>
+        [MCPMethod("renumberSheets", Category = "Sheet", Description = "Renumber sheets according to a new numbering scheme")]
         public static string RenumberSheets(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1606,6 +1622,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get title block dimensions and details
         /// </summary>
+        [MCPMethod("getTitleblockDimensions", Category = "Sheet", Description = "Get the dimensions and details of a title block")]
         public static string GetTitleblockDimensions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1662,6 +1679,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get viewport bounding boxes and details
         /// </summary>
+        [MCPMethod("getViewportBounds", Category = "Sheet", Description = "Get bounding box and position details for viewports on a sheet")]
         public static string GetViewportBounds(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1722,6 +1740,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Analyze sheet layout for overlaps and boundary issues
         /// </summary>
+        [MCPMethod("analyzeSheetLayout", Category = "Sheet", Description = "Analyze a sheet layout for viewport overlaps and boundary issues")]
         public static string AnalyzeSheetLayout(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1851,6 +1870,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Calculate optimal view scale to fit on sheet
         /// </summary>
+        [MCPMethod("calculateOptimalScale", Category = "Sheet", Description = "Calculate the optimal scale for a view to fit on a sheet")]
         public static string CalculateOptimalScale(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1911,6 +1931,7 @@ namespace RevitMCPBridge
         /// List all available title blocks in the project
         /// Returns family name, type name, dimensions, and ID for each
         /// </summary>
+        [MCPMethod("listTitleBlocks", Category = "Sheet", Description = "List all available title block families and types in the project")]
         public static string ListTitleBlocks(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1969,6 +1990,7 @@ namespace RevitMCPBridge
         /// This is what createSheet will auto-detect if no titleblockId is provided.
         /// Call this to see what titleblock will be used for new sheets.
         /// </summary>
+        [MCPMethod("getPreferredTitleblock", Category = "Sheet", Description = "Get the most commonly used titleblock in the project")]
         public static string GetPreferredTitleblock(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2078,6 +2100,7 @@ namespace RevitMCPBridge
         ///
         /// Where: T=Top, M=Middle, B=Bottom, L=Left, C=Center, R=Right
         /// </summary>
+        [MCPMethod("getSheetCoordinateSystem", Category = "Sheet", Description = "Get the coordinate system and zone grid for a sheet")]
         public static string GetSheetCoordinateSystem(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2327,6 +2350,7 @@ namespace RevitMCPBridge
         /// The method calculates the view's size at scale, then determines if it fits
         /// in the target area before placing.
         /// </summary>
+        [MCPMethod("placeViewOnSheetSmart", Category = "Sheet", Description = "Place a view on a sheet with smart collision avoidance")]
         public static string PlaceViewOnSheetSmart(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2714,6 +2738,7 @@ namespace RevitMCPBridge
         /// - margin: Space between viewports in feet (optional, default 0.08)
         /// - startPosition: "top-left" | "bottom-left" (optional, default "top-left")
         /// </summary>
+        [MCPMethod("placeMultipleViewsOnSheet", Category = "Sheet", Description = "Place multiple views on a sheet with automatic layout")]
         public static string PlaceMultipleViewsOnSheet(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3383,6 +3408,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Import an image (PNG, JPG, BMP, PDF) onto a sheet or view
         /// </summary>
+        [MCPMethod("importImage", Category = "Sheet", Description = "Import an image onto a sheet or view")]
         public static string ImportImage(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3485,6 +3511,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Move/resize an existing image instance on a sheet
         /// </summary>
+        [MCPMethod("moveImage", Category = "Sheet", Description = "Move or resize an image on a sheet")]
         public static string MoveImage(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3567,6 +3594,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete an image from a sheet
         /// </summary>
+        [MCPMethod("deleteImage", Category = "Sheet", Description = "Delete an image from a sheet or view")]
         public static string DeleteImage(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3608,6 +3636,7 @@ namespace RevitMCPBridge
         /// Copy elements from one sheet/view to another at the same position
         /// This is useful for replicating layouts across multiple sheets
         /// </summary>
+        [MCPMethod("copyElementsToSheet", Category = "Sheet", Description = "Copy elements from one sheet to another at the same position")]
         public static string CopyElementsToSheet(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3687,6 +3716,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set the text content of a text note
         /// </summary>
+        [MCPMethod("setTextNoteText", Category = "Sheet", Description = "Set the text content of a text note element")]
         public static string SetTextNoteText(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3750,6 +3780,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Export sheets to PDF files
         /// </summary>
+        [MCPMethod("exportSheetsToPDF", Category = "Sheet", Description = "Export sheets to PDF files")]
         public static string ExportSheetsToPDF(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3971,6 +4002,7 @@ namespace RevitMCPBridge
         /// Returns: text styles, titleblocks, view organization, legends, schedules, and more.
         /// Use this at the start of any project to understand its established standards.
         /// </summary>
+        [MCPMethod("analyzeProjectStandards", Category = "Sheet", Description = "Analyze project standards including text styles, titleblocks, and view organization")]
         public static string AnalyzeProjectStandards(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4220,6 +4252,7 @@ namespace RevitMCPBridge
         /// - sheetNumber (required): The sheet number (e.g., "A15.0")
         /// - sheetName (required): The sheet name (e.g., "FLOOR PLAN")
         /// </summary>
+        [MCPMethod("createSheetAuto", Category = "Sheet", Description = "Create a sheet using the project's existing titleblock automatically")]
         public static string CreateSheetAuto(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4389,6 +4422,7 @@ namespace RevitMCPBridge
         /// - sheetType (optional): Sheet type name (e.g., "DETAILS", "FLOOR PLAN")
         /// - sheetName (optional): Custom sheet name override
         /// </summary>
+        [MCPMethod("createSheetsIntelligent", Category = "Sheet", Description = "Intelligently create sheets using project standards and numbering patterns")]
         public static string CreateSheetsIntelligent(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4634,6 +4668,7 @@ namespace RevitMCPBridge
         /// - detailsPerSheet: Number of details to place on each sheet
         /// - layout: Layout style for details (auto, grid, column, row)
         /// </summary>
+        [MCPMethod("batchCreateSheetsWithDetails", Category = "Sheet", Description = "Batch create sheets with pre-placed detail views")]
         public static string BatchCreateSheetsWithDetails(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4741,6 +4776,7 @@ namespace RevitMCPBridge
         /// - sheetId (required): The sheet to modify
         /// - titleBlockId (required): The new titleblock type ID to use
         /// </summary>
+        [MCPMethod("changeTitleBlock", Category = "Sheet", Description = "Change the titleblock on an existing sheet")]
         public static string ChangeTitleBlock(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4865,6 +4901,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Auto-populate sheet titleblock fields from project information.
         /// </summary>
+        [MCPMethod("autoPopulateSheetFields", Category = "Sheet", Description = "Auto-populate titleblock fields from project information")]
         public static string AutoPopulateSheetFields(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4977,6 +5014,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Batch print/export sheets to PDF or printer.
         /// </summary>
+        [MCPMethod("batchPrintSheets", Category = "Sheet", Description = "Batch print or export sheets to PDF")]
         public static string BatchPrintSheets(UIApplication uiApp, JObject parameters)
         {
             try
@@ -5108,6 +5146,7 @@ namespace RevitMCPBridge
         /// - alignToGrid (optional): Snap to grid lines if present (default: false)
         /// </param>
         /// <returns>JSON response with arrangement results</returns>
+        [MCPMethod("generateViewportLayout", Category = "Sheet", Description = "Generate an automatic viewport layout arrangement on a sheet")]
         public static string GenerateViewportLayout(UIApplication uiApp, JObject parameters)
         {
             try
@@ -5345,6 +5384,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get information about title blocks on sheets
         /// </summary>
+        [MCPMethod("getTitleBlockInfo", Category = "Sheet", Description = "Get information about title blocks on sheets")]
         public static string GetTitleBlockInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -5446,6 +5486,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Update parameters on a title block
         /// </summary>
+        [MCPMethod("updateTitleBlockParameters", Category = "Sheet", Description = "Update parameters on a title block")]
         public static string UpdateTitleBlockParameters(UIApplication uiApp, JObject parameters)
         {
             try
@@ -5532,6 +5573,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Batch update title blocks across multiple sheets
         /// </summary>
+        [MCPMethod("batchUpdateTitleBlocks", Category = "Sheet", Description = "Batch update title block parameters across multiple sheets")]
         public static string BatchUpdateTitleBlocks(UIApplication uiApp, JObject parameters)
         {
             try
@@ -5657,6 +5699,7 @@ namespace RevitMCPBridge
         /// Places a view on a sheet with enhanced handling for views copied between documents.
         /// This method forces view initialization that may be needed for copied DraftingViews.
         /// </summary>
+        [MCPMethod("placeViewOnSheetForced", Category = "Sheet", Description = "Place a view on a sheet with forced initialization for copied views")]
         public static string PlaceViewOnSheetForced(UIApplication uiApp, JObject parameters)
         {
             try

@@ -25,6 +25,7 @@ namespace RevitMCPBridge
         /// - levelId: ID of the level to place the floor on
         /// - structural: (optional) whether the floor is structural (default false)
         /// </summary>
+        [MCPMethod("createFloor", Category = "FloorCeilingRoof", Description = "Create a floor from boundary points on a level")]
         public static string CreateFloor(UIApplication uiApp, JObject parameters)
         {
             try
@@ -154,6 +155,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all available floor types
         /// </summary>
+        [MCPMethod("getFloorTypes", Category = "FloorCeilingRoof", Description = "Get all available floor types in the model")]
         public static string GetFloorTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -257,6 +259,7 @@ namespace RevitMCPBridge
         /// - levelId: ID of the level to place the ceiling on
         /// - heightOffset: (optional) height offset from level (default 8 feet)
         /// </summary>
+        [MCPMethod("createCeiling", Category = "FloorCeilingRoof", Description = "Create a ceiling from boundary points on a level")]
         public static string CreateCeiling(UIApplication uiApp, JObject parameters)
         {
             try
@@ -383,6 +386,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all available ceiling types
         /// </summary>
+        [MCPMethod("getCeilingTypes", Category = "FloorCeilingRoof", Description = "Get all available ceiling types in the model")]
         public static string GetCeilingTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -426,6 +430,7 @@ namespace RevitMCPBridge
         /// - slope: (optional) default slope in degrees (default 30)
         /// - overhang: (optional) roof overhang in feet (default 1)
         /// </summary>
+        [MCPMethod("createRoofByFootprint", "createFootprintRoof", Category = "FloorCeilingRoof", Description = "Create a roof by footprint from boundary points")]
         public static string CreateRoofByFootprint(UIApplication uiApp, JObject parameters)
         {
             try
@@ -569,6 +574,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all available roof types
         /// </summary>
+        [MCPMethod("getRoofTypes", Category = "FloorCeilingRoof", Description = "Get all available roof types in the model")]
         public static string GetRoofTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1038,6 +1044,7 @@ namespace RevitMCPBridge
         /// Parameters: roomId OR boundaryPoints, ceilingTypeId (optional), heightOffset,
         ///             gridRotation (degrees, optional), gridSpacing (optional, defaults to 2' for 2x2 or 2x4)
         /// </summary>
+        [MCPMethod("createCeilingGrid", Category = "FloorCeilingRoof", Description = "Create a ceiling with ACT tile grid layout")]
         public static string CreateCeilingGrid(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1176,6 +1183,7 @@ namespace RevitMCPBridge
         /// Place light fixtures in ceiling at specified points or in grid pattern
         /// Parameters: ceilingId, fixtureTypeId (optional), points: [[x,y], ...] OR gridSpacing (for auto layout)
         /// </summary>
+        [MCPMethod("placeLightFixture", Category = "FloorCeilingRoof", Description = "Place light fixtures in ceiling at specified points or in a grid pattern")]
         public static string PlaceLightFixture(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1318,6 +1326,7 @@ namespace RevitMCPBridge
         /// Tag ceiling heights in a view
         /// Parameters: viewId, ceilingIds (optional - if not provided, tags all ceilings in view)
         /// </summary>
+        [MCPMethod("tagCeilingHeight", Category = "FloorCeilingRoof", Description = "Tag ceiling heights in a view")]
         public static string TagCeilingHeight(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1432,6 +1441,7 @@ namespace RevitMCPBridge
         /// Parameters: levelId, roofTypeId (optional), profilePoints: [[x,z], ...], extrusionLength,
         ///             extrusionStart: [x,y] (optional)
         /// </summary>
+        [MCPMethod("createRoofByExtrusion", Category = "FloorCeilingRoof", Description = "Create a roof by extrusion for shed or barrel roof styles")]
         public static string CreateRoofByExtrusion(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1528,6 +1538,7 @@ namespace RevitMCPBridge
         /// Parameters: roofId, tailPoint: [x,y], headPoint: [x,y], slopeValue (rise/run, e.g., 0.25 for 1/4:12)
         /// Note: This sets the slope on the edge closest to the tail point
         /// </summary>
+        [MCPMethod("addSlopeArrow", Category = "FloorCeilingRoof", Description = "Set slope direction on a footprint roof by modifying edge slopes")]
         public static string AddSlopeArrow(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1624,6 +1635,7 @@ namespace RevitMCPBridge
         /// Modify slope of existing roof edges
         /// Parameters: roofId, edgeIndex (optional - modifies all if not specified), slopeAngle (degrees) OR slope (rise/run)
         /// </summary>
+        [MCPMethod("modifyRoofSlope", Category = "FloorCeilingRoof", Description = "Modify slope of existing roof edges")]
         public static string ModifyRoofSlope(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1713,6 +1725,7 @@ namespace RevitMCPBridge
         /// Parameters: floorId, newBoundaryPoints: [[x,y,z], ...]
         /// Note: This deletes and recreates the floor with the new boundary
         /// </summary>
+        [MCPMethod("editFloorBoundary", Category = "FloorCeilingRoof", Description = "Edit an existing floor's boundary by replacing it with new points")]
         public static string EditFloorBoundary(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1813,6 +1826,7 @@ namespace RevitMCPBridge
         /// Edit an existing ceiling's boundary by replacing it with new points
         /// Parameters: ceilingId, newBoundaryPoints: [[x,y], ...]
         /// </summary>
+        [MCPMethod("editCeilingBoundary", Category = "FloorCeilingRoof", Description = "Edit an existing ceiling's boundary by replacing it with new points")]
         public static string EditCeilingBoundary(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1904,6 +1918,7 @@ namespace RevitMCPBridge
         /// Edit an existing roof's footprint boundary by replacing it with new points
         /// Parameters: roofId, newBoundaryPoints: [[x,y,z], ...], preserveSlopes (bool, optional)
         /// </summary>
+        [MCPMethod("editRoofBoundary", Category = "FloorCeilingRoof", Description = "Edit an existing roof's footprint boundary by replacing it with new points")]
         public static string EditRoofBoundary(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2022,6 +2037,7 @@ namespace RevitMCPBridge
         /// Parameters: floorId
         /// Returns: The floor's boundary as an array of points
         /// </summary>
+        [MCPMethod("getFloorBoundary", Category = "FloorCeilingRoof", Description = "Get the boundary points of an existing floor")]
         public static string GetFloorBoundary(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2104,6 +2120,7 @@ namespace RevitMCPBridge
         /// Get the boundary points of an existing ceiling
         /// Parameters: ceilingId
         /// </summary>
+        [MCPMethod("getCeilingBoundary", Category = "FloorCeilingRoof", Description = "Get the boundary points of an existing ceiling")]
         public static string GetCeilingBoundary(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2174,6 +2191,7 @@ namespace RevitMCPBridge
         /// Get the footprint boundary of an existing roof
         /// Parameters: roofId
         /// </summary>
+        [MCPMethod("getRoofBoundary", Category = "FloorCeilingRoof", Description = "Get the footprint boundary points of an existing roof")]
         public static string GetRoofBoundary(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2243,6 +2261,7 @@ namespace RevitMCPBridge
         /// - wallIds: array of wall element IDs to attach
         /// - roofId: ID of the roof to attach to
         /// </summary>
+        [MCPMethod("attachWallsToRoof", Category = "FloorCeilingRoof", Description = "Attach walls to a roof so walls are cut by the roof geometry")]
         public static string AttachWallsToRoof(UIApplication uiApp, JObject parameters)
         {
             try

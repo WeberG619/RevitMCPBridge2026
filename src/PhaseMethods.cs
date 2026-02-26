@@ -23,6 +23,7 @@ namespace RevitMCPBridge2026
         /// <param name="uiApp">The Revit UI Application</param>
         /// <param name="parameters">JSON parameters containing phaseName</param>
         /// <returns>JSON response with success status and phase ID</returns>
+        [MCPMethod("createPhase", Category = "Phase", Description = "Creates a new phase in the project")]
         public static string CreatePhase(UIApplication uiApp, JObject parameters)
         {
             try
@@ -67,6 +68,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all phases in the project
         /// </summary>
+        [MCPMethod("getAllPhases", Category = "Phase", Description = "Gets all phases in the project")]
         public static string GetAllPhases(UIApplication uiApp, JObject parameters)
         {
             try
@@ -108,6 +110,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets information about a specific phase
         /// </summary>
+        [MCPMethod("getPhaseInfo", Category = "Phase", Description = "Gets information about a specific phase")]
         public static string GetPhaseInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -186,6 +189,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Renames a phase
         /// </summary>
+        [MCPMethod("renamePhase", Category = "Phase", Description = "Renames an existing phase")]
         public static string RenamePhase(UIApplication uiApp, JObject parameters)
         {
             try
@@ -253,6 +257,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Deletes a phase
         /// </summary>
+        [MCPMethod("deletePhase", Category = "Phase", Description = "Deletes a phase from the project")]
         public static string DeletePhase(UIApplication uiApp, JObject parameters)
         {
             try
@@ -351,6 +356,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Reorders phases
         /// </summary>
+        [MCPMethod("reorderPhases", Category = "Phase", Description = "Reorders phases in the project")]
         public static string ReorderPhases(UIApplication uiApp, JObject parameters)
         {
             try
@@ -404,6 +410,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets the phase created for an element
         /// </summary>
+        [MCPMethod("setElementPhaseCreated", Category = "Phase", Description = "Sets the phase created property for an element")]
         public static string SetElementPhaseCreated(UIApplication uiApp, JObject parameters)
         {
             try
@@ -490,6 +497,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets the phase demolished for an element
         /// </summary>
+        [MCPMethod("setElementPhaseDemolished", Category = "Phase", Description = "Sets the phase demolished property for an element")]
         public static string SetElementPhaseDemolished(UIApplication uiApp, JObject parameters)
         {
             try
@@ -595,6 +603,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets phasing information for an element
         /// </summary>
+        [MCPMethod("getElementPhasing", Category = "Phase", Description = "Gets phasing information for an element")]
         public static string GetElementPhasing(UIApplication uiApp, JObject parameters)
         {
             try
@@ -683,6 +692,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all elements in a specific phase
         /// </summary>
+        [MCPMethod("getElementsInPhase", Category = "Phase", Description = "Gets all elements belonging to a specific phase")]
         public static string GetElementsInPhase(UIApplication uiApp, JObject parameters)
         {
             try
@@ -783,6 +793,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets phasing for multiple elements
         /// </summary>
+        [MCPMethod("setBulkElementPhasing", Category = "Phase", Description = "Sets phase created and demolished for multiple elements at once")]
         public static string SetBulkElementPhasing(UIApplication uiApp, JObject parameters)
         {
             try
@@ -916,6 +927,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a new phase filter
         /// </summary>
+        [MCPMethod("createPhaseFilter", Category = "Phase", Description = "Creates a new phase filter")]
         public static string CreatePhaseFilter(UIApplication uiApp, JObject parameters)
         {
             // **API LIMITATION**: Phase filters cannot be created programmatically in Revit 2026
@@ -933,6 +945,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all phase filters
         /// </summary>
+        [MCPMethod("getPhaseFilters", Category = "Phase", Description = "Gets all phase filters in the project")]
         public static string GetPhaseFilters(UIApplication uiApp, JObject parameters)
         {
             try
@@ -974,6 +987,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets phase filter settings
         /// </summary>
+        [MCPMethod("getPhaseFilterInfo", Category = "Phase", Description = "Gets settings for a specific phase filter")]
         public static string GetPhaseFilterInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1009,6 +1023,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies phase filter settings
         /// </summary>
+        [MCPMethod("modifyPhaseFilter", Category = "Phase", Description = "Modifies settings for a phase filter")]
         public static string ModifyPhaseFilter(UIApplication uiApp, JObject parameters)
         {
             // **API LIMITATION**: Phase filter settings cannot be modified programmatically in Revit 2026
@@ -1023,6 +1038,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Deletes a phase filter
         /// </summary>
+        [MCPMethod("deletePhaseFilter", Category = "Phase", Description = "Deletes a phase filter")]
         public static string DeletePhaseFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1077,6 +1093,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets the phase for a view
         /// </summary>
+        [MCPMethod("setViewPhase", Category = "Phase", Description = "Sets the phase assigned to a view")]
         public static string SetViewPhase(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1174,6 +1191,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets the phase filter for a view
         /// </summary>
+        [MCPMethod("setViewPhaseFilter", Category = "Phase", Description = "Sets the phase filter for a view")]
         public static string SetViewPhaseFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1258,6 +1276,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets phase settings for a view
         /// </summary>
+        [MCPMethod("getViewPhaseSettings", Category = "Phase", Description = "Gets phase and phase filter settings for a view")]
         public static string GetViewPhaseSettings(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1352,6 +1371,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Analyzes phasing status across the project
         /// </summary>
+        [MCPMethod("analyzePhasing", Category = "Phase", Description = "Analyzes phasing status across the project")]
         public static string AnalyzePhasing(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1435,6 +1455,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Finds phasing conflicts or issues
         /// </summary>
+        [MCPMethod("findPhasingConflicts", Category = "Phase", Description = "Finds phasing conflicts or inconsistencies in the project")]
         public static string FindPhasingConflicts(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1548,6 +1569,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets phase transition report
         /// </summary>
+        [MCPMethod("getPhaseTransitionReport", Category = "Phase", Description = "Gets a report of element transitions between phases")]
         public static string GetPhaseTransitionReport(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1679,6 +1701,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets the current phase for the project
         /// </summary>
+        [MCPMethod("getCurrentPhase", Category = "Phase", Description = "Gets the current active phase for the project")]
         public static string GetCurrentPhase(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1733,6 +1756,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Copies elements from one phase to another
         /// </summary>
+        [MCPMethod("copyElementsToPhase", Category = "Phase", Description = "Copies elements from one phase to another")]
         public static string CopyElementsToPhase(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1869,6 +1893,7 @@ namespace RevitMCPBridge2026
         /// - demoViewName (optional): Name for the demolition view
         /// </param>
         /// <returns>JSON response with demolished elements and view info</returns>
+        [MCPMethod("setupDemolitionPlan", Category = "Phase", Description = "Sets up a demolition plan by identifying elements to demolish and configuring phase settings")]
         public static string SetupDemolitionPlan(UIApplication uiApp, JObject parameters)
         {
             try

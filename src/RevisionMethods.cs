@@ -18,6 +18,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all revisions in the model
         /// </summary>
+        [MCPMethod("getRevisions", Category = "Revision", Description = "Get all revisions in the model")]
         public static string GetRevisions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -57,6 +58,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a new revision
         /// </summary>
+        [MCPMethod("createNewRevision", Category = "Revision", Description = "Create a new revision in the model")]
         public static string CreateRevision(UIApplication uiApp, JObject parameters)
         {
             try
@@ -102,6 +104,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Update a revision
         /// </summary>
+        [MCPMethod("updateRevision", Category = "Revision", Description = "Update an existing revision's properties")]
         public static string UpdateRevision(UIApplication uiApp, JObject parameters)
         {
             try
@@ -160,6 +163,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Issue a revision (mark as issued)
         /// </summary>
+        [MCPMethod("issueRevision", Category = "Revision", Description = "Mark a revision as issued")]
         public static string IssueRevision(UIApplication uiApp, JObject parameters)
         {
             try
@@ -207,6 +211,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a revision
         /// </summary>
+        [MCPMethod("deleteRevision", Category = "Revision", Description = "Delete a revision from the model")]
         public static string DeleteRevision(UIApplication uiApp, JObject parameters)
         {
             try
@@ -242,6 +247,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all revision clouds in the model
         /// </summary>
+        [MCPMethod("getRevisionCloudsList", Category = "Revision", Description = "Get all revision clouds in the model or a specific view")]
         public static string GetRevisionClouds(UIApplication uiApp, JObject parameters)
         {
             try
@@ -294,6 +300,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a revision cloud
         /// </summary>
+        [MCPMethod("createNewRevisionCloud", Category = "Revision", Description = "Create a new revision cloud in a view")]
         public static string CreateRevisionCloud(UIApplication uiApp, JObject parameters)
         {
             try
@@ -364,6 +371,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a revision cloud
         /// </summary>
+        [MCPMethod("deleteRevisionCloudById", Category = "Revision", Description = "Delete a revision cloud by element ID")]
         public static string DeleteRevisionCloud(UIApplication uiApp, JObject parameters)
         {
             try
@@ -399,6 +407,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get revisions on a sheet
         /// </summary>
+        [MCPMethod("getSheetRevisions", Category = "Revision", Description = "Get all revisions associated with a sheet")]
         public static string GetSheetRevisions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -449,6 +458,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Add revisions to a sheet
         /// </summary>
+        [MCPMethod("addRevisionsToSheet", Category = "Revision", Description = "Add revisions to a sheet's revision block")]
         public static string AddRevisionsToSheet(UIApplication uiApp, JObject parameters)
         {
             try
@@ -508,6 +518,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Remove revisions from a sheet
         /// </summary>
+        [MCPMethod("removeRevisionsFromSheet", Category = "Revision", Description = "Remove revisions from a sheet's revision block")]
         public static string RemoveRevisionsFromSheet(UIApplication uiApp, JObject parameters)
         {
             try
@@ -560,6 +571,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set revision visibility
         /// </summary>
+        [MCPMethod("setRevisionVisibility", Category = "Revision", Description = "Set the visibility of a revision's clouds and tags")]
         public static string SetRevisionVisibility(UIApplication uiApp, JObject parameters)
         {
             try
@@ -618,6 +630,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Reorder revisions
         /// </summary>
+        [MCPMethod("reorderRevisions", Category = "Revision", Description = "Reorder revisions to change their sequence numbers")]
         public static string ReorderRevisions(UIApplication uiApp, JObject parameters)
         {
             try

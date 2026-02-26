@@ -19,6 +19,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all groups in the model
         /// </summary>
+        [MCPMethod("getGroups", Category = "Group", Description = "Get all groups in the model")]
         public static string GetGroups(UIApplication uiApp, JObject parameters)
         {
             try
@@ -54,6 +55,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all group types in the model
         /// </summary>
+        [MCPMethod("getGroupTypes", Category = "Group", Description = "Get all group types in the model")]
         public static string GetGroupTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -87,6 +89,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get group members
         /// </summary>
+        [MCPMethod("getGroupMembers", Category = "Group", Description = "Get group members")]
         public static string GetGroupMembers(UIApplication uiApp, JObject parameters)
         {
             try
@@ -135,6 +138,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a group from selected elements
         /// </summary>
+        [MCPMethod("createGroup", Category = "Group", Description = "Create a group from selected elements")]
         public static string CreateGroup(UIApplication uiApp, JObject parameters)
         {
             try
@@ -184,6 +188,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Place an instance of a group type
         /// </summary>
+        [MCPMethod("placeGroup", Category = "Group", Description = "Place an instance of a group type")]
         public static string PlaceGroup(UIApplication uiApp, JObject parameters)
         {
             try
@@ -240,6 +245,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Ungroup a group
         /// </summary>
+        [MCPMethod("ungroupGroup", Category = "Group", Description = "Ungroup a group")]
         public static string UngroupGroup(UIApplication uiApp, JObject parameters)
         {
             try
@@ -287,6 +293,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a group type
         /// </summary>
+        [MCPMethod("deleteGroupType", Category = "Group", Description = "Delete a group type")]
         public static string DeleteGroupType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -322,6 +329,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Rename a group type
         /// </summary>
+        [MCPMethod("renameGroupType", Category = "Group", Description = "Rename a group type")]
         public static string RenameGroupType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -370,6 +378,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Duplicate a group type
         /// </summary>
+        [MCPMethod("duplicateGroupType", Category = "Group", Description = "Duplicate a group type")]
         public static string DuplicateGroupType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -419,6 +428,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all model groups (excludes detail groups)
         /// </summary>
+        [MCPMethod("getModelGroups", Category = "Group", Description = "Get all model groups (excludes detail groups)")]
         public static string GetModelGroups(UIApplication uiApp, JObject parameters)
         {
             try
@@ -455,6 +465,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all detail groups
         /// </summary>
+        [MCPMethod("getDetailGroups", Category = "Group", Description = "Get all detail groups")]
         public static string GetDetailGroups(UIApplication uiApp, JObject parameters)
         {
             try
@@ -492,6 +503,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a group from elements and replicate in a pattern (grid, linear, radial).
         /// </summary>
+        [MCPMethod("createGroupAndReplicatePattern", Category = "Group", Description = "Create a group from elements and replicate in a pattern")]
         public static string CreateGroupAndReplicatePattern(UIApplication uiApp, JObject parameters)
         {
             try

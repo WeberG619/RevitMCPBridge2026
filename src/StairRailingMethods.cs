@@ -20,6 +20,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all stairs in the model
         /// </summary>
+        [MCPMethod("getStairs", Category = "StairRailing", Description = "Get all stairs in the model")]
         public static string GetStairs(UIApplication uiApp, JObject parameters)
         {
             try
@@ -53,6 +54,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get stair types available in the model
         /// </summary>
+        [MCPMethod("getStairTypes", Category = "StairRailing", Description = "Get stair types available in the model")]
         public static string GetStairTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -85,6 +87,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get stair details (runs, landings, risers)
         /// </summary>
+        [MCPMethod("getStairDetails", Category = "StairRailing", Description = "Get stair details including runs, landings, and risers")]
         public static string GetStairDetails(UIApplication uiApp, JObject parameters)
         {
             try
@@ -141,6 +144,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a stair
         /// </summary>
+        [MCPMethod("deleteStair", Category = "StairRailing", Description = "Delete a stair by element ID")]
         public static string DeleteStair(UIApplication uiApp, JObject parameters)
         {
             try
@@ -176,6 +180,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all railings in the model
         /// </summary>
+        [MCPMethod("getRailings", Category = "StairRailing", Description = "Get all railings in the model")]
         public static string GetRailings(UIApplication uiApp, JObject parameters)
         {
             try
@@ -209,6 +214,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get railing types available in the model
         /// </summary>
+        [MCPMethod("getRailingTypes", Category = "StairRailing", Description = "Get railing types available in the model")]
         public static string GetRailingTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -241,6 +247,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a railing along a path
         /// </summary>
+        [MCPMethod("createRailing", Category = "StairRailing", Description = "Create a railing along a path")]
         public static string CreateRailing(UIApplication uiApp, JObject parameters)
         {
             try
@@ -322,6 +329,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a railing
         /// </summary>
+        [MCPMethod("deleteRailing", Category = "StairRailing", Description = "Delete a railing by element ID")]
         public static string DeleteRailing(UIApplication uiApp, JObject parameters)
         {
             try
@@ -357,6 +365,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all ramps in the model
         /// </summary>
+        [MCPMethod("getRamps", Category = "StairRailing", Description = "Get all ramps in the model")]
         public static string GetRamps(UIApplication uiApp, JObject parameters)
         {
             try
@@ -390,6 +399,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get ramp types available in the model
         /// </summary>
+        [MCPMethod("getRampTypes", Category = "StairRailing", Description = "Get ramp types available in the model")]
         public static string GetRampTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -422,6 +432,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a ramp
         /// </summary>
+        [MCPMethod("deleteRamp", Category = "StairRailing", Description = "Delete a ramp by element ID")]
         public static string DeleteRamp(UIApplication uiApp, JObject parameters)
         {
             try
@@ -461,6 +472,7 @@ namespace RevitMCPBridge
         ///             width (optional, default 4'),
         ///             slope (optional, default 1:12 = 0.0833)
         /// </summary>
+        [MCPMethod("createRamp", Category = "StairRailing", Description = "Create a ramp by sketch")]
         public static string CreateRamp(UIApplication uiApp, JObject parameters)
         {
             try
@@ -638,6 +650,7 @@ namespace RevitMCPBridge
         ///             runs: [{startPoint: [x,y], endPoint: [x,y], width: feet}],
         ///             locationLine: "center"|"left"|"right" (optional)
         /// </summary>
+        [MCPMethod("createStairBySketch", Category = "StairRailing", Description = "Create a stair by sketch with run and landing geometry")]
         public static string CreateStairBySketch(UIApplication uiApp, JObject parameters)
         {
             try
@@ -767,6 +780,7 @@ namespace RevitMCPBridge
         /// Parameters: baseLevelId, topLevelId, stairTypeId (optional),
         ///             shape: "straight"|"L"|"U", width, startPoint: [x,y], direction: [dx,dy]
         /// </summary>
+        [MCPMethod("createStairByComponent", Category = "StairRailing", Description = "Create a stair with straight, L-shape, or U-shape configuration")]
         public static string CreateStairByComponent(UIApplication uiApp, JObject parameters)
         {
             try
@@ -911,6 +925,7 @@ namespace RevitMCPBridge
         /// Modify an existing stair's properties
         /// Parameters: stairId, width (optional), stairTypeId (optional)
         /// </summary>
+        [MCPMethod("modifyStair", Category = "StairRailing", Description = "Modify an existing stair's properties such as width and type")]
         public static string ModifyStair(UIApplication uiApp, JObject parameters)
         {
             try
@@ -988,6 +1003,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get railings attached to a stair
         /// </summary>
+        [MCPMethod("getStairRailings", Category = "StairRailing", Description = "Get all railings attached to a specific stair")]
         public static string GetStairRailings(UIApplication uiApp, JObject parameters)
         {
             try

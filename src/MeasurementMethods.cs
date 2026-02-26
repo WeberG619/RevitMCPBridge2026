@@ -50,6 +50,7 @@ namespace RevitMCPBridge
         /// Measure distance between two points
         /// Parameters: point1 ([x,y,z] or {x,y,z}), point2 ([x,y,z] or {x,y,z})
         /// </summary>
+        [MCPMethod("measureDistance", Category = "Measurement", Description = "Measure the distance between two XYZ points")]
         public static string MeasureDistance(UIApplication uiApp, JObject parameters)
         {
             try
@@ -86,6 +87,7 @@ namespace RevitMCPBridge
         /// Measure distance between two elements (center to center or closest points)
         /// Parameters: elementId1, elementId2, method ("center" | "closest" | "boundingBox")
         /// </summary>
+        [MCPMethod("measureBetweenElements", Category = "Measurement", Description = "Measure the distance between two Revit elements")]
         public static string MeasureBetweenElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -171,6 +173,7 @@ namespace RevitMCPBridge
         /// Get room dimensions (width, length, area, perimeter)
         /// Parameters: roomId
         /// </summary>
+        [MCPMethod("getRoomDimensions", Category = "Measurement", Description = "Get room dimensions including width, length, area, and perimeter")]
         public static string GetRoomDimensions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -279,6 +282,7 @@ namespace RevitMCPBridge
         /// Measure perpendicular distance from a point to a wall
         /// Parameters: wallId, point ([x,y,z] or {x,y,z})
         /// </summary>
+        [MCPMethod("measurePerpendicularToWall", Category = "Measurement", Description = "Measure the perpendicular distance from a point to a wall")]
         public static string MeasurePerpendicularToWall(UIApplication uiApp, JObject parameters)
         {
             try
@@ -352,6 +356,7 @@ namespace RevitMCPBridge
         /// Measure corridor width by finding parallel walls
         /// Parameters: point ([x,y,z] or {x,y,z}) - a point inside the corridor
         /// </summary>
+        [MCPMethod("measureCorridorWidth", Category = "Measurement", Description = "Measure corridor width by finding parallel walls around a point")]
         public static string MeasureCorridorWidth(UIApplication uiApp, JObject parameters)
         {
             try

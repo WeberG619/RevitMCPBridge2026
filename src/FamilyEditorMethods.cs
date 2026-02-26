@@ -22,6 +22,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Open a family for editing from the current document.
         /// </summary>
+        [MCPMethod("openFamilyForEditing", Category = "FamilyEditor", Description = "Open a family for editing from the current document")]
         public static string OpenFamilyForEditing(UIApplication uiApp, JObject parameters)
         {
             try
@@ -93,6 +94,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get information about the currently active family document.
         /// </summary>
+        [MCPMethod("getFamilyDocumentInfo", Category = "FamilyEditor", Description = "Get information about the currently active family document")]
         public static string GetFamilyDocumentInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -183,6 +185,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Add a new parameter to the family.
         /// </summary>
+        [MCPMethod("addFamilyParameter", Category = "FamilyEditor", Description = "Add a new parameter to the family")]
         public static string AddFamilyParameter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -254,6 +257,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Add a new type to the family.
         /// </summary>
+        [MCPMethod("addFamilyType", Category = "FamilyEditor", Description = "Add a new type to the family")]
         public static string AddFamilyType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -317,6 +321,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set a parameter value in the current family type.
         /// </summary>
+        [MCPMethod("setFamilyParameterValue", Category = "FamilyEditor", Description = "Set a parameter value in the current family type")]
         public static string SetFamilyParameterValue(UIApplication uiApp, JObject parameters)
         {
             try
@@ -394,6 +399,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Add a reference plane to the family.
         /// </summary>
+        [MCPMethod("addReferencePlane", Category = "FamilyEditor", Description = "Add a reference plane to the family")]
         public static string AddReferencePlane(UIApplication uiApp, JObject parameters)
         {
             try
@@ -452,6 +458,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create an extrusion in the family document.
         /// </summary>
+        [MCPMethod("createExtrusion", Category = "FamilyEditor", Description = "Create an extrusion in the family document")]
         public static string CreateExtrusion(UIApplication uiApp, JObject parameters)
         {
             try
@@ -539,6 +546,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Load the currently open family document back into a project.
         /// </summary>
+        [MCPMethod("loadFamilyIntoProject", Category = "FamilyEditor", Description = "Load the currently open family document back into a project")]
         public static string LoadFamilyIntoProject(UIApplication uiApp, JObject parameters)
         {
             try
@@ -633,6 +641,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Save the family document.
         /// </summary>
+        [MCPMethod("saveFamily", Category = "FamilyEditor", Description = "Save the family document")]
         public static string SaveFamily(UIApplication uiApp, JObject parameters)
         {
             try
@@ -696,6 +705,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Close the family document.
         /// </summary>
+        [MCPMethod("closeFamily", Category = "FamilyEditor", Description = "Close the family document")]
         public static string CloseFamily(UIApplication uiApp, JObject parameters)
         {
             try
@@ -738,6 +748,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get available family categories for creating new families.
         /// </summary>
+        [MCPMethod("getFamilyCategories", Category = "FamilyEditor", Description = "Get available family categories for creating new families")]
         public static string GetFamilyCategories(UIApplication uiApp, JObject parameters)
         {
             try
@@ -785,6 +796,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a new family document from a template.
         /// </summary>
+        [MCPMethod("createNewFamily", Category = "FamilyEditor", Description = "Create a new family document from a template")]
         public static string CreateNewFamily(UIApplication uiApp, JObject parameters)
         {
             try
@@ -852,6 +864,7 @@ namespace RevitMCPBridge
         /// Model lines are actual geometry that shows in all views.
         /// Perfect for parking stripes, floor patterns, etc.
         /// </summary>
+        [MCPMethod("createFamilyModelLine", Category = "FamilyEditor", Description = "Create a model line in the family document")]
         public static string CreateModelLine(UIApplication uiApp, JObject parameters)
         {
             try
@@ -938,6 +951,7 @@ namespace RevitMCPBridge
         /// Create multiple model lines at once - more efficient for complex shapes.
         /// Pass an array of line segments.
         /// </summary>
+        [MCPMethod("createFamilyModelLines", Category = "FamilyEditor", Description = "Create multiple model lines at once in the family document")]
         public static string CreateModelLines(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1034,6 +1048,7 @@ namespace RevitMCPBridge
         /// Symbolic lines only show in the view they're created in (plan, elevation, etc.)
         /// Good for annotation-style graphics.
         /// </summary>
+        [MCPMethod("createFamilySymbolicLine", Category = "FamilyEditor", Description = "Create a symbolic line in the family document")]
         public static string CreateSymbolicLine(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1095,6 +1110,7 @@ namespace RevitMCPBridge
         /// Create a model arc in the family document.
         /// Useful for curved parking stripes, radius corners, etc.
         /// </summary>
+        [MCPMethod("createFamilyModelArc", Category = "FamilyEditor", Description = "Create a model arc in the family document")]
         public static string CreateModelArc(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1179,6 +1195,7 @@ namespace RevitMCPBridge
         /// Get all geometry elements in the current family document.
         /// Useful for understanding what's already in a family before modifying it.
         /// </summary>
+        [MCPMethod("getFamilyGeometry", Category = "FamilyEditor", Description = "Get all geometry elements in the current family document")]
         public static string GetFamilyGeometry(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1264,6 +1281,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete an element from the family document.
         /// </summary>
+        [MCPMethod("deleteFamilyElement", Category = "FamilyEditor", Description = "Delete an element from the family document")]
         public static string DeleteFamilyElement(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1321,6 +1339,7 @@ namespace RevitMCPBridge
         /// Associate a geometry element's visibility with a Yes/No parameter.
         /// This makes the geometry show/hide based on the parameter value.
         /// </summary>
+        [MCPMethod("associateGeometryWithParameter", Category = "FamilyEditor", Description = "Associate geometry visibility with a Yes/No parameter")]
         public static string AssociateGeometryWithParameter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1401,6 +1420,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all available line styles in the family document.
         /// </summary>
+        [MCPMethod("getLineStyles", Category = "FamilyEditor", Description = "Get all available line styles in the family document")]
         public static string GetLineStyles(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1449,6 +1469,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set the line style/subcategory for a curve element.
         /// </summary>
+        [MCPMethod("setLineStyle", Category = "FamilyEditor", Description = "Set the line style or subcategory for a curve element")]
         public static string SetLineStyle(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1538,6 +1559,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all constraints (dimensions, alignments) on an element.
         /// </summary>
+        [MCPMethod("getElementConstraints", Category = "FamilyEditor", Description = "Get all constraints and dimensions on an element")]
         public static string GetElementConstraints(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1626,6 +1648,7 @@ namespace RevitMCPBridge
         ///   - Multi-point EQ dimensions: elementIds array with setEQ=true
         /// For EQ dimensions (e.g., Left-Center-Right), use elementIds=[leftId, centerId, rightId] with setEQ=true
         /// </summary>
+        [MCPMethod("addFamilyDimension", Category = "FamilyEditor", Description = "Add a dimension between references in the family for parametric control")]
         public static string AddDimension(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1959,6 +1982,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Lock/align a curve element's endpoint to a reference plane.
         /// </summary>
+        [MCPMethod("constrainToReferencePlane", Category = "FamilyEditor", Description = "Lock a curve element's endpoint to a reference plane")]
         public static string ConstrainToReferencePlane(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2075,6 +2099,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Open a nested family for editing from within the current family.
         /// </summary>
+        [MCPMethod("openNestedFamily", Category = "FamilyEditor", Description = "Open a nested family for editing from within the current family")]
         public static string OpenNestedFamily(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2159,6 +2184,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// List all nested families in the current family document.
         /// </summary>
+        [MCPMethod("getNestedFamilies", Category = "FamilyEditor", Description = "List all nested families in the current family document")]
         public static string GetNestedFamilies(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2203,6 +2229,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Move an element within the family document.
         /// </summary>
+        [MCPMethod("moveFamilyElement", Category = "FamilyEditor", Description = "Move an element within the family document")]
         public static string MoveFamilyElement(UIApplication uiApp, JObject parameters)
         {
             try

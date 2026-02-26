@@ -22,6 +22,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a linear grid line
         /// </summary>
+        [MCPMethod("createGrid", Category = "Grid", Description = "Create a linear grid line between two points")]
         public static string CreateGrid(UIApplication uiApp, JObject parameters)
         {
             try
@@ -75,6 +76,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create an arc grid line
         /// </summary>
+        [MCPMethod("createArcGrid", Category = "Grid", Description = "Create a curved arc grid line from a center point, radius, and angle range")]
         public static string CreateArcGrid(UIApplication uiApp, JObject parameters)
         {
             try
@@ -128,6 +130,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all grids in the model
         /// </summary>
+        [MCPMethod("getGrids", Category = "Grid", Description = "Get all grid lines in the model with their geometry and names")]
         public static string GetGrids(UIApplication uiApp, JObject parameters)
         {
             try
@@ -162,6 +165,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get a specific grid by name or ID
         /// </summary>
+        [MCPMethod("getGrid", Category = "Grid", Description = "Get a specific grid line by name or element ID")]
         public static string GetGrid(UIApplication uiApp, JObject parameters)
         {
             try
@@ -208,6 +212,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Rename a grid
         /// </summary>
+        [MCPMethod("renameGrid", Category = "Grid", Description = "Rename a grid line to a new name")]
         public static string RenameGrid(UIApplication uiApp, JObject parameters)
         {
             try
@@ -255,6 +260,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a grid
         /// </summary>
+        [MCPMethod("deleteGrid", Category = "Grid", Description = "Delete a grid line from the model by element ID")]
         public static string DeleteGrid(UIApplication uiApp, JObject parameters)
         {
             try
@@ -290,6 +296,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create multiple grids at regular intervals (array)
         /// </summary>
+        [MCPMethod("createGridArray", Category = "Grid", Description = "Create an array of evenly spaced parallel grid lines in a specified direction")]
         public static string CreateGridArray(UIApplication uiApp, JObject parameters)
         {
             try
@@ -372,6 +379,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set grid extents (2D extents in a specific view)
         /// </summary>
+        [MCPMethod("setGridExtents", Category = "Grid", Description = "Set the 2D view-specific extents of a grid line in a given view")]
         public static string SetGridExtents(UIApplication uiApp, JObject parameters)
         {
             try
@@ -450,6 +458,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the intersection point of two grids
         /// </summary>
+        [MCPMethod("getGridIntersection", Category = "Grid", Description = "Get the XYZ intersection point of two grid lines")]
         public static string GetGridIntersection(UIApplication uiApp, JObject parameters)
         {
             try

@@ -25,6 +25,7 @@ namespace RevitMCPBridge2026
         /// <param name="uiApp">The Revit UI Application</param>
         /// <param name="parameters">JSON parameters containing viewId, startPoint, endPoint, lineStyleId</param>
         /// <returns>JSON response with success status and detail line ID</returns>
+        [MCPMethod("createDetailLine", Category = "Detail", Description = "Creates a detail line in a view")]
         public static string CreateDetailLine(UIApplication uiApp, JObject parameters)
         {
             try
@@ -98,6 +99,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a detail arc in a view
         /// </summary>
+        [MCPMethod("createDetailArc", Category = "Detail", Description = "Creates a detail arc in a view")]
         public static string CreateDetailArc(UIApplication uiApp, JObject parameters)
         {
             try
@@ -170,6 +172,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates detail lines from a polyline (multiple connected lines)
         /// </summary>
+        [MCPMethod("createDetailPolyline", Category = "Detail", Description = "Creates a detail polyline in a view")]
         public static string CreateDetailPolyline(UIApplication uiApp, JObject parameters)
         {
             try
@@ -239,6 +242,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets information about a detail line
         /// </summary>
+        [MCPMethod("getDetailLineInfo", Category = "Detail", Description = "Gets info about a detail line element")]
         public static string GetDetailLineInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -359,6 +363,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies a detail line
         /// </summary>
+        [MCPMethod("modifyDetailLine", Category = "Detail", Description = "Modifies an existing detail line")]
         public static string ModifyDetailLine(UIApplication uiApp, JObject parameters)
         {
             try
@@ -475,6 +480,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all detail lines in a view
         /// </summary>
+        [MCPMethod("getDetailLinesInView", Category = "Detail", Description = "Gets all detail lines in a view")]
         public static string GetDetailLinesInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -586,6 +592,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a filled region in a view
         /// </summary>
+        [MCPMethod("createFilledRegion", Category = "Detail", Description = "Creates a filled region in a view")]
         public static string CreateFilledRegion(UIApplication uiApp, JObject parameters)
         {
             try
@@ -681,6 +688,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets information about a filled region
         /// </summary>
+        [MCPMethod("getFilledRegionInfo", Category = "Detail", Description = "Gets info about a filled region")]
         public static string GetFilledRegionInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -795,6 +803,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies a filled region's boundary
         /// </summary>
+        [MCPMethod("modifyFilledRegionBoundary", Category = "Detail", Description = "Modifies the boundary of a filled region")]
         public static string ModifyFilledRegionBoundary(UIApplication uiApp, JObject parameters)
         {
             try
@@ -898,6 +907,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all filled region types
         /// </summary>
+        [MCPMethod("getFilledRegionTypes", Category = "Detail", Description = "Gets all filled region types in the document")]
         public static string GetFilledRegionTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -989,6 +999,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all filled regions in a view
         /// </summary>
+        [MCPMethod("getFilledRegionsInView", Category = "Detail", Description = "Gets all filled regions in a view")]
         public static string GetFilledRegionsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1077,6 +1088,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places a detail component (detail item) in a view
         /// </summary>
+        [MCPMethod("placeDetailComponent", Category = "Detail", Description = "Places a detail component by type ID")]
         public static string PlaceDetailComponent(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1174,6 +1186,7 @@ namespace RevitMCPBridge2026
         /// Places a detail component by family name and type name (looks up the type ID automatically)
         /// Parameters: viewId, familyName, typeName, x, y, rotation (optional)
         /// </summary>
+        [MCPMethod("placeDetailComponentByName", Category = "Detail", Description = "Places a detail component by family and type name")]
         public static string PlaceDetailComponentByName(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1305,6 +1318,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places a repeating detail component along a path
         /// </summary>
+        [MCPMethod("placeRepeatingDetailComponent", Category = "Detail", Description = "Places a repeating detail component along a path")]
         public static string PlaceRepeatingDetailComponent(UIApplication uiApp, JObject parameters)
         {
             // Note: Revit 2026 API has changed the repeating detail classes
@@ -1320,6 +1334,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets information about a detail component
         /// </summary>
+        [MCPMethod("getDetailComponentInfo", Category = "Detail", Description = "Gets info about a detail component instance")]
         public static string GetDetailComponentInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1412,6 +1427,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all detail component types
         /// </summary>
+        [MCPMethod("getDetailComponentTypes", Category = "Detail", Description = "Gets all detail component types in the document")]
         public static string GetDetailComponentTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1471,6 +1487,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all detail components in a view
         /// </summary>
+        [MCPMethod("getDetailComponentsInView", Category = "Detail", Description = "Gets all detail components in a view")]
         public static string GetDetailComponentsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1550,6 +1567,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Adds insulation to a duct, pipe, or other element
         /// </summary>
+        [MCPMethod("addInsulation", Category = "Detail", Description = "Adds insulation to a detail line")]
         public static string AddInsulation(UIApplication uiApp, JObject parameters)
         {
             // Note: Insulation creation in Revit 2026 API is complex and element-type specific
@@ -1566,6 +1584,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets insulation information
         /// </summary>
+        [MCPMethod("getInsulationInfo", Category = "Detail", Description = "Gets info about an insulation element")]
         public static string GetInsulationInfo(UIApplication uiApp, JObject parameters)
         {
             // Note: Insulation retrieval in Revit 2026 API requires element-specific access
@@ -1581,6 +1600,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Removes insulation from an element
         /// </summary>
+        [MCPMethod("removeInsulation", Category = "Detail", Description = "Removes insulation from a detail line")]
         public static string RemoveInsulation(UIApplication uiApp, JObject parameters)
         {
             // Note: Insulation removal in Revit 2026 API requires element-specific workflows
@@ -1600,6 +1620,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a break line symbol
         /// </summary>
+        [MCPMethod("createBreakLine", Category = "Detail", Description = "Creates a break line symbol in a view")]
         public static string CreateBreakLine(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1700,6 +1721,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places a section/elevation marker symbol
         /// </summary>
+        [MCPMethod("placeMarkerSymbol", Category = "Detail", Description = "Places a marker symbol annotation in a view")]
         public static string PlaceMarkerSymbol(UIApplication uiApp, JObject parameters)
         {
             // Note: Section, elevation, and callout markers in Revit are automatically created
@@ -1720,6 +1742,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all line styles (line patterns) in the project
         /// </summary>
+        [MCPMethod("getLineStyles", Category = "Detail", Description = "Gets all line styles in the document")]
         public static string GetLineStyles(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1772,6 +1795,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a new line style
         /// </summary>
+        [MCPMethod("createLineStyle", Category = "Detail", Description = "Creates a new line style")]
         public static string CreateLineStyle(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1841,6 +1865,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies a line style
         /// </summary>
+        [MCPMethod("modifyLineStyle", Category = "Detail", Description = "Modifies an existing line style")]
         public static string ModifyLineStyle(UIApplication uiApp, JObject parameters)
         {
             // Note: Direct modification of GraphicsStyle properties (LineWeight, LineColor, LinePattern)
@@ -1861,6 +1886,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a detail group from selected elements
         /// </summary>
+        [MCPMethod("createDetailGroup", Category = "Detail", Description = "Creates a detail group from selected elements")]
         public static string CreateDetailGroup(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1938,6 +1964,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places an instance of a detail group
         /// </summary>
+        [MCPMethod("placeDetailGroup", Category = "Detail", Description = "Places an instance of a detail group")]
         public static string PlaceDetailGroup(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2023,6 +2050,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all detail group types
         /// </summary>
+        [MCPMethod("getDetailGroupTypes", Category = "Detail", Description = "Gets all detail group types in the document")]
         public static string GetDetailGroupTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2099,6 +2127,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a masking region in a view
         /// </summary>
+        [MCPMethod("createMaskingRegion", Category = "Detail", Description = "Creates a masking region in a view")]
         public static string CreateMaskingRegion(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2219,6 +2248,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Overrides graphics for an element in a specific view
         /// </summary>
+        [MCPMethod("overrideElementGraphics", Category = "Detail", Description = "Overrides graphics settings for an element in a view")]
         public static string OverrideElementGraphics(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2360,6 +2390,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets graphics overrides for an element in a view
         /// </summary>
+        [MCPMethod("getElementGraphicsOverrides", Category = "Detail", Description = "Gets graphics overrides for an element in a view")]
         public static string GetElementGraphicsOverrides(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2454,6 +2485,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Clears graphics overrides for an element in a view
         /// </summary>
+        [MCPMethod("clearElementGraphicsOverrides", Category = "Detail", Description = "Clears graphics overrides for an element in a view")]
         public static string ClearElementGraphicsOverrides(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2525,6 +2557,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Deletes a detail element
         /// </summary>
+        [MCPMethod("deleteDetailElement", Category = "Detail", Description = "Deletes a detail element from the document")]
         public static string DeleteDetailElement(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2592,6 +2625,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Copies detail elements from one view to another
         /// </summary>
+        [MCPMethod("copyDetailElements", Category = "Detail", Description = "Copies detail elements within or between views")]
         public static string CopyDetailElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2718,6 +2752,7 @@ namespace RevitMCPBridge2026
         /// - includeDimensions (optional): Include dimensions (default: false)
         /// </param>
         /// <returns>JSON response with captured detail elements and library info</returns>
+        [MCPMethod("createDetailComponentLibrary", Category = "Detail", Description = "Creates a detail component library from view content")]
         public static string CreateDetailComponentLibrary(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2943,6 +2978,7 @@ namespace RevitMCPBridge2026
         /// - dryRun (optional): Preview only, don't make changes (default: false)
         /// </param>
         /// <returns>JSON response with replacement results</returns>
+        [MCPMethod("extractAndReplaceFilledRegions", Category = "Detail", Description = "Extracts and replaces filled regions in a view")]
         public static string ExtractAndReplaceFilledRegions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3101,6 +3137,7 @@ namespace RevitMCPBridge2026
         /// Get all available break line family types in the project.
         /// Use the returned typeId with placeBreakLineAuto or createBreakLine.
         /// </summary>
+        [MCPMethod("getBreakLineTypes", Category = "Detail", Description = "Gets all break line types in the document")]
         public static string GetBreakLineTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3148,6 +3185,7 @@ namespace RevitMCPBridge2026
         ///   rotation (optional): Rotation in degrees (default: 0)
         ///   typeName (optional): Specific break line type name to use
         /// </summary>
+        [MCPMethod("placeBreakLineAuto", Category = "Detail", Description = "Places a break line automatically in a view")]
         public static string PlaceBreakLineAuto(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3273,6 +3311,7 @@ namespace RevitMCPBridge2026
         ///   endX, endY (required): End point in view coordinates
         ///   lineStyle (optional): Name of line style to use
         /// </summary>
+        [MCPMethod("createDetailLineInDraftingView", Category = "Detail", Description = "Creates a detail line in a drafting view")]
         public static string CreateDetailLineInDraftingView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3381,6 +3420,7 @@ namespace RevitMCPBridge2026
         ///   dimensionOffset (optional): Offset distance for dimension line placement
         ///   direction (optional): "horizontal" or "vertical" - forces dimension direction
         /// </summary>
+        [MCPMethod("dimensionDetailLines", Category = "Detail", Description = "Adds dimensions to detail lines in a view")]
         public static string DimensionDetailLines(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3519,6 +3559,7 @@ namespace RevitMCPBridge2026
         /// Get the bounds of a drafting view for element placement.
         /// Returns the coordinate extents of existing elements or the view's outline.
         /// </summary>
+        [MCPMethod("getDraftingViewBounds", Category = "Detail", Description = "Gets the bounding box of a drafting view")]
         public static string GetDraftingViewBounds(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3611,6 +3652,7 @@ namespace RevitMCPBridge2026
         ///   width (optional): Insulation width in feet (default: 0.333 = 4")
         ///   typeName (optional): Specific insulation type name
         /// </summary>
+        [MCPMethod("placeInsulationPattern", Category = "Detail", Description = "Places an insulation pattern between two lines")]
         public static string PlaceInsulationPattern(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3769,6 +3811,7 @@ namespace RevitMCPBridge2026
         /// - includeDetailLines (optional): Include detail lines (default: true)
         /// </param>
         /// <returns>JSON response with new drafting view ID and copied element counts</returns>
+        [MCPMethod("convertDetailToDraftingView", Category = "Detail", Description = "Converts a detail view to a drafting view")]
         public static string ConvertDetailToDraftingView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4020,6 +4063,7 @@ namespace RevitMCPBridge2026
         /// - includeDetailLines (optional): Include detail lines (default: true)
         /// </param>
         /// <returns>JSON response with array of conversion results</returns>
+        [MCPMethod("batchConvertDetailsToDraftingViews", Category = "Detail", Description = "Batch converts detail views to drafting views")]
         public static string BatchConvertDetailsToDraftingViews(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4117,6 +4161,7 @@ namespace RevitMCPBridge2026
         /// - lineStyleId (optional): Line style ID for traced lines (default: uses medium lines)
         /// </param>
         /// <returns>JSON response with new drafting view ID and element counts</returns>
+        [MCPMethod("traceDetailToDraftingView", Category = "Detail", Description = "Traces detail elements into a drafting view")]
         public static string TraceDetailToDraftingView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4707,6 +4752,7 @@ namespace RevitMCPBridge2026
         /// Uses 2.5D approach: traces visible edges first, then adds detail items based on
         /// wall/floor compound structure layers.
         /// </summary>
+        [MCPMethod("intelligentTraceDetailToDraftingView", Category = "Detail", Description = "Intelligently traces detail elements into a drafting view")]
         public static string IntelligentTraceDetailToDraftingView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -5461,6 +5507,7 @@ namespace RevitMCPBridge2026
         /// Gets all loaded detail component families and their types
         /// This is essential for placing detail items in drafting views
         /// </summary>
+        [MCPMethod("getDetailComponentFamilies", Category = "Detail", Description = "Gets all detail component families in the document")]
         public static string GetDetailComponentFamilies(UIApplication uiApp, JObject parameters)
         {
             try
@@ -5542,6 +5589,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Loads a detail component family from a local .rfa file
         /// </summary>
+        [MCPMethod("loadDetailComponentFamily", Category = "Detail", Description = "Loads a detail component family from disk")]
         public static string LoadDetailComponentFamily(UIApplication uiApp, JObject parameters)
         {
             try
@@ -5642,6 +5690,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Searches local folders for detail component families (.rfa files)
         /// </summary>
+        [MCPMethod("searchLocalDetailFamilies", Category = "Detail", Description = "Searches local disk for detail component families")]
         public static string SearchLocalDetailFamilies(UIApplication uiApp, JObject parameters)
         {
             try
@@ -5736,6 +5785,7 @@ namespace RevitMCPBridge2026
         /// Activates a family symbol (type) so it can be placed
         /// Required before placing any family instance
         /// </summary>
+        [MCPMethod("activateDetailComponentType", Category = "Detail", Description = "Activates a detail component type for placement")]
         public static string ActivateDetailComponentType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -5796,6 +5846,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places a detail component in a drafting or detail view
         /// </summary>
+        [MCPMethod("placeDetailComponentAdvanced", Category = "Detail", Description = "Places a detail component with advanced options")]
         public static string PlaceDetailComponentAdvanced(UIApplication uiApp, JObject parameters)
         {
             try
@@ -5907,6 +5958,7 @@ namespace RevitMCPBridge2026
         /// Automates loading a family from the Autodesk cloud library
         /// Opens the dialog and uses UI automation to search and load
         /// </summary>
+        [MCPMethod("loadAutodeskFamilyAutomated", Category = "Detail", Description = "Loads an Autodesk family with automated dialog handling")]
         public static string LoadAutodeskFamilyAutomated(UIApplication uiApp, JObject parameters)
         {
             try
@@ -6030,6 +6082,7 @@ namespace RevitMCPBridge2026
         /// Takes a screenshot of the Revit window and analyzes it for the Load Autodesk Family dialog
         /// Used for debugging and manual automation
         /// </summary>
+        [MCPMethod("captureDialogState", Category = "Detail", Description = "Captures the current state of open Revit dialogs")]
         public static string CaptureDialogState(UIApplication uiApp, JObject parameters)
         {
             try
@@ -6102,6 +6155,7 @@ namespace RevitMCPBridge2026
         /// <param name="uiApp">The Revit UI Application</param>
         /// <param name="parameters">JSON parameters (optional: libraryPath)</param>
         /// <returns>JSON with categories and their detail files</returns>
+        [MCPMethod("getDetailLibrary", Category = "Detail", Description = "Gets the detail library contents")]
         public static string GetDetailLibrary(UIApplication uiApp, JObject parameters)
         {
             try
@@ -6169,6 +6223,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets details in a specific category folder
         /// </summary>
+        [MCPMethod("getDetailsInCategory", Category = "Detail", Description = "Gets all details in a specified category")]
         public static string GetDetailsInCategory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -6238,6 +6293,7 @@ namespace RevitMCPBridge2026
         /// Imports a detail RVT file into the current document
         /// Copies the first drafting view found in the source document
         /// </summary>
+        [MCPMethod("importDetailToDocument", Category = "Detail", Description = "Imports a detail from the library into the document")]
         public static string ImportDetailToDocument(UIApplication uiApp, JObject parameters)
         {
             Document sourceDoc = null;
@@ -6496,6 +6552,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Searches the detail library for files matching a search term
         /// </summary>
+        [MCPMethod("searchDetailLibrary", Category = "Detail", Description = "Searches the detail library by keyword")]
         public static string SearchDetailLibrary(UIApplication uiApp, JObject parameters)
         {
             try

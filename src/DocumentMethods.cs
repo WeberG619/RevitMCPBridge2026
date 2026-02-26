@@ -22,6 +22,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a new Revit document from a template.
         /// </summary>
+        [MCPMethod("createNewDocument", Category = "Document", Description = "Create a new Revit document from a template")]
         public static string CreateNewDocument(UIApplication uiApp, JObject parameters)
         {
             try
@@ -81,6 +82,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// List available project templates (.rte files)
         /// </summary>
+        [MCPMethod("listProjectTemplates", Category = "Document", Description = "List available project templates")]
         public static string ListProjectTemplates(UIApplication uiApp, JObject parameters)
         {
             try
@@ -172,6 +174,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Open an existing Revit document.
         /// </summary>
+        [MCPMethod("openDocument", Category = "Document", Description = "Open an existing Revit document")]
         public static string OpenDocument(UIApplication uiApp, JObject parameters)
         {
             try
@@ -238,6 +241,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Save the active document.
         /// </summary>
+        [MCPMethod("saveDocument", Category = "Document", Description = "Save the active document")]
         public static string SaveDocument(UIApplication uiApp, JObject parameters)
         {
             try
@@ -302,6 +306,7 @@ namespace RevitMCPBridge
         /// Save the active document as a project template (.rte file).
         /// This creates a reusable template that can be used to start new projects.
         /// </summary>
+        [MCPMethod("saveAsTemplate", Category = "Document", Description = "Save the active document as a project template")]
         public static string SaveAsTemplate(UIApplication uiApp, JObject parameters)
         {
             try
@@ -442,6 +447,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Close a document.
         /// </summary>
+        [MCPMethod("closeDocument", Category = "Document", Description = "Close a document")]
         public static string CloseDocument(UIApplication uiApp, JObject parameters)
         {
             try
@@ -510,6 +516,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Sync a workshared document with central.
         /// </summary>
+        [MCPMethod("syncWithCentral", Category = "Document", Description = "Sync a workshared document with central")]
         public static string SyncWithCentral(UIApplication uiApp, JObject parameters)
         {
             try
@@ -584,6 +591,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get detailed information about the active document.
         /// </summary>
+        [MCPMethod("getDocumentInfo", Category = "Document", Description = "Get detailed information about the active document")]
         public static string GetDocumentInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -663,6 +671,7 @@ namespace RevitMCPBridge
         /// Switch the active document to a different open document.
         /// Enables AI to move between open projects in the same Revit session.
         /// </summary>
+        [MCPMethod("switchDocument", Category = "Document", Description = "Switch the active document to a different open document")]
         public static string SwitchDocument(UIApplication uiApp, JObject parameters)
         {
             try
@@ -779,6 +788,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Purge unused elements from the document.
         /// </summary>
+        [MCPMethod("purgeUnused", Category = "Document", Description = "Purge unused elements from the document")]
         public static string PurgeUnused(UIApplication uiApp, JObject parameters)
         {
             try
@@ -883,6 +893,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Reload Revit links in the document.
         /// </summary>
+        [MCPMethod("reloadLinks", Category = "Document", Description = "Reload Revit links in the document")]
         public static string ReloadLinks(UIApplication uiApp, JObject parameters)
         {
             try
@@ -958,6 +969,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set project information properties.
         /// </summary>
+        [MCPMethod("setProjectInfo", Category = "Document", Description = "Set project information properties")]
         public static string SetProjectInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1032,6 +1044,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Enable worksharing on a document.
         /// </summary>
+        [MCPMethod("enableWorksharing", Category = "Document", Description = "Enable worksharing on a document")]
         public static string EnableWorksharing(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1082,6 +1095,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Export document to IFC format.
         /// </summary>
+        [MCPMethod("exportToIFC", Category = "Document", Description = "Export document to IFC format")]
         public static string ExportToIFC(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1139,6 +1153,7 @@ namespace RevitMCPBridge
         /// Export selected views to DWG format
         /// Parameters: viewIds (array), outputFolder, fileNamingPattern (optional), dwgVersion (optional: "AutoCAD2018", "AutoCAD2013", etc.)
         /// </summary>
+        [MCPMethod("exportViewsToDWG", Category = "Document", Description = "Export selected views to DWG format")]
         public static string ExportViewsToDWG(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1250,6 +1265,7 @@ namespace RevitMCPBridge
         /// Export sheets to DWG format (each sheet becomes a DWG file)
         /// Parameters: sheetIds (array, optional - exports all if not specified), outputFolder, includeViewsOnSheet (bool), dwgVersion
         /// </summary>
+        [MCPMethod("exportSheetsToDWG", Category = "Document", Description = "Export sheets to DWG format")]
         public static string ExportSheetsToDWG(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1366,6 +1382,7 @@ namespace RevitMCPBridge
         /// Batch export all sheets and/or views to DWG with organized folder structure
         /// Parameters: outputFolder, exportSheets (bool), exportViews (bool), organizeFolders (bool), dwgVersion
         /// </summary>
+        [MCPMethod("batchExportDWG", Category = "Document", Description = "Batch export all sheets and/or views to DWG")]
         public static string BatchExportDWG(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1533,6 +1550,7 @@ namespace RevitMCPBridge
         /// Create a new revision in the document
         /// Parameters: description, issuedBy, issuedTo, date (optional), visibility (optional: "CloudAndTagVisible", "Hidden", "TagVisible")
         /// </summary>
+        [MCPMethod("createRevision", Category = "Document", Description = "Create a new revision in the document")]
         public static string CreateRevision(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1602,6 +1620,7 @@ namespace RevitMCPBridge
         /// Get all revisions in the document
         /// Parameters: none
         /// </summary>
+        [MCPMethod("getRevisions", Category = "Document", Description = "Get all revisions in the document")]
         public static string GetRevisions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1648,6 +1667,7 @@ namespace RevitMCPBridge
         /// Add a revision to one or more sheets
         /// Parameters: revisionId, sheetIds (array)
         /// </summary>
+        [MCPMethod("addRevisionToSheets", Category = "Document", Description = "Add a revision to one or more sheets")]
         public static string AddRevisionToSheets(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1735,6 +1755,7 @@ namespace RevitMCPBridge
         /// Remove a revision from one or more sheets
         /// Parameters: revisionId, sheetIds (array)
         /// </summary>
+        [MCPMethod("removeRevisionFromSheets", Category = "Document", Description = "Remove a revision from one or more sheets")]
         public static string RemoveRevisionFromSheets(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1816,6 +1837,7 @@ namespace RevitMCPBridge
         /// Place a revision cloud in a view
         /// Parameters: viewId, revisionId, points (array of {x, y} coordinates forming the cloud boundary)
         /// </summary>
+        [MCPMethod("placeRevisionCloud", Category = "Document", Description = "Place a revision cloud in a view")]
         public static string PlaceRevisionCloud(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1904,6 +1926,7 @@ namespace RevitMCPBridge
         /// Get all revision clouds in the document or a specific view
         /// Parameters: viewId (optional - if not specified, gets all clouds)
         /// </summary>
+        [MCPMethod("getRevisionClouds", Category = "Document", Description = "Get all revision clouds in the document or a specific view")]
         public static string GetRevisionClouds(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1964,6 +1987,7 @@ namespace RevitMCPBridge
         /// Tag a revision cloud
         /// Parameters: cloudId, location (optional {x, y} - auto-places if not specified)
         /// </summary>
+        [MCPMethod("tagRevisionCloud", Category = "Document", Description = "Tag a revision cloud")]
         public static string TagRevisionCloud(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2058,6 +2082,7 @@ namespace RevitMCPBridge
         ///             fileName (optional pattern with {SheetNumber}, {SheetName}),
         ///             combineIntoSingle (bool, default false), paperSize (optional)
         /// </summary>
+        [MCPMethod("exportSheetsToPDF", Category = "Document", Description = "Export sheets to PDF")]
         public static string ExportSheetsToPDF(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2196,6 +2221,7 @@ namespace RevitMCPBridge
         ///             organizeFolders (bool), viewTypes (array, optional),
         ///             sheetFilter (optional: "all", "issued", "notIssued")
         /// </summary>
+        [MCPMethod("batchExportPDF", Category = "Document", Description = "Batch export to PDF with advanced options")]
         public static string BatchExportPDF(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2358,6 +2384,7 @@ namespace RevitMCPBridge
         /// Get available print/export settings
         /// Parameters: none
         /// </summary>
+        [MCPMethod("getPrintSettings", Category = "Document", Description = "Get available print/export settings")]
         public static string GetPrintSettings(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2413,6 +2440,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all linked Revit models in the document
         /// </summary>
+        [MCPMethod("getLinkedModels", Category = "Document", Description = "Get all linked Revit models in the document")]
         public static string GetLinkedModels(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2490,6 +2518,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set link visibility in a view
         /// </summary>
+        [MCPMethod("setLinkVisibility", Category = "Document", Description = "Set link visibility in a view")]
         public static string SetLinkVisibility(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2554,6 +2583,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get worksets from linked models
         /// </summary>
+        [MCPMethod("getLinkWorksets", Category = "Document", Description = "Get worksets from linked models")]
         public static string GetLinkWorksets(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3958,6 +3988,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Export model to Navisworks NWC format.
         /// </summary>
+        [MCPMethod("exportToNWC", Category = "Document", Description = "Export model to Navisworks NWC format")]
         public static string ExportToNWC(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4035,6 +4066,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Batch export view/sheet images (PNG/JPEG) for review or markup.
         /// </summary>
+        [MCPMethod("batchExportImages", Category = "Document", Description = "Batch export view/sheet images for review or markup")]
         public static string BatchExportImages(UIApplication uiApp, JObject parameters)
         {
             try

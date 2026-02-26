@@ -28,6 +28,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Execute a built-in Revit command by its PostableCommand enum value.
         /// </summary>
+        [MCPMethod("executeRevitCommand", Category = "UIAutomation", Description = "Execute a built-in Revit command by its PostableCommand enum value")]
         public static string ExecuteRevitCommand(UIApplication uiApp, JObject parameters)
         {
             try
@@ -96,6 +97,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// List all available PostableCommand values.
         /// </summary>
+        [MCPMethod("listRevitCommands", Category = "UIAutomation", Description = "List all available PostableCommand values")]
         public static string ListRevitCommands(UIApplication uiApp, JObject parameters)
         {
             try
@@ -142,6 +144,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Show a TaskDialog to the user with customizable buttons and content.
         /// </summary>
+        [MCPMethod("showTaskDialog", Category = "UIAutomation", Description = "Show a TaskDialog to the user with customizable buttons and content")]
         public static string ShowTaskDialog(UIApplication uiApp, JObject parameters)
         {
             try
@@ -236,6 +239,7 @@ namespace RevitMCPBridge
         /// Show a simple input dialog to get text from user.
         /// Uses TaskDialog with verification text as a workaround since Revit lacks native input dialogs.
         /// </summary>
+        [MCPMethod("showInputDialog", Category = "UIAutomation", Description = "Show a simple input dialog to get text from user")]
         public static string ShowInputDialog(UIApplication uiApp, JObject parameters)
         {
             try
@@ -280,6 +284,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get detailed information about the currently active view.
         /// </summary>
+        [MCPMethod("getActiveViewInfo", Category = "UIAutomation", Description = "Get detailed information about the currently active view")]
         public static string GetActiveViewInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -376,6 +381,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Activate/switch to a specific view by ID or name.
         /// </summary>
+        [MCPMethod("activateView", Category = "UIAutomation", Description = "Activate/switch to a specific view by ID or name")]
         public static string ActivateView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -450,6 +456,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get list of all open documents in the Revit session.
         /// </summary>
+        [MCPMethod("getOpenDocuments", Category = "UIAutomation", Description = "Get list of all open documents in the Revit session")]
         public static string GetOpenDocuments(UIApplication uiApp, JObject parameters)
         {
             try
@@ -498,6 +505,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Force refresh of the active view.
         /// </summary>
+        [MCPMethod("refreshActiveView", Category = "UIAutomation", Description = "Force refresh of the active view")]
         public static string RefreshActiveView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -531,6 +539,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get current UI state including active ribbon tab, open views, etc.
         /// </summary>
+        [MCPMethod("getUIState", Category = "UIAutomation", Description = "Get current UI state including active ribbon tab, open views, etc.")]
         public static string GetUIState(UIApplication uiApp, JObject parameters)
         {
             try
@@ -585,6 +594,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Close a specific open view.
         /// </summary>
+        [MCPMethod("closeView", Category = "UIAutomation", Description = "Close a specific open view")]
         public static string CloseView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -643,6 +653,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set zoom level or zoom to fit for active view.
         /// </summary>
+        [MCPMethod("setViewZoom", Category = "UIAutomation", Description = "Set zoom level or zoom to fit for active view")]
         public static string SetViewZoom(UIApplication uiApp, JObject parameters)
         {
             try
@@ -851,6 +862,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get detailed information about currently selected elements.
         /// </summary>
+        [MCPMethod("getSelectionInfo", Category = "UIAutomation", Description = "Get detailed information about currently selected elements")]
         public static string GetSelectionInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -905,6 +917,7 @@ namespace RevitMCPBridge
         /// Send keyboard shortcuts to Revit (e.g., Escape, Ctrl+Z, Tab).
         /// Uses Windows SendKeys API.
         /// </summary>
+        [MCPMethod("sendKeySequence", Category = "UIAutomation", Description = "Send keyboard shortcuts to Revit")]
         public static string SendKeySequence(UIApplication uiApp, JObject parameters)
         {
             try
@@ -999,6 +1012,7 @@ namespace RevitMCPBridge
         /// Note: Revit API has limited access to ribbon internals,
         /// this returns what's available via the API.
         /// </summary>
+        [MCPMethod("getRibbonState", Category = "UIAutomation", Description = "Get current ribbon state including all tabs")]
         public static string GetRibbonState(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1082,6 +1096,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Check if a specific command can be executed in the current context.
         /// </summary>
+        [MCPMethod("canExecuteCommand", Category = "UIAutomation", Description = "Check if a specific command can be executed in the current context")]
         public static string CanExecuteCommand(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1146,6 +1161,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Clear the current selection.
         /// </summary>
+        [MCPMethod("clearSelection", Category = "UIAutomation", Description = "Clear the current selection")]
         public static string ClearSelection(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1180,6 +1196,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set selection to specific elements by ID.
         /// </summary>
+        [MCPMethod("setSelection", Category = "UIAutomation", Description = "Set selection to specific elements by ID")]
         public static string SetSelection(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1227,6 +1244,7 @@ namespace RevitMCPBridge
         /// Note: Full Properties palette access requires UI Automation.
         /// This method returns selection-based property information.
         /// </summary>
+        [MCPMethod("getPropertiesPaletteState", Category = "UIAutomation", Description = "Get information about the Properties palette")]
         public static string GetPropertiesPaletteState(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1354,6 +1372,7 @@ namespace RevitMCPBridge
         /// Note: This returns the view organization, not the full tree.
         /// Full tree access requires UI Automation.
         /// </summary>
+        [MCPMethod("getProjectBrowserState", Category = "UIAutomation", Description = "Get the Project Browser tree structure")]
         public static string GetProjectBrowserState(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1431,6 +1450,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Zoom the view to fit selected elements.
         /// </summary>
+        [MCPMethod("zoomToSelected", Category = "UIAutomation", Description = "Zoom the view to fit selected elements")]
         public static string ZoomToSelected(UIApplication uiApp, JObject parameters)
         {
             try

@@ -29,6 +29,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get currently selected elements in Revit.
         /// </summary>
+        [MCPMethod("getSelection", Category = "Selection", Description = "Get currently selected elements in Revit")]
         public static string GetSelection(UIApplication uiApp, JObject parameters)
         {
             try
@@ -84,6 +85,7 @@ namespace RevitMCPBridge
         /// Prompt user to select elements and wait for selection.
         /// Returns when user completes selection or timeout occurs.
         /// </summary>
+        [MCPMethod("waitForSelection", Category = "Selection", Description = "Prompt user to select elements and wait for selection")]
         public static string WaitForSelection(UIApplication uiApp, JObject parameters)
         {
             try
@@ -196,6 +198,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Select elements programmatically by their IDs.
         /// </summary>
+        [MCPMethod("selectElements", Category = "Selection", Description = "Select elements programmatically by their IDs")]
         public static string SelectElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -257,6 +260,7 @@ namespace RevitMCPBridge
         /// Highlight elements temporarily without changing selection.
         /// Uses OverrideGraphicSettings for visual feedback.
         /// </summary>
+        [MCPMethod("highlightElements", Category = "Selection", Description = "Highlight elements temporarily without changing selection")]
         public static string HighlightElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -335,6 +339,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Clear the current selection in Revit.
         /// </summary>
+        [MCPMethod("clearSelection", Category = "Selection", Description = "Clear the current selection in Revit")]
         public static string ClearSelection(UIApplication uiApp, JObject parameters)
         {
             try
@@ -369,6 +374,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Prompt user to pick a point in the model.
         /// </summary>
+        [MCPMethod("pickPoint", Category = "Selection", Description = "Prompt user to pick a point in the model")]
         public static string PickPoint(UIApplication uiApp, JObject parameters)
         {
             try
@@ -434,6 +440,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Prompt user to pick an edge on an element.
         /// </summary>
+        [MCPMethod("pickEdge", Category = "Selection", Description = "Prompt user to pick an edge on an element")]
         public static string PickEdge(UIApplication uiApp, JObject parameters)
         {
             try
@@ -498,6 +505,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Prompt user to pick a face on an element.
         /// </summary>
+        [MCPMethod("pickFace", Category = "Selection", Description = "Prompt user to pick a face on an element")]
         public static string PickFace(UIApplication uiApp, JObject parameters)
         {
             try
@@ -564,6 +572,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Zoom the active view to fit selected or specified elements.
         /// </summary>
+        [MCPMethod("zoomToElements", Category = "Selection", Description = "Zoom the active view to fit selected or specified elements")]
         public static string ZoomToElements(UIApplication uiApp, JObject parameters)
         {
             try

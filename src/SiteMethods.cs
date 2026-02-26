@@ -23,6 +23,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all topography surfaces in the model
         /// </summary>
+        [MCPMethod("getTopographySurfaces", Category = "Site", Description = "Get all topography surfaces in the model")]
         public static string GetTopographySurfaces(UIApplication uiApp, JObject parameters)
         {
             try
@@ -55,6 +56,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a topography surface from points
         /// </summary>
+        [MCPMethod("createTopography", Category = "Site", Description = "Create a topography surface from a list of XYZ points")]
         public static string CreateTopography(UIApplication uiApp, JObject parameters)
         {
             try
@@ -97,6 +99,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get topography points
         /// </summary>
+        [MCPMethod("getTopographyPoints", Category = "Site", Description = "Get all points that define a topography surface")]
         public static string GetTopographyPoints(UIApplication uiApp, JObject parameters)
         {
             try
@@ -135,6 +138,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Add points to topography
         /// </summary>
+        [MCPMethod("addTopographyPoints", Category = "Site", Description = "Add new points to an existing topography surface")]
         public static string AddTopographyPoints(UIApplication uiApp, JObject parameters)
         {
             try
@@ -190,6 +194,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a topography surface
         /// </summary>
+        [MCPMethod("deleteTopography", Category = "Site", Description = "Delete a topography surface from the model")]
         public static string DeleteTopography(UIApplication uiApp, JObject parameters)
         {
             try
@@ -225,6 +230,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all building pads
         /// </summary>
+        [MCPMethod("getBuildingPads", Category = "Site", Description = "Get all building pads in the model")]
         public static string GetBuildingPads(UIApplication uiApp, JObject parameters)
         {
             try
@@ -258,6 +264,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a building pad
         /// </summary>
+        [MCPMethod("createBuildingPad", Category = "Site", Description = "Create a building pad from boundary points on a level")]
         public static string CreateBuildingPad(UIApplication uiApp, JObject parameters)
         {
             try
@@ -339,6 +346,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all property lines (site boundary elements)
         /// </summary>
+        [MCPMethod("getPropertyLines", Category = "Site", Description = "Get all property lines and site boundary elements")]
         public static string GetPropertyLines(UIApplication uiApp, JObject parameters)
         {
             try
@@ -374,6 +382,7 @@ namespace RevitMCPBridge
         /// Create a property line (model lines in Site category)
         /// Note: Revit 2026 doesn't have PropertyLine.Create - using model lines instead
         /// </summary>
+        [MCPMethod("createPropertyLine", Category = "Site", Description = "Create a property line from a series of points")]
         public static string CreatePropertyLine(UIApplication uiApp, JObject parameters)
         {
             try
@@ -436,6 +445,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get site information
         /// </summary>
+        [MCPMethod("getSiteInfo", Category = "Site", Description = "Get site information including project address and geographic coordinates")]
         public static string GetSiteInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -465,6 +475,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set site location
         /// </summary>
+        [MCPMethod("setSiteLocation", Category = "Site", Description = "Set the site geographic location by latitude and longitude")]
         public static string SetSiteLocation(UIApplication uiApp, JObject parameters)
         {
             try

@@ -19,6 +19,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a room at a point
         /// </summary>
+        [MCPMethod("createRoom", Category = "Room", Description = "Create a room at a specified point on a level")]
         public static string CreateRoom(UIApplication uiApp, JObject parameters)
         {
             try
@@ -98,6 +99,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get room information
         /// </summary>
+        [MCPMethod("getRoomInfo", Category = "Room", Description = "Get detailed information about a specific room")]
         public static string GetRoomInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -166,6 +168,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Modify room properties
         /// </summary>
+        [MCPMethod("modifyRoomProperties", Category = "Room", Description = "Modify properties of an existing room")]
         public static string ModifyRoomProperties(UIApplication uiApp, JObject parameters)
         {
             try
@@ -263,6 +266,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Place a room tag
         /// </summary>
+        [MCPMethod("placeRoomTag", Category = "Room", Description = "Place a room tag annotation in a view")]
         public static string PlaceRoomTag(UIApplication uiApp, JObject parameters)
         {
             try
@@ -328,6 +332,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all rooms in a view or level
         /// </summary>
+        [MCPMethod("getRooms", Category = "Room", Description = "Get all rooms in the model, optionally filtered by level or view")]
         public static string GetRooms(UIApplication uiApp, JObject parameters)
         {
             try
@@ -402,6 +407,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set a room's number property. Uses Room.Number property directly for reliable updates.
         /// </summary>
+        [MCPMethod("setRoomNumber", Category = "Room", Description = "Set the number property of a room")]
         public static string SetRoomNumber(UIApplication uiApp, JObject parameters)
         {
             try
@@ -483,6 +489,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set room name property
         /// </summary>
+        [MCPMethod("setRoomName", Category = "Room", Description = "Set the name property of a room")]
         public static string SetRoomName(UIApplication uiApp, JObject parameters)
         {
             try
@@ -563,6 +570,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set room department property
         /// </summary>
+        [MCPMethod("setRoomDepartment", Category = "Room", Description = "Set the department property of a room")]
         public static string SetRoomDepartment(UIApplication uiApp, JObject parameters)
         {
             try
@@ -634,6 +642,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set room comments property
         /// </summary>
+        [MCPMethod("setRoomComments", Category = "Room", Description = "Set the comments property of a room")]
         public static string SetRoomComments(UIApplication uiApp, JObject parameters)
         {
             try
@@ -705,6 +714,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get rooms filtered by level
         /// </summary>
+        [MCPMethod("getRoomsByLevel", Category = "Room", Description = "Get all rooms on a specific level")]
         public static string GetRoomsByLevel(UIApplication uiApp, JObject parameters)
         {
             try
@@ -770,6 +780,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Batch update multiple room properties at once
         /// </summary>
+        [MCPMethod("batchUpdateRooms", Category = "Room", Description = "Update properties on multiple rooms in a single transaction")]
         public static string BatchUpdateRooms(UIApplication uiApp, JObject parameters)
         {
             try
@@ -877,6 +888,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Validate room data and find issues
         /// </summary>
+        [MCPMethod("validateRoomData", Category = "Room", Description = "Validate room data and report any issues found")]
         public static string ValidateRoomData(UIApplication uiApp, JObject parameters)
         {
             try
@@ -982,6 +994,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create room separation lines
         /// </summary>
+        [MCPMethod("createRoomSeparationLine", Category = "Room", Description = "Create a room separation line to define room boundaries")]
         public static string CreateRoomSeparationLine(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1057,6 +1070,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a room
         /// </summary>
+        [MCPMethod("deleteRoom", Category = "Room", Description = "Delete a room element from the model")]
         public static string DeleteRoom(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1092,6 +1106,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get room at point
         /// </summary>
+        [MCPMethod("getRoomAtPoint", Category = "Room", Description = "Get the room that contains a given XYZ point")]
         public static string GetRoomAtPoint(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1143,6 +1158,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Renumber rooms sequentially
         /// </summary>
+        [MCPMethod("renumberRooms", Category = "Room", Description = "Renumber rooms sequentially based on a specified order")]
         public static string RenumberRooms(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1202,6 +1218,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Calculate filled region area for a room and update room parameter with adjusted square footage
         /// </summary>
+        [MCPMethod("updateRoomAreaFromFilledRegion", Category = "Room", Description = "Calculate filled region area and update room parameter with adjusted square footage")]
         public static string UpdateRoomAreaFromFilledRegion(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1374,6 +1391,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get walls that bound a specific room with classification
         /// </summary>
+        [MCPMethod("getRoomBoundaryWalls", Category = "Room", Description = "Get all boundary walls for a room with their classifications")]
         public static string GetRoomBoundaryWalls(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1525,6 +1543,7 @@ namespace RevitMCPBridge
         /// Set the Area Computation setting for the document (affects all room area calculations)
         /// Options: "Finish" (wall finish/interior), "Center" (wall center), "CoreBoundary", "CoreCenter"
         /// </summary>
+        [MCPMethod("setAreaComputation", Category = "Room", Description = "Set the area computation method for room area calculations")]
         public static string SetAreaComputation(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1594,6 +1613,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the current Area Computation setting
         /// </summary>
+        [MCPMethod("getAreaComputation", Category = "Room", Description = "Get the current area computation method setting for the document")]
         public static string GetAreaComputation(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1640,6 +1660,7 @@ namespace RevitMCPBridge
         /// Create an area plan view for gross/rentable area calculations
         /// Parameters: levelId, areaScheme: "Gross Building"|"Rentable" (optional), viewName (optional)
         /// </summary>
+        [MCPMethod("createAreaPlan", Category = "Room", Description = "Create an area plan view for gross or rentable area calculations")]
         public static string CreateAreaPlan(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1718,6 +1739,7 @@ namespace RevitMCPBridge
         /// Create area boundary lines in an area plan
         /// Parameters: viewId, points: [[x1,y1], [x2,y2], ...], closed: true|false (optional)
         /// </summary>
+        [MCPMethod("createAreaBoundary", Category = "Room", Description = "Create area boundary lines in an area plan view")]
         public static string CreateAreaBoundary(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1804,6 +1826,7 @@ namespace RevitMCPBridge
         /// Get all areas in the model or in a specific view
         /// Parameters: viewId (optional) - if not provided, gets all areas
         /// </summary>
+        [MCPMethod("getAreas", Category = "Room", Description = "Get all areas in the model or in a specific area plan view")]
         public static string GetAreas(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1864,6 +1887,7 @@ namespace RevitMCPBridge
         /// Place an area in an area plan at a specific point
         /// Parameters: viewId, point: [x, y], areaName (optional), areaNumber (optional)
         /// </summary>
+        [MCPMethod("placeArea", Category = "Room", Description = "Place an area element in an area plan at a specified point")]
         public static string PlaceArea(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1947,6 +1971,7 @@ namespace RevitMCPBridge
         /// Create a room finish schedule automatically with standard finish parameters
         /// Parameters: scheduleName (optional), includeFloor, includeCeiling, includeWalls, includeBase (all optional bools)
         /// </summary>
+        [MCPMethod("createRoomFinishSchedule", Category = "Room", Description = "Create a room finish schedule with floor, ceiling, wall, and base finish parameters")]
         public static string CreateRoomFinishSchedule(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2061,6 +2086,7 @@ namespace RevitMCPBridge
         /// Get room finish data for all rooms or specific rooms
         /// Parameters: roomIds (optional array), levelId (optional filter)
         /// </summary>
+        [MCPMethod("getRoomFinishes", Category = "Room", Description = "Get finish data for all rooms or a specific set of rooms")]
         public static string GetRoomFinishes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2127,6 +2153,7 @@ namespace RevitMCPBridge
         /// Parameters:
         ///   updates: array of { roomIds: [ids] OR roomNamePattern: "pattern", floorFinish, ceilingFinish, wallFinish, baseFinish }
         /// </summary>
+        [MCPMethod("updateRoomFinishes", Category = "Room", Description = "Bulk update floor, ceiling, wall, and base finishes for rooms by ID or name pattern")]
         public static string UpdateRoomFinishes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2309,6 +2336,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set the upper limit and offset for a room element
         /// </summary>
+        [MCPMethod("setRoomUpperLimit", Category = "Room", Description = "Set the upper limit level and offset for a room element")]
         public static string Setroomupperlimit(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2340,6 +2368,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the bounding box coordinates for a room element
         /// </summary>
+        [MCPMethod("getRoomBoundingBox", Category = "Room", Description = "Get the bounding box coordinates for a room element")]
         public static string Getroomboundingbox(UIApplication uiApp, JObject parameters)
         {
             try

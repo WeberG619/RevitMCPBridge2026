@@ -26,6 +26,7 @@ namespace RevitMCPBridge
         /// - expectedLocation: (optional) Expected [x, y, z] location
         /// - tolerance: (optional) Location tolerance in feet (default 0.1)
         /// </summary>
+        [MCPMethod("verifyElement", Category = "Validation", Description = "Verify an element exists and matches expected properties")]
         public static string VerifyElement(UIApplication uiApp, JObject parameters)
         {
             try
@@ -147,6 +148,7 @@ namespace RevitMCPBridge
         /// - expectedText: Text that should be present (partial match)
         /// - exactMatch: (optional) Require exact match (default false)
         /// </summary>
+        [MCPMethod("verifyTextContent", Category = "Validation", Description = "Verify a text note contains expected content")]
         public static string VerifyTextContent(UIApplication uiApp, JObject parameters)
         {
             try
@@ -237,6 +239,7 @@ namespace RevitMCPBridge
         /// - viewId: ID of the view
         /// - categories: (optional) Array of category names to include
         /// </summary>
+        [MCPMethod("getViewSnapshot", Category = "Validation", Description = "Get a snapshot of view contents for comparison")]
         public static string GetViewSnapshot(UIApplication uiApp, JObject parameters)
         {
             try
@@ -328,6 +331,7 @@ namespace RevitMCPBridge
         /// - viewId: ID of the view
         /// - previousSnapshot: Previous snapshot data from GetViewSnapshot
         /// </summary>
+        [MCPMethod("compareViewState", Category = "Validation", Description = "Compare current view state against a previous snapshot")]
         public static string CompareViewState(UIApplication uiApp, JObject parameters)
         {
             try
@@ -439,6 +443,7 @@ namespace RevitMCPBridge
         ///   - expectedName: (optional)
         ///   - expectedText: (optional, for text notes)
         /// </summary>
+        [MCPMethod("verifyBatch", Category = "Validation", Description = "Verify multiple elements in a single call")]
         public static string VerifyBatch(UIApplication uiApp, JObject parameters)
         {
             try
@@ -549,6 +554,7 @@ namespace RevitMCPBridge
         /// - elementId: ID of element that was operated on
         /// - expectedState: What state the element should be in
         /// </summary>
+        [MCPMethod("verifyOperation", Category = "Validation", Description = "Verify that a recent operation completed successfully")]
         public static string VerifyOperation(UIApplication uiApp, JObject parameters)
         {
             try
@@ -694,6 +700,7 @@ namespace RevitMCPBridge
         /// - expectedCount: Expected number of elements
         /// - tolerance: (optional) Allowed difference (default 0)
         /// </summary>
+        [MCPMethod("verifyElementCount", Category = "Validation", Description = "Verify element count in a view matches expectations")]
         public static string VerifyElementCount(UIApplication uiApp, JObject parameters)
         {
             try
@@ -788,6 +795,7 @@ namespace RevitMCPBridge
         /// - includeSheets: (optional) Include sheet summary (default: true)
         /// - includeTypes: (optional) Include type counts (default: false, slower)
         /// </summary>
+        [MCPMethod("getModelState", Category = "Validation", Description = "Get comprehensive model state for AI awareness before operations")]
         public static string GetModelState(UIApplication uiApp, JObject parameters)
         {
             try
@@ -982,6 +990,7 @@ namespace RevitMCPBridge
         /// - operation: Operation name (e.g., "createWall", "placeViewOnSheet")
         /// - parameters: The parameters that will be passed to the operation
         /// </summary>
+        [MCPMethod("preFlightCheck", Category = "Validation", Description = "Pre-flight check before executing an operation")]
         public static string PreFlightCheck(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1138,6 +1147,7 @@ namespace RevitMCPBridge
         /// Detect geometric clashes between elements of different categories.
         /// Essential for coordination and QC.
         /// </summary>
+        [MCPMethod("detectClashes", Category = "Validation", Description = "Detect geometric clashes between elements of different categories")]
         public static string DetectClashes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1253,6 +1263,7 @@ namespace RevitMCPBridge
         /// - useDefaults: If true, runs standard MEP/Structural/Architectural tests (default: true)
         /// - maxClashesPerTest: Max clashes to report per test (default: 100)
         /// </summary>
+        [MCPMethod("runFullClashDetection", Category = "Validation", Description = "Run comprehensive clash detection across multiple category pairs")]
         public static string RunFullClashDetection(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1429,6 +1440,7 @@ namespace RevitMCPBridge
         /// - viewName: Name for the clash view (optional)
         /// - zoomMargin: Extra margin around clash in feet (default: 5)
         /// </summary>
+        [MCPMethod("createClashView", Category = "Validation", Description = "Create a 3D view focused on a clash location")]
         public static string CreateClashView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1561,6 +1573,7 @@ namespace RevitMCPBridge
         /// - projectName: Name to include in report (optional)
         /// - format: "html" (default), "csv", or "json"
         /// </summary>
+        [MCPMethod("exportClashReport", Category = "Validation", Description = "Export clash detection results to file")]
         public static string ExportClashReport(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1688,6 +1701,7 @@ namespace RevitMCPBridge
         /// Get quick summary of potential clashes without full detection.
         /// Checks element counts and overlap potential for common problem pairs.
         /// </summary>
+        [MCPMethod("getClashRiskAssessment", Category = "Validation", Description = "Get quick summary of potential clashes without full detection")]
         public static string GetClashRiskAssessment(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1827,6 +1841,7 @@ namespace RevitMCPBridge
         /// Comprehensive model health validation.
         /// Checks for orphaned elements, floating furniture, missing parameters, etc.
         /// </summary>
+        [MCPMethod("validateModelHealth", Category = "Validation", Description = "Comprehensive model health validation")]
         public static string ValidateModelHealth(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1997,6 +2012,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Auto-place keynotes on elements in a view with collision avoidance.
         /// </summary>
+        [MCPMethod("autoPlaceKeynotes", Category = "Validation", Description = "Auto-place keynotes on elements in a view with collision avoidance")]
         public static string AutoPlaceKeynotes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2155,6 +2171,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Generate a legend from model element types.
         /// </summary>
+        [MCPMethod("generateLegendFromTypes", Category = "Validation", Description = "Generate a legend from model element types")]
         public static string GenerateLegendFromTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2235,6 +2252,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Export construction data for takeoffs and estimating.
         /// </summary>
+        [MCPMethod("exportConstructionData", Category = "Validation", Description = "Export construction data for takeoffs and estimating")]
         public static string ExportConstructionData(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2370,6 +2388,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Analyze furniture layout and suggest optimizations based on clearances and accessibility.
         /// </summary>
+        [MCPMethod("optimizeFurnitureLayout", Category = "Validation", Description = "Analyze furniture layout and suggest optimizations based on clearances")]
         public static string OptimizeFurnitureLayout(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2542,6 +2561,7 @@ namespace RevitMCPBridge
         /// - viewId (optional): Limit to specific view
         /// </param>
         /// <returns>JSON response with validation violations and suggestions</returns>
+        [MCPMethod("validateElementSpacingAndAlignment", Category = "Validation", Description = "Validate element spacing and alignment against tolerances and code requirements")]
         public static string ValidateElementSpacingAndAlignment(UIApplication uiApp, JObject parameters)
         {
             try

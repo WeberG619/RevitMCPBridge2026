@@ -22,6 +22,7 @@ namespace RevitMCPBridge
         /// Run comprehensive CD checklist verification on the current model
         /// Returns pass/fail status for each check category
         /// </summary>
+        [MCPMethod("runCDChecklist", Category = "CDChecklist", Description = "Run comprehensive construction document checklist verification on the current model")]
         public static string RunCDChecklist(UIApplication uiApp, JObject parameters)
         {
             try
@@ -766,6 +767,7 @@ namespace RevitMCPBridge
         /// Audit rooms for naming, numbering, finish data, and area issues.
         /// Wraps the private CheckRooms method and adds detailed per-room data.
         /// </summary>
+        [MCPMethod("auditRooms", Category = "CDChecklist", Description = "Audit rooms for naming, numbering, finish data, and area completeness")]
         public static string AuditRooms(UIApplication uiApp, JObject parameters)
         {
             try
@@ -879,6 +881,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Audit doors for marks, types, fire ratings, and schedule readiness.
         /// </summary>
+        [MCPMethod("auditDoors", Category = "CDChecklist", Description = "Audit doors for marks, types, fire ratings, and schedule readiness")]
         public static string AuditDoors(UIApplication uiApp, JObject parameters)
         {
             try
@@ -987,6 +990,7 @@ namespace RevitMCPBridge
         /// Get purgeable element counts without deleting.
         /// Thin wrapper around PurgeUnused with dryRun=true, plus additional categories.
         /// </summary>
+        [MCPMethod("getPurgeable", Category = "CDChecklist", Description = "Get counts of purgeable unused elements without deleting them")]
         public static string GetPurgeable(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1071,6 +1075,7 @@ namespace RevitMCPBridge
         /// Run standards check against firm profile or custom rules.
         /// Checks text types, dimension types, line weights, and naming conventions.
         /// </summary>
+        [MCPMethod("runStandardsCheck", Category = "CDChecklist", Description = "Run standards check against firm profile rules for text types, dimension types, and naming conventions")]
         public static string RunStandardsCheck(UIApplication uiApp, JObject parameters)
         {
             try

@@ -23,6 +23,7 @@ namespace RevitMCPBridge2026
         /// <param name="uiApp">The Revit UI Application</param>
         /// <param name="parameters">JSON parameters containing materialName, properties</param>
         /// <returns>JSON response with success status and material ID</returns>
+        [MCPMethod("createMaterial", Category = "Material", Description = "Creates a new material in the project")]
         public static string CreateMaterial(UIApplication uiApp, JObject parameters)
         {
             try
@@ -97,6 +98,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all materials in the project
         /// </summary>
+        [MCPMethod("getAllMaterials", Category = "Material", Description = "Gets all materials in the project")]
         public static string GetAllMaterials(UIApplication uiApp, JObject parameters)
         {
             try
@@ -148,6 +150,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets detailed information about a material
         /// </summary>
+        [MCPMethod("getMaterialInfo", Category = "Material", Description = "Gets detailed information about a material")]
         public static string GetMaterialInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -220,6 +223,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies material properties
         /// </summary>
+        [MCPMethod("modifyMaterial", Category = "Material", Description = "Modifies material properties")]
         public static string ModifyMaterial(UIApplication uiApp, JObject parameters)
         {
             try
@@ -312,6 +316,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Duplicates a material
         /// </summary>
+        [MCPMethod("duplicateMaterial", Category = "Material", Description = "Duplicates an existing material")]
         public static string DuplicateMaterial(UIApplication uiApp, JObject parameters)
         {
             try
@@ -376,6 +381,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Deletes a material
         /// </summary>
+        [MCPMethod("deleteMaterial", Category = "Material", Description = "Deletes a material from the project")]
         public static string DeleteMaterial(UIApplication uiApp, JObject parameters)
         {
             try
@@ -446,6 +452,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets material appearance properties
         /// </summary>
+        [MCPMethod("setMaterialAppearance", Category = "Material", Description = "Sets material appearance properties")]
         public static string SetMaterialAppearance(UIApplication uiApp, JObject parameters)
         {
             try
@@ -516,6 +523,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets material appearance properties
         /// </summary>
+        [MCPMethod("getMaterialAppearance", Category = "Material", Description = "Gets material appearance properties")]
         public static string GetMaterialAppearance(UIApplication uiApp, JObject parameters)
         {
             try
@@ -581,6 +589,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets material texture/image
         /// </summary>
+        [MCPMethod("setMaterialTexture", Category = "Material", Description = "Sets the texture or image for a material")]
         public static string SetMaterialTexture(UIApplication uiApp, JObject parameters)
         {
             try
@@ -633,6 +642,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets material render appearance
         /// </summary>
+        [MCPMethod("setRenderAppearance", Category = "Material", Description = "Sets material render appearance asset")]
         public static string SetRenderAppearance(UIApplication uiApp, JObject parameters)
         {
             try
@@ -702,6 +712,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets material surface pattern for cut/surface
         /// </summary>
+        [MCPMethod("setMaterialSurfacePattern", Category = "Material", Description = "Sets the surface pattern for a material")]
         public static string SetMaterialSurfacePattern(UIApplication uiApp, JObject parameters)
         {
             try
@@ -755,6 +766,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets material surface pattern settings
         /// </summary>
+        [MCPMethod("getMaterialSurfacePattern", Category = "Material", Description = "Gets surface pattern settings for a material")]
         public static string GetMaterialSurfacePattern(UIApplication uiApp, JObject parameters)
         {
             try
@@ -811,6 +823,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets material physical/thermal properties
         /// </summary>
+        [MCPMethod("setMaterialPhysicalProperties", Category = "Material", Description = "Sets physical and thermal properties for a material")]
         public static string SetMaterialPhysicalProperties(UIApplication uiApp, JObject parameters)
         {
             try
@@ -865,6 +878,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets material physical/thermal properties
         /// </summary>
+        [MCPMethod("getMaterialPhysicalProperties", Category = "Material", Description = "Gets physical and thermal properties for a material")]
         public static string GetMaterialPhysicalProperties(UIApplication uiApp, JObject parameters)
         {
             try
@@ -926,6 +940,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all material classes
         /// </summary>
+        [MCPMethod("getMaterialClasses", Category = "Material", Description = "Gets all material classes in the project")]
         public static string GetMaterialClasses(UIApplication uiApp, JObject parameters)
         {
             try
@@ -970,6 +985,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets material class
         /// </summary>
+        [MCPMethod("setMaterialClass", Category = "Material", Description = "Sets the class for a material")]
         public static string SetMaterialClass(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1038,6 +1054,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Finds all elements using a material
         /// </summary>
+        [MCPMethod("findElementsWithMaterial", Category = "Material", Description = "Finds all elements using a specific material")]
         public static string FindElementsWithMaterial(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1120,6 +1137,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Replaces material in all elements
         /// </summary>
+        [MCPMethod("replaceMaterial", Category = "Material", Description = "Replaces a material across all elements that use it")]
         public static string ReplaceMaterial(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1199,6 +1217,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets material usage statistics
         /// </summary>
+        [MCPMethod("getMaterialUsageStats", Category = "Material", Description = "Gets usage statistics for a material")]
         public static string GetMaterialUsageStats(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1287,6 +1306,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Loads material from Autodesk material library
         /// </summary>
+        [MCPMethod("loadMaterialFromLibrary", Category = "Material", Description = "Loads a material from the Autodesk material library")]
         public static string LoadMaterialFromLibrary(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1316,6 +1336,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Exports material to library file
         /// </summary>
+        [MCPMethod("exportMaterial", Category = "Material", Description = "Exports a material to a library file")]
         public static string ExportMaterial(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1349,6 +1370,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Searches for materials by name or properties
         /// </summary>
+        [MCPMethod("searchMaterials", Category = "Material", Description = "Searches for materials by name or properties")]
         public static string SearchMaterials(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1431,6 +1453,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all appearance assets in project
         /// </summary>
+        [MCPMethod("getAppearanceAssets", Category = "Material", Description = "Gets all appearance assets in the project")]
         public static string GetAppearanceAssets(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1472,6 +1495,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a new appearance asset
         /// </summary>
+        [MCPMethod("createAppearanceAsset", Category = "Material", Description = "Creates a new appearance asset")]
         public static string CreateAppearanceAsset(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1501,6 +1525,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Duplicates an appearance asset
         /// </summary>
+        [MCPMethod("duplicateAppearanceAsset", Category = "Material", Description = "Duplicates an existing appearance asset")]
         public static string DuplicateAppearanceAsset(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1565,6 +1590,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies an appearance asset's color/tint (limited support in Revit 2026)
         /// </summary>
+        [MCPMethod("modifyAppearanceAssetColor", Category = "Material", Description = "Modifies the color or tint of an appearance asset")]
         public static string ModifyAppearanceAssetColor(UIApplication uiApp, JObject parameters)
         {
             // Note: AppearanceAssetEditScope is internal in Revit 2026 API
@@ -1582,6 +1608,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets detailed information about an appearance asset including its properties
         /// </summary>
+        [MCPMethod("getAppearanceAssetDetails", Category = "Material", Description = "Gets detailed information about an appearance asset")]
         public static string GetAppearanceAssetDetails(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1683,6 +1710,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a complete material with appearance asset in one call
         /// </summary>
+        [MCPMethod("createMaterialWithAppearance", Category = "Material", Description = "Creates a complete material with appearance asset in one call")]
         public static string CreateMaterialWithAppearance(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1784,6 +1812,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets material by name
         /// </summary>
+        [MCPMethod("getMaterialByName", Category = "Material", Description = "Gets a material by its name")]
         public static string GetMaterialByName(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1844,6 +1873,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Checks if material is in use
         /// </summary>
+        [MCPMethod("isMaterialInUse", Category = "Material", Description = "Checks if a material is currently in use by any element")]
         public static string IsMaterialInUse(UIApplication uiApp, JObject parameters)
         {
             try

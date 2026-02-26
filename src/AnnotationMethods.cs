@@ -23,6 +23,7 @@ namespace RevitMCPBridge2026
         /// <param name="uiApp">The Revit UI Application</param>
         /// <param name="parameters">JSON parameters containing reference, location, keynoteKey</param>
         /// <returns>JSON response with success status and keynote ID</returns>
+        [MCPMethod("placeKeynote", Category = "Annotation", Description = "Places a keynote annotation tag")]
         public static string PlaceKeynote(UIApplication uiApp, JObject parameters)
         {
             try
@@ -138,6 +139,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Loads keynote file
         /// </summary>
+        [MCPMethod("loadKeynoteFile", Category = "Annotation", Description = "Loads a keynote file into the project")]
         public static string LoadKeynoteFile(UIApplication uiApp, JObject parameters)
         {
             try
@@ -188,6 +190,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all keynote entries
         /// </summary>
+        [MCPMethod("getKeynoteEntries", Category = "Annotation", Description = "Gets all keynote entries from the loaded file")]
         public static string GetKeynoteEntries(UIApplication uiApp, JObject parameters)
         {
             try
@@ -215,6 +218,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets keynotes in a view
         /// </summary>
+        [MCPMethod("getKeynotesInView", Category = "Annotation", Description = "Gets all keynote tags in a view")]
         public static string GetKeynotesInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -306,6 +310,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places an annotation symbol
         /// </summary>
+        [MCPMethod("placeAnnotationSymbol", Category = "Annotation", Description = "Places an annotation symbol in a view")]
         public static string PlaceAnnotationSymbol(UIApplication uiApp, JObject parameters)
         {
             try
@@ -393,6 +398,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all annotation symbol types
         /// </summary>
+        [MCPMethod("getAnnotationSymbolTypes", Category = "Annotation", Description = "Gets all annotation symbol types in the document")]
         public static string GetAnnotationSymbolTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -442,6 +448,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a revision cloud
         /// </summary>
+        [MCPMethod("createRevisionCloud", Category = "Annotation", Description = "Creates a revision cloud in a view")]
         public static string CreateRevisionCloud(UIApplication uiApp, JObject parameters)
         {
             try
@@ -541,6 +548,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all revision clouds in a view
         /// </summary>
+        [MCPMethod("getRevisionCloudsInView", Category = "Annotation", Description = "Gets all revision clouds in a view")]
         public static string GetRevisionCloudsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -611,6 +619,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies a revision cloud boundary
         /// </summary>
+        [MCPMethod("modifyRevisionCloud", Category = "Annotation", Description = "Modifies an existing revision cloud")]
         public static string ModifyRevisionCloud(UIApplication uiApp, JObject parameters)
         {
             try
@@ -708,6 +717,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Deletes a revision cloud
         /// </summary>
+        [MCPMethod("deleteRevisionCloud", Category = "Annotation", Description = "Deletes a revision cloud from the document")]
         public static string DeleteRevisionCloud(UIApplication uiApp, JObject parameters)
         {
             try
@@ -774,6 +784,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a new revision
         /// </summary>
+        [MCPMethod("createRevision", Category = "Annotation", Description = "Creates a new revision in the project")]
         public static string CreateRevision(UIApplication uiApp, JObject parameters)
         {
             try
@@ -854,6 +865,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all revisions in the project
         /// </summary>
+        [MCPMethod("getAllRevisions", Category = "Annotation", Description = "Gets all revisions in the project")]
         public static string GetAllRevisions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -906,6 +918,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies revision properties
         /// </summary>
+        [MCPMethod("modifyRevision", Category = "Annotation", Description = "Modifies revision properties")]
         public static string ModifyRevision(UIApplication uiApp, JObject parameters)
         {
             try
@@ -994,6 +1007,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Issues or unissues a revision
         /// </summary>
+        [MCPMethod("setRevisionIssued", Category = "Annotation", Description = "Sets the issued state of a revision")]
         public static string SetRevisionIssued(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1074,6 +1088,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places an angular dimension
         /// </summary>
+        [MCPMethod("placeAngularDimension", Category = "Annotation", Description = "Places an angular dimension in a view")]
         public static string PlaceAngularDimension(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1176,6 +1191,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places a radial dimension
         /// </summary>
+        [MCPMethod("placeRadialDimension", Category = "Annotation", Description = "Places a radial dimension in a view")]
         public static string PlaceRadialDimension(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1286,6 +1302,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places a diameter dimension
         /// </summary>
+        [MCPMethod("placeDiameterDimension", Category = "Annotation", Description = "Places a diameter dimension in a view")]
         public static string PlaceDiameterDimension(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1397,6 +1414,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places an arc length dimension
         /// </summary>
+        [MCPMethod("placeArcLengthDimension", Category = "Annotation", Description = "Places an arc length dimension in a view")]
         public static string PlaceArcLengthDimension(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1508,6 +1526,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a callout view
         /// </summary>
+        [MCPMethod("createCallout", Category = "Annotation", Description = "Creates a callout view in a parent view")]
         public static string CreateCallout(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1596,6 +1615,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets callouts in a view
         /// </summary>
+        [MCPMethod("getCalloutsInView", Category = "Annotation", Description = "Gets all callout views in a parent view")]
         public static string GetCalloutsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1678,6 +1698,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places an area tag
         /// </summary>
+        [MCPMethod("placeAreaTag", Category = "Annotation", Description = "Places an area tag in an area plan view")]
         public static string PlaceAreaTag(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1789,6 +1810,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets area tags in a view
         /// </summary>
+        [MCPMethod("getAreaTagsInView", Category = "Annotation", Description = "Gets all area tags in a view")]
         public static string GetAreaTagsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1875,6 +1897,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places a spot elevation
         /// </summary>
+        [MCPMethod("placeSpotElevation", Category = "Annotation", Description = "Places a spot elevation annotation")]
         public static string PlaceSpotElevation(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1978,6 +2001,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places a spot coordinate
         /// </summary>
+        [MCPMethod("placeSpotCoordinate", Category = "Annotation", Description = "Places a spot coordinate annotation")]
         public static string PlaceSpotCoordinate(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2081,6 +2105,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places a spot slope
         /// </summary>
+        [MCPMethod("placeSpotSlope", Category = "Annotation", Description = "Places a spot slope annotation")]
         public static string PlaceSpotSlope(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2172,6 +2197,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a reference plane
         /// </summary>
+        [MCPMethod("createReferencePlane", Category = "Annotation", Description = "Creates a reference plane in a view")]
         public static string CreateReferencePlane(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2239,6 +2265,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets reference planes in a view
         /// </summary>
+        [MCPMethod("getReferencePlanesInView", Category = "Annotation", Description = "Gets all reference planes in a view")]
         public static string GetReferencePlanesInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2297,6 +2324,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a matchline
         /// </summary>
+        [MCPMethod("createMatchline", Category = "Annotation", Description = "Creates a matchline in a view")]
         public static string CreateMatchline(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2323,6 +2351,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets matchlines in a view
         /// </summary>
+        [MCPMethod("getMatchlinesInView", Category = "Annotation", Description = "Gets all matchlines in a view")]
         public static string GetMatchlinesInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2382,6 +2411,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places a legend component
         /// </summary>
+        [MCPMethod("placeLegendComponent", Category = "Annotation", Description = "Places a legend component in a legend view")]
         public static string PlaceLegendComponent(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2489,6 +2519,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets legend components in a legend view
         /// </summary>
+        [MCPMethod("getLegendComponents", Category = "Annotation", Description = "Gets all legend components in a legend view")]
         public static string GetLegendComponents(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2549,6 +2580,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all annotations in a view
         /// </summary>
+        [MCPMethod("getAllAnnotationsInView", Category = "Annotation", Description = "Gets all annotation elements in a view")]
         public static string GetAllAnnotationsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2655,6 +2687,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Deletes an annotation element
         /// </summary>
+        [MCPMethod("deleteAnnotation", Category = "Annotation", Description = "Deletes an annotation element from the document")]
         public static string DeleteAnnotation(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2722,6 +2755,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Adds or enables a leader on an annotation symbol (generic annotation family instance)
         /// </summary>
+        [MCPMethod("addAnnotationLeader", Category = "Annotation", Description = "Adds a leader to an existing annotation tag")]
         public static string AddAnnotationLeader(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2885,6 +2919,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets the leader endpoint for an annotation (where the leader arrow points)
         /// </summary>
+        [MCPMethod("setLeaderEndpoint", Category = "Annotation", Description = "Sets the endpoint of an annotation leader")]
         public static string SetLeaderEndpoint(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3019,6 +3054,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets leader information for an annotation
         /// </summary>
+        [MCPMethod("getAnnotationLeaderInfo", Category = "Annotation", Description = "Gets leader information for an annotation tag")]
         public static string GetAnnotationLeaderInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3117,6 +3153,7 @@ namespace RevitMCPBridge2026
         /// Places an annotation symbol with a leader pointing to a target element
         /// Combined operation for efficient keynote placement with leaders
         /// </summary>
+        [MCPMethod("placeAnnotationWithLeader", Category = "Annotation", Description = "Places an annotation tag with a leader")]
         public static string PlaceAnnotationWithLeader(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3311,6 +3348,7 @@ namespace RevitMCPBridge2026
         /// Batch places multiple keynotes with leaders pointing to their respective elements
         /// Efficient method for placing all keynotes on a floor plan at once
         /// </summary>
+        [MCPMethod("batchPlaceKeynotesWithLeaders", Category = "Annotation", Description = "Batch places keynote tags with leaders on multiple elements")]
         public static string BatchPlaceKeynotesWithLeaders(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3484,6 +3522,7 @@ namespace RevitMCPBridge2026
         /// Add text note(s) to a legend view at specified positions.
         /// Used to build legends with title, labels, and descriptions.
         /// </summary>
+        [MCPMethod("addTextToLegend", Category = "Annotation", Description = "Adds a text note to a legend view")]
         public static string AddTextToLegend(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3572,6 +3611,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Create a keynote schedule (keynote legend) that lists all keynotes used in the project.
         /// </summary>
+        [MCPMethod("createKeynoteSchedule", Category = "Annotation", Description = "Creates a keynote legend schedule")]
         public static string CreateKeynoteSchedule(UIApplication uiApp, JObject parameters)
         {
             try

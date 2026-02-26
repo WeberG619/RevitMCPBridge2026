@@ -36,6 +36,7 @@ namespace RevitMCPBridge
         ///   - backend: automatic1111 or comfyui (default: automatic1111)
         ///   - backendUrl: URL of the AI backend (default: http://localhost:7860)
         /// </param>
+        [MCPMethod("submitRender", Category = "Render", Description = "Submit a viewport capture for AI rendering")]
         public static string SubmitRender(UIApplication uiApp, JObject parameters)
         {
             try
@@ -110,6 +111,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the status of a render job.
         /// </summary>
+        [MCPMethod("getRenderStatus", Category = "Render", Description = "Get the status of a render job")]
         public static string GetRenderStatus(UIApplication uiApp, JObject parameters)
         {
             try
@@ -156,6 +158,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the result of a completed render job.
         /// </summary>
+        [MCPMethod("getRenderResult", Category = "Render", Description = "Get the result of a completed render job")]
         public static string GetRenderResult(UIApplication uiApp, JObject parameters)
         {
             try
@@ -226,6 +229,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// List all render jobs.
         /// </summary>
+        [MCPMethod("listRenderJobs", Category = "Render", Description = "List all render jobs")]
         public static string ListRenderJobs(UIApplication uiApp, JObject parameters)
         {
             try
@@ -284,6 +288,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Cancel a render job.
         /// </summary>
+        [MCPMethod("cancelRender", Category = "Render", Description = "Cancel a render job")]
         public static string CancelRender(UIApplication uiApp, JObject parameters)
         {
             try
@@ -340,6 +345,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get available style presets.
         /// </summary>
+        [MCPMethod("getRenderPresets", Category = "Render", Description = "Get available render style presets")]
         public static string GetRenderPresets(UIApplication uiApp, JObject parameters)
         {
             try
@@ -399,6 +405,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Capture viewport and immediately submit for rendering (convenience method).
         /// </summary>
+        [MCPMethod("captureAndRender", Category = "Render", Description = "Capture viewport and immediately submit for rendering")]
         public static string CaptureAndRender(UIApplication uiApp, JObject parameters)
         {
             try

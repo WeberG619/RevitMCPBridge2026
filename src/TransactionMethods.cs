@@ -26,6 +26,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Start a transaction group to combine multiple operations into one undoable action.
         /// </summary>
+        [MCPMethod("startTransactionGroup", Category = "Transaction", Description = "Start a transaction group to combine multiple operations into one undoable action")]
         public static string StartTransactionGroup(UIApplication uiApp, JObject parameters)
         {
             try
@@ -75,6 +76,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Commit the active transaction group, finalizing all operations.
         /// </summary>
+        [MCPMethod("commitTransactionGroup", Category = "Transaction", Description = "Commit the active transaction group, finalizing all operations")]
         public static string CommitTransactionGroup(UIApplication uiApp, JObject parameters)
         {
             try
@@ -119,6 +121,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Rollback the active transaction group, undoing all operations since it started.
         /// </summary>
+        [MCPMethod("rollbackTransactionGroup", Category = "Transaction", Description = "Rollback the active transaction group, undoing all operations since it started")]
         public static string RollbackTransactionGroup(UIApplication uiApp, JObject parameters)
         {
             try
@@ -163,6 +166,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Add a named checkpoint to track progress within a transaction group.
         /// </summary>
+        [MCPMethod("addCheckpoint", Category = "Transaction", Description = "Add a named checkpoint to track progress within a transaction group")]
         public static string AddCheckpoint(UIApplication uiApp, JObject parameters)
         {
             try
@@ -194,6 +198,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the current status of transaction groups and checkpoints.
         /// </summary>
+        [MCPMethod("getTransactionStatus", Category = "Transaction", Description = "Get the current status of transaction groups and checkpoints")]
         public static string GetTransactionStatus(UIApplication uiApp, JObject parameters)
         {
             try
@@ -222,6 +227,7 @@ namespace RevitMCPBridge
         /// Get available undo operations from Revit's undo stack.
         /// Note: Revit API has limited access to undo stack details.
         /// </summary>
+        [MCPMethod("getUndoHistory", Category = "Transaction", Description = "Get available undo operations from Revit's undo stack")]
         public static string GetUndoHistory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -252,6 +258,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Execute a method with explicit undo point creation.
         /// </summary>
+        [MCPMethod("executeWithUndo", Category = "Transaction", Description = "Execute a method with explicit undo point creation")]
         public static string ExecuteWithUndo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -306,6 +313,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Execute multiple methods as a single undoable operation.
         /// </summary>
+        [MCPMethod("batchExecute", Category = "Transaction", Description = "Execute multiple methods as a single undoable operation")]
         public static string BatchExecute(UIApplication uiApp, JObject parameters)
         {
             try
@@ -420,6 +428,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Execute a method with automatic rollback if it fails.
         /// </summary>
+        [MCPMethod("safeExecute", Category = "Transaction", Description = "Execute a method with automatic rollback if it fails")]
         public static string SafeExecute(UIApplication uiApp, JObject parameters)
         {
             try
@@ -501,6 +510,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Execute a method, then run verification. Rollback if verification fails.
         /// </summary>
+        [MCPMethod("verifyAndRollback", Category = "Transaction", Description = "Execute a method, then run verification; rollback if verification fails")]
         public static string VerifyAndRollback(UIApplication uiApp, JObject parameters)
         {
             try

@@ -43,6 +43,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Gets comprehensive smart template info for the currently selected element
         /// </summary>
+        [MCPMethod("getSelectedElementSmartInfo", Category = "SmartTemplate", Description = "Get comprehensive smart template info for the currently selected element")]
         public static string GetSelectedElementSmartInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -92,6 +93,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Gets smart template info for a specific element by ID
         /// </summary>
+        [MCPMethod("getSmartElementInfo", Category = "SmartTemplate", Description = "Get smart template info for a specific element by ID")]
         public static string GetSmartElementInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -138,6 +140,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Gets smart template info for an element type by type ID
         /// </summary>
+        [MCPMethod("getSmartTypeInfo", Category = "SmartTemplate", Description = "Get smart template info for an element type by type ID")]
         public static string GetSmartTypeInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -188,6 +191,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Gets all linked drafting views for an element type
         /// </summary>
+        [MCPMethod("getLinkedViews", Category = "SmartTemplate", Description = "Get all linked drafting views for an element type")]
         public static string GetLinkedViews(UIApplication uiApp, JObject parameters)
         {
             try
@@ -312,6 +316,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Navigates to a linked view for an element type
         /// </summary>
+        [MCPMethod("navigateToLinkedView", Category = "SmartTemplate", Description = "Navigate to a linked view for an element type")]
         public static string NavigateToLinkedView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -379,6 +384,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Gets all element types with smart template data for a specific category
         /// </summary>
+        [MCPMethod("getAllSmartTypes", Category = "SmartTemplate", Description = "Get all element types with smart template data for a specific category")]
         public static string GetAllSmartTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -458,6 +464,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Searches for element types by smart template criteria
         /// </summary>
+        [MCPMethod("searchSmartTypes", Category = "SmartTemplate", Description = "Search for element types by smart template criteria")]
         public static string SearchSmartTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -580,6 +587,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Updates smart template parameters for an element type
         /// </summary>
+        [MCPMethod("updateSmartParameters", Category = "SmartTemplate", Description = "Update smart template parameters for an element type")]
         public static string UpdateSmartParameters(UIApplication uiApp, JObject parameters)
         {
             try
@@ -715,6 +723,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Bulk updates smart template parameters for multiple element types
         /// </summary>
+        [MCPMethod("bulkUpdateSmartParameters", Category = "SmartTemplate", Description = "Bulk update smart template parameters for multiple element types")]
         public static string BulkUpdateSmartParameters(UIApplication uiApp, JObject parameters)
         {
             try
@@ -818,6 +827,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Opens the schedule associated with an element type
         /// </summary>
+        [MCPMethod("openLinkedSchedule", Category = "SmartTemplate", Description = "Open the schedule associated with an element type")]
         public static string OpenLinkedSchedule(UIApplication uiApp, JObject parameters)
         {
             try
@@ -908,6 +918,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Gets all resources (URLs) associated with an element type
         /// </summary>
+        [MCPMethod("getTypeResources", Category = "SmartTemplate", Description = "Get all resources (URLs) associated with an element type")]
         public static string GetTypeResources(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1157,6 +1168,7 @@ namespace RevitMCPBridge
         /// Binds Smart Template shared parameters from a shared parameter file to specified categories.
         /// This method actually creates the parameter bindings programmatically.
         /// </summary>
+        [MCPMethod("bindSmartParametersFromFile", Category = "SmartTemplate", Description = "Bind smart template shared parameters from a shared parameter file to specified categories")]
         public static string BindSmartParametersFromFile(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1346,6 +1358,7 @@ namespace RevitMCPBridge
         /// Binds Smart Template shared parameters to specified categories.
         /// This method should be called once per template to set up the parameters.
         /// </summary>
+        [MCPMethod("bindSmartParameters", Category = "SmartTemplate", Description = "Bind smart template shared parameters to specified categories")]
         public static string BindSmartParameters(UIApplication uiApp, JObject parameters)
         {
             try

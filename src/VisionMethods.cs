@@ -25,6 +25,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Export the current view as an image.
         /// </summary>
+        [MCPMethod("exportViewImage", Category = "Vision", Description = "Export the current view as an image")]
         public static string ExportViewImage(UIApplication uiApp, JObject parameters)
         {
             try
@@ -92,6 +93,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the 2D/3D extents of the active view.
         /// </summary>
+        [MCPMethod("getViewExtents", Category = "Vision", Description = "Get the 2D/3D extents of the active view")]
         public static string GetViewExtents(UIApplication uiApp, JObject parameters)
         {
             try
@@ -162,6 +164,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Hide or show specific elements in the current view.
         /// </summary>
+        [MCPMethod("setElementVisibility", Category = "Vision", Description = "Hide or show specific elements in the current view")]
         public static string SetElementVisibility(UIApplication uiApp, JObject parameters)
         {
             try
@@ -222,6 +225,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Hide or show an entire category in the current view.
         /// </summary>
+        [MCPMethod("setCategoryVisibility", Category = "Vision", Description = "Hide or show an entire category in the current view")]
         public static string SetCategoryVisibility(UIApplication uiApp, JObject parameters)
         {
             try
@@ -289,6 +293,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all elements visible in the current view.
         /// </summary>
+        [MCPMethod("getVisibleElements", Category = "Vision", Description = "Get all elements visible in the current view")]
         public static string GetVisibleElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -353,6 +358,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set graphics override for elements in the current view.
         /// </summary>
+        [MCPMethod("setGraphicsOverride", Category = "Vision", Description = "Set graphics override for elements in the current view")]
         public static string SetGraphicsOverride(UIApplication uiApp, JObject parameters)
         {
             try
@@ -431,6 +437,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the view range settings for a plan view.
         /// </summary>
+        [MCPMethod("getViewRange", Category = "Vision", Description = "Get the view range settings for a plan view")]
         public static string GetViewRange(UIApplication uiApp, JObject parameters)
         {
             try
@@ -485,6 +492,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set the view range for a plan view.
         /// </summary>
+        [MCPMethod("setViewRange", Category = "Vision", Description = "Set the view range for a plan view")]
         public static string SetViewRange(UIApplication uiApp, JObject parameters)
         {
             try
@@ -550,6 +558,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Isolate specific elements in the view (hide everything else).
         /// </summary>
+        [MCPMethod("isolateElements", Category = "Vision", Description = "Isolate specific elements in the view")]
         public static string IsolateElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -618,6 +627,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set or clear the section box on a 3D view.
         /// </summary>
+        [MCPMethod("set3DSectionBox", Category = "Vision", Description = "Set or clear the section box on a 3D view")]
         public static string Set3DSectionBox(UIApplication uiApp, JObject parameters)
         {
             try
@@ -744,6 +754,7 @@ namespace RevitMCPBridge
         /// Find all elements near a given XY point within a specified radius.
         /// Used to map markup locations to Revit model elements.
         /// </summary>
+        [MCPMethod("findElementsNearPoint", Category = "Vision", Description = "Find all elements near a given XY point within a specified radius")]
         public static string FindElementsNearPoint(UIApplication uiApp, JObject parameters)
         {
             try
@@ -901,6 +912,7 @@ namespace RevitMCPBridge
         /// Get view coordinate system info needed for PDF-to-Revit coordinate mapping.
         /// Returns crop region bounds, scale, and coordinate transform.
         /// </summary>
+        [MCPMethod("getViewCoordinateInfo", Category = "Vision", Description = "Get view coordinate system info for PDF-to-Revit coordinate mapping")]
         public static string GetViewCoordinateInfo(UIApplication uiApp, JObject parameters)
         {
             try

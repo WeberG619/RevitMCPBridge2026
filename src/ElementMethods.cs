@@ -22,6 +22,7 @@ namespace RevitMCPBridge
         /// - elementId: ID of the element
         /// Returns location as point or curve endpoints
         /// </summary>
+        [MCPMethod("getElementLocation", Category = "Element", Description = "Get the location of any element as a point or curve endpoints")]
         public static string GetElementLocation(UIApplication uiApp, JObject parameters)
         {
             try
@@ -118,6 +119,7 @@ namespace RevitMCPBridge
         /// - elementId: ID of the element
         /// - viewId: (optional) view ID for view-specific bounding box
         /// </summary>
+        [MCPMethod("getBoundingBox", Category = "Element", Description = "Get the bounding box of any element")]
         public static string GetBoundingBox(UIApplication uiApp, JObject parameters)
         {
             try
@@ -191,6 +193,7 @@ namespace RevitMCPBridge
         /// - elementId: ID of the element to move
         /// - targetLocation: {x, y, z} target location in feet
         /// </summary>
+        [MCPMethod("moveElement", Category = "Element", Description = "Move an element by offset or to an absolute location")]
         public static string MoveElement(UIApplication uiApp, JObject parameters)
         {
             try
@@ -328,6 +331,7 @@ namespace RevitMCPBridge
         /// - elementIds: array of element IDs to move
         /// - offset: {x, y, z} offset in feet
         /// </summary>
+        [MCPMethod("moveElements", Category = "Element", Description = "Move multiple elements by a specified offset")]
         public static string MoveElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -398,6 +402,7 @@ namespace RevitMCPBridge
         /// - rotation: (optional) rotation angle in degrees (default 0)
         /// - hostId: (optional) ID of the host element (for face-based families)
         /// </summary>
+        [MCPMethod("placeFamilyInstance", Category = "Element", Description = "Place a family instance at a specified location")]
         public static string PlaceFamilyInstance(UIApplication uiApp, JObject parameters)
         {
             try
@@ -589,6 +594,7 @@ namespace RevitMCPBridge
         /// Parameters:
         /// - category: Category name (e.g., "Casework", "Plumbing Fixtures", "Furniture")
         /// </summary>
+        [MCPMethod("getFamilyInstanceTypes", Category = "Element", Description = "Get available family types for a given category")]
         public static string GetFamilyInstanceTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -688,6 +694,7 @@ namespace RevitMCPBridge
         /// - elementIds: array of element IDs to copy
         /// - translation: [x, y, z] translation vector
         /// </summary>
+        [MCPMethod("copyElements", Category = "Element", Description = "Copy elements to a new location by translation vector")]
         public static string CopyElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -754,6 +761,7 @@ namespace RevitMCPBridge
         /// Parameters:
         /// - elementIds: array of element IDs to delete
         /// </summary>
+        [MCPMethod("deleteElements", Category = "Element", Description = "Delete multiple elements by ID")]
         public static string DeleteElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -804,6 +812,7 @@ namespace RevitMCPBridge
         /// Parameters:
         /// - elementId: ID of the element to delete
         /// </summary>
+        [MCPMethod("deleteElement", Category = "Element", Description = "Delete a single element by ID")]
         public static string DeleteElement(UIApplication uiApp, JObject parameters)
         {
             try
@@ -872,6 +881,7 @@ namespace RevitMCPBridge
         /// - familyPath: Full path to the .rfa file
         /// Returns the loaded family and its types
         /// </summary>
+        [MCPMethod("loadFamily", Category = "Element", Description = "Load a family from an .rfa file into the project")]
         public static string LoadFamily(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1070,6 +1080,7 @@ namespace RevitMCPBridge
         /// - searchPattern: (optional) search pattern (default "*.rfa")
         /// - recursive: (optional) search subdirectories (default false)
         /// </summary>
+        [MCPMethod("listFamilyFiles", Category = "Element", Description = "List .rfa files in a directory for browsing the Revit library")]
         public static string ListFamilyFiles(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1128,6 +1139,7 @@ namespace RevitMCPBridge
         /// Get the default Revit library paths
         /// Returns common library locations for the current Revit version
         /// </summary>
+        [MCPMethod("getLibraryPaths", Category = "Element", Description = "Get the default Revit library paths for the current version")]
         public static string GetLibraryPaths(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1189,6 +1201,7 @@ namespace RevitMCPBridge
         /// Parameters:
         /// - category: (optional) filter by category name
         /// </summary>
+        [MCPMethod("getLoadedFamilies", Category = "Element", Description = "Get all loaded families in the project, optionally filtered by category")]
         public static string GetLoadedFamilies(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1260,6 +1273,7 @@ namespace RevitMCPBridge
         /// Open the Load Autodesk Family dialog (cloud family library)
         /// This uses PostableCommand to open the dialog - user interaction required to select family
         /// </summary>
+        [MCPMethod("openLoadAutodeskFamilyDialog", Category = "Element", Description = "Open the Load Autodesk Family dialog for cloud family library access")]
         public static string OpenLoadAutodeskFamilyDialog(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1312,6 +1326,7 @@ namespace RevitMCPBridge
         /// Parameters:
         /// - viewId: (optional) Limit to specific view
         /// </summary>
+        [MCPMethod("getImportedInstances", Category = "Element", Description = "Get all imported CAD/PDF instances in the document or a specific view")]
         public static string GetImportedInstances(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1376,6 +1391,7 @@ namespace RevitMCPBridge
         /// - geometryOptions: (optional) "coarse", "medium", "fine" (default: "fine")
         /// - filterByLayer: (optional) only return geometry from specific layer name
         /// </summary>
+        [MCPMethod("getImportedGeometry", Category = "Element", Description = "Extract geometry from an imported CAD/PDF instance for tracing")]
         public static string GetImportedGeometry(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1577,6 +1593,7 @@ namespace RevitMCPBridge
         /// - minLength: (optional) minimum line length to include (default 0.5 feet)
         /// - maxResults: (optional) maximum number of lines to return (default 1000)
         /// </summary>
+        [MCPMethod("getImportedLines", Category = "Element", Description = "Get simplified line segments from an imported CAD/PDF for wall tracing")]
         public static string GetImportedLines(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1720,6 +1737,7 @@ namespace RevitMCPBridge
         /// <param name="axisStart">Start point of mirror axis [x, y, z]</param>
         /// <param name="axisEnd">End point of mirror axis [x, y, z]</param>
         /// <param name="copyElements">If true, creates mirrored copies; if false, moves originals</param>
+        [MCPMethod("mirrorElements", Category = "Element", Description = "Mirror elements about a line axis, optionally creating copies")]
         public static string MirrorElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1809,6 +1827,7 @@ namespace RevitMCPBridge
         /// <param name="spacing">For linear: distance between copies; For radial: angle between copies (degrees)</param>
         /// <param name="direction">For linear: direction vector [x, y, z]; For radial: rotation axis [x, y, z]</param>
         /// <param name="centerPoint">For radial: center point of rotation [x, y, z]</param>
+        [MCPMethod("arrayElements", Category = "Element", Description = "Create a linear or radial array of elements")]
         public static string ArrayElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1922,6 +1941,7 @@ namespace RevitMCPBridge
         /// <param name="elementIds">Array of element IDs to align</param>
         /// <param name="alignType">Type: "left", "right", "top", "bottom", "centerH", "centerV", or "toPoint"</param>
         /// <param name="referencePoint">For "toPoint": target point [x, y, z]; otherwise: optional reference point</param>
+        [MCPMethod("alignElements", Category = "Element", Description = "Align elements to a reference point or edge")]
         public static string AlignElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2099,6 +2119,7 @@ namespace RevitMCPBridge
         /// <param name="centerPoint">Center of rotation [x, y, z]</param>
         /// <param name="angle">Rotation angle in degrees</param>
         /// <param name="axis">Rotation axis (optional, defaults to Z axis) [x, y, z]</param>
+        [MCPMethod("rotateElements", Category = "Element", Description = "Rotate elements around a center point by a specified angle")]
         public static string RotateElements(UIApplication uiApp, JObject parameters)
         {
             try

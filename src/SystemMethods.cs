@@ -20,6 +20,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get version information for the MCP Bridge
         /// </summary>
+        [MCPMethod("getVersion", Category = "System", Description = "Get version information for the MCP Bridge")]
         public static string GetVersion(UIApplication uiApp, JObject parameters)
         {
             try
@@ -54,6 +55,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get current configuration values
         /// </summary>
+        [MCPMethod("getConfiguration", Category = "System", Description = "Get current configuration values")]
         public static string GetConfiguration(UIApplication uiApp, JObject parameters)
         {
             try
@@ -102,6 +104,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Health check endpoint
         /// </summary>
+        [MCPMethod("healthCheck", Category = "System", Description = "Health check endpoint")]
         public static string HealthCheck(UIApplication uiApp, JObject parameters)
         {
             try
@@ -140,6 +143,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get statistics about MCP server usage
         /// </summary>
+        [MCPMethod("getStats", Category = "System", Description = "Get statistics about MCP server usage")]
         public static string GetStats(UIApplication uiApp, JObject parameters)
         {
             try
@@ -169,6 +173,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Reload configuration from disk
         /// </summary>
+        [MCPMethod("reloadConfiguration", Category = "System", Description = "Reload configuration from disk")]
         public static string ReloadConfiguration(UIApplication uiApp, JObject parameters)
         {
             try
@@ -191,6 +196,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get available MCP methods
         /// </summary>
+        [MCPMethod("getMethods", Category = "System", Description = "Get available MCP methods")]
         public static string GetMethods(UIApplication uiApp, JObject parameters)
         {
             try
@@ -229,6 +235,7 @@ namespace RevitMCPBridge
         ///   enabled (bool): true to enable auto-handling, false to disable
         ///   defaultResult (int, optional): 1=OK/Yes (default), 2=No, 0=Cancel
         /// </summary>
+        [MCPMethod("setDialogAutoHandle", Category = "System", Description = "Configure automatic dialog handling")]
         public static string SetDialogAutoHandle(UIApplication uiApp, JObject parameters)
         {
             try
@@ -277,6 +284,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get current dialog handling settings
         /// </summary>
+        [MCPMethod("getDialogSettings", Category = "System", Description = "Get current dialog handling settings")]
         public static string GetDialogSettings(UIApplication uiApp, JObject parameters)
         {
             try
@@ -308,6 +316,7 @@ namespace RevitMCPBridge
         /// Parameters:
         ///   limit (int, optional): Maximum number of records to return (default: 50)
         /// </summary>
+        [MCPMethod("getDialogHistory", Category = "System", Description = "Get history of dialogs that have appeared")]
         public static string GetDialogHistory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -354,6 +363,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Clear the dialog history
         /// </summary>
+        [MCPMethod("clearDialogHistory", Category = "System", Description = "Clear the dialog history")]
         public static string ClearDialogHistory(UIApplication uiApp, JObject parameters)
         {
             try

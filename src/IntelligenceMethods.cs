@@ -23,6 +23,7 @@ namespace RevitMCPBridge
         /// Get current suggestions from the proactive assistant
         /// Parameters: maxCount (optional, default 5)
         /// </summary>
+        [MCPMethod("getSuggestions", Category = "Intelligence", Description = "Get current suggestions from the proactive assistant")]
         public static string GetSuggestions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -61,6 +62,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get comprehensive assistance summary
         /// </summary>
+        [MCPMethod("getAssistanceSummary", Category = "Intelligence", Description = "Get comprehensive assistance summary")]
         public static string GetAssistanceSummary(UIApplication uiApp, JObject parameters)
         {
             try
@@ -120,6 +122,7 @@ namespace RevitMCPBridge
         /// Get task-specific assistance
         /// Parameters: task (string description of what user wants to do)
         /// </summary>
+        [MCPMethod("getTaskAssistance", Category = "Intelligence", Description = "Get task-specific assistance")]
         public static string GetTaskAssistance(UIApplication uiApp, JObject parameters)
         {
             try
@@ -161,6 +164,7 @@ namespace RevitMCPBridge
         /// Accept or reject a suggestion (for learning)
         /// Parameters: title (suggestion title), accepted (bool)
         /// </summary>
+        [MCPMethod("respondToSuggestion", Category = "Intelligence", Description = "Accept or reject a suggestion for learning")]
         public static string RespondToSuggestion(UIApplication uiApp, JObject parameters)
         {
             try
@@ -201,6 +205,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get workflow statistics
         /// </summary>
+        [MCPMethod("getWorkflowStatistics", Category = "Intelligence", Description = "Get workflow statistics")]
         public static string GetWorkflowStatistics(UIApplication uiApp, JObject parameters)
         {
             try
@@ -232,6 +237,7 @@ namespace RevitMCPBridge
         /// Get detected workflow patterns
         /// Parameters: minOccurrences (optional, default 3)
         /// </summary>
+        [MCPMethod("getWorkflowPatterns", Category = "Intelligence", Description = "Get detected workflow patterns")]
         public static string GetWorkflowPatterns(UIApplication uiApp, JObject parameters)
         {
             try
@@ -264,6 +270,7 @@ namespace RevitMCPBridge
         /// Get most frequent actions
         /// Parameters: top (optional, default 20)
         /// </summary>
+        [MCPMethod("getActionFrequencies", Category = "Intelligence", Description = "Get most frequent actions")]
         public static string GetActionFrequencies(UIApplication uiApp, JObject parameters)
         {
             try
@@ -293,6 +300,7 @@ namespace RevitMCPBridge
         /// Start tracking a named task
         /// Parameters: taskName (string)
         /// </summary>
+        [MCPMethod("startTaskTracking", Category = "Intelligence", Description = "Start tracking a named task")]
         public static string StartTaskTracking(UIApplication uiApp, JObject parameters)
         {
             try
@@ -320,6 +328,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// End current task tracking
         /// </summary>
+        [MCPMethod("endTaskTracking", Category = "Intelligence", Description = "End current task tracking")]
         public static string EndTaskTracking(UIApplication uiApp, JObject parameters)
         {
             try
@@ -355,6 +364,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all learned preferences
         /// </summary>
+        [MCPMethod("getLearnedPreferences", Category = "Intelligence", Description = "Get all learned preferences")]
         public static string GetLearnedPreferences(UIApplication uiApp, JObject parameters)
         {
             try
@@ -400,6 +410,7 @@ namespace RevitMCPBridge
         /// Get preferred scale for a view type
         /// Parameters: viewType (string)
         /// </summary>
+        [MCPMethod("getPreferredScale", Category = "Intelligence", Description = "Get preferred scale for a view type")]
         public static string GetPreferredScale(UIApplication uiApp, JObject parameters)
         {
             try
@@ -430,6 +441,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Export preferences for Claude Memory storage
         /// </summary>
+        [MCPMethod("exportPreferencesForMemory", Category = "Intelligence", Description = "Export preferences for Claude Memory storage")]
         public static string ExportPreferencesForMemory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -456,6 +468,7 @@ namespace RevitMCPBridge
         /// Get sheet layout recommendation
         /// Parameters: sheetNumber (string), viewIds (optional array of view IDs to place)
         /// </summary>
+        [MCPMethod("getSheetLayoutRecommendation", Category = "Intelligence", Description = "Get sheet layout recommendation")]
         public static string GetSheetLayoutRecommendation(UIApplication uiApp, JObject parameters)
         {
             try
@@ -541,6 +554,7 @@ namespace RevitMCPBridge
         /// Get recommended scale for a view
         /// Parameters: viewId (long), availableWidth (optional, inches), availableHeight (optional, inches)
         /// </summary>
+        [MCPMethod("getRecommendedScale", Category = "Intelligence", Description = "Get recommended scale for a view")]
         public static string GetRecommendedScale(UIApplication uiApp, JObject parameters)
         {
             try
@@ -601,6 +615,7 @@ namespace RevitMCPBridge
         /// Suggest viewport position for a view on a sheet
         /// Parameters: viewId (long), sheetNumber (string)
         /// </summary>
+        [MCPMethod("suggestViewportPosition", Category = "Intelligence", Description = "Suggest viewport position for a view on a sheet")]
         public static string SuggestViewportPosition(UIApplication uiApp, JObject parameters)
         {
             try
@@ -666,6 +681,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get comprehensive learning report
         /// </summary>
+        [MCPMethod("getLearningReport", Category = "Intelligence", Description = "Get comprehensive learning report")]
         public static string GetLearningReport(UIApplication uiApp, JObject parameters)
         {
             try
@@ -687,6 +703,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Export all workflow data for Claude Memory
         /// </summary>
+        [MCPMethod("exportWorkflowData", Category = "Intelligence", Description = "Export all workflow data for Claude Memory")]
         public static string ExportWorkflowData(UIApplication uiApp, JObject parameters)
         {
             try
@@ -720,6 +737,7 @@ namespace RevitMCPBridge
         /// - correctApproach: The correct way to handle this
         /// - category: (optional) Category like "code", "placement", "workflow"
         /// </summary>
+        [MCPMethod("storeCorrection", Category = "Intelligence", Description = "Store a correction when an operation fails")]
         public static string StoreCorrection(UIApplication uiApp, JObject parameters)
         {
             try
@@ -755,6 +773,7 @@ namespace RevitMCPBridge
         /// - query: Search query
         /// - limit: (optional) Max results (default 5)
         /// </summary>
+        [MCPMethod("getRelevantCorrections", Category = "Intelligence", Description = "Get relevant corrections for a query")]
         public static string GetRelevantCorrections(UIApplication uiApp, JObject parameters)
         {
             try
@@ -797,6 +816,7 @@ namespace RevitMCPBridge
         /// Parameters:
         /// - method: The MCP method name
         /// </summary>
+        [MCPMethod("getMethodCorrections", Category = "Intelligence", Description = "Get corrections for a specific MCP method")]
         public static string GetMethodCorrections(UIApplication uiApp, JObject parameters)
         {
             try
@@ -834,6 +854,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get correction statistics
         /// </summary>
+        [MCPMethod("getCorrectionStats", Category = "Intelligence", Description = "Get correction statistics")]
         public static string GetCorrectionStats(UIApplication uiApp, JObject parameters)
         {
             try
@@ -854,6 +875,7 @@ namespace RevitMCPBridge
         /// Get corrections formatted as knowledge context
         /// Returns recent corrections formatted for AI consumption
         /// </summary>
+        [MCPMethod("getCorrectionsAsKnowledge", Category = "Intelligence", Description = "Get corrections formatted as knowledge context")]
         public static string GetCorrectionsAsKnowledge(UIApplication uiApp, JObject parameters)
         {
             try
@@ -878,6 +900,7 @@ namespace RevitMCPBridge
         /// Parameters:
         /// - correctionId: The correction ID
         /// </summary>
+        [MCPMethod("markCorrectionApplied", Category = "Intelligence", Description = "Mark a correction as applied")]
         public static string MarkCorrectionApplied(UIApplication uiApp, JObject parameters)
         {
             try
@@ -908,6 +931,7 @@ namespace RevitMCPBridge
         /// Parameters:
         /// - correctionId: The correction ID to delete
         /// </summary>
+        [MCPMethod("deleteCorrection", Category = "Intelligence", Description = "Delete a correction by ID")]
         public static string DeleteCorrection(UIApplication uiApp, JObject parameters)
         {
             try
@@ -960,6 +984,7 @@ namespace RevitMCPBridge
         /// - parameters: The parameters that were passed
         /// - result: The result returned
         /// </summary>
+        [MCPMethod("verifyOperationResult", Category = "Intelligence", Description = "Verify the result of an MCP operation")]
         public static string VerifyOperationResult(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1013,6 +1038,7 @@ namespace RevitMCPBridge
         /// Parameters:
         /// - request: The user's natural language request
         /// </summary>
+        [MCPMethod("analyzeWorkflowRequest", Category = "Intelligence", Description = "Analyze a user request and create a workflow plan")]
         public static string AnalyzeWorkflowRequest(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1055,6 +1081,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get available workflow templates
         /// </summary>
+        [MCPMethod("getWorkflowTemplates", Category = "Intelligence", Description = "Get available workflow templates")]
         public static string GetWorkflowTemplates(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1085,6 +1112,7 @@ namespace RevitMCPBridge
         /// - projectType: Type (residential, commercial, etc.)
         /// - clientFirm: (optional) Client/firm name for standards matching
         /// </summary>
+        [MCPMethod("setProjectContext", Category = "Intelligence", Description = "Set project context for workflow planning")]
         public static string SetProjectContext(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1117,6 +1145,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get current project context
         /// </summary>
+        [MCPMethod("getProjectContext", Category = "Intelligence", Description = "Get current project context")]
         public static string GetProjectContext(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1143,6 +1172,7 @@ namespace RevitMCPBridge
         /// Export all intelligence data for syncing to Claude Memory
         /// This returns everything Claude needs to store in claude-memory MCP
         /// </summary>
+        [MCPMethod("exportAllIntelligence", Category = "Intelligence", Description = "Export all intelligence data for syncing to Claude Memory")]
         public static string ExportAllIntelligence(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1208,6 +1238,7 @@ namespace RevitMCPBridge
         /// Get a summary of what should be saved to memory at session end
         /// This is optimized for storing in claude-memory MCP
         /// </summary>
+        [MCPMethod("getSessionSummaryForMemory", Category = "Intelligence", Description = "Get a summary of what should be saved to memory at session end")]
         public static string GetSessionSummaryForMemory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1307,6 +1338,7 @@ namespace RevitMCPBridge
         /// Import preferences from a previous session (from claude-memory)
         /// Parameters: preferencesJson - JSON string of preferences to restore
         /// </summary>
+        [MCPMethod("importPreferencesFromMemory", Category = "Intelligence", Description = "Import preferences from a previous session")]
         public static string ImportPreferencesFromMemory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1414,6 +1446,7 @@ namespace RevitMCPBridge
         /// Run proactive analysis - detects gaps, generates suggestions
         /// Returns comprehensive report of model state and recommendations
         /// </summary>
+        [MCPMethod("runProactiveAnalysis", Category = "Intelligence", Description = "Run proactive analysis and detect model gaps")]
         public static string RunProactiveAnalysis(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1471,6 +1504,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get proactive monitoring suggestions based on current model state (Level 4)
         /// </summary>
+        [MCPMethod("getMonitorSuggestions", Category = "Intelligence", Description = "Get proactive monitoring suggestions based on current model state")]
         public static string GetMonitorSuggestions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1518,6 +1552,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Execute a suggestion's action
         /// </summary>
+        [MCPMethod("executeSuggestion", Category = "Intelligence", Description = "Execute a suggestion's action")]
         public static string ExecuteSuggestion(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1557,6 +1592,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Take a model state snapshot for comparison
         /// </summary>
+        [MCPMethod("takeModelSnapshot", Category = "Intelligence", Description = "Take a model state snapshot for comparison")]
         public static string TakeModelSnapshot(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1605,6 +1641,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get unplaced views that should be on sheets
         /// </summary>
+        [MCPMethod("getUnplacedViews", Category = "Intelligence", Description = "Get unplaced views that should be on sheets")]
         public static string GetUnplacedViews(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1642,6 +1679,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get untagged rooms
         /// </summary>
+        [MCPMethod("getUntaggedRooms", Category = "Intelligence", Description = "Get untagged rooms")]
         public static string GetUntaggedRooms(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1679,6 +1717,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get auto-applicable corrections for a method
         /// </summary>
+        [MCPMethod("getAutoCorrections", Category = "Intelligence", Description = "Get auto-applicable corrections for a method")]
         public static string GetAutoCorrections(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1715,6 +1754,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Dismiss a suggestion so it won't be shown again for a while
         /// </summary>
+        [MCPMethod("dismissSuggestion", Category = "Intelligence", Description = "Dismiss a suggestion so it won't be shown again for a while")]
         public static string DismissSuggestion(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1832,6 +1872,7 @@ namespace RevitMCPBridge
         /// Cancel an active autonomous task
         /// Parameters: taskId (string)
         /// </summary>
+        [MCPMethod("cancelTask", Category = "Intelligence", Description = "Cancel an active autonomous task")]
         public static string CancelTask(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1860,6 +1901,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get status of all active autonomous tasks
         /// </summary>
+        [MCPMethod("getActiveTasks", Category = "Intelligence", Description = "Get status of all active autonomous tasks")]
         public static string GetActiveTasks(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1892,6 +1934,7 @@ namespace RevitMCPBridge
         /// Get result of a completed autonomous task
         /// Parameters: taskId (string)
         /// </summary>
+        [MCPMethod("getTaskResult", Category = "Intelligence", Description = "Get result of a completed autonomous task")]
         public static string GetTaskResult(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1941,6 +1984,7 @@ namespace RevitMCPBridge
         /// Configure autonomous execution settings
         /// Parameters: maxRetries, maxConcurrentTasks, requireApprovalForDestructive
         /// </summary>
+        [MCPMethod("configureAutonomy", Category = "Intelligence", Description = "Configure autonomous execution settings")]
         public static string ConfigureAutonomy(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1966,6 +2010,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get autonomous execution statistics
         /// </summary>
+        [MCPMethod("getAutonomyStats", Category = "Intelligence", Description = "Get autonomous execution statistics")]
         public static string GetAutonomyStats(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1986,6 +2031,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get list of supported autonomous goals
         /// </summary>
+        [MCPMethod("getSupportedGoals", Category = "Intelligence", Description = "Get list of supported autonomous goals")]
         public static string GetSupportedGoals(UIApplication uiApp, JObject parameters)
         {
             try

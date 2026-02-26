@@ -24,6 +24,7 @@ namespace RevitMCPBridge2026
         /// <param name="uiApp">The Revit UI Application</param>
         /// <param name="parameters">JSON parameters containing name, group, parameterType, categories, isInstance</param>
         /// <returns>JSON response with success status and parameter info</returns>
+        [MCPMethod("createProjectParameter", Category = "Parameter", Description = "Creates a new project parameter")]
         public static string CreateProjectParameter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -135,6 +136,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all project parameters
         /// </summary>
+        [MCPMethod("getProjectParameters", Category = "Parameter", Description = "Gets all project parameters")]
         public static string GetProjectParameters(UIApplication uiApp, JObject parameters)
         {
             try
@@ -196,6 +198,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies a project parameter
         /// </summary>
+        [MCPMethod("modifyProjectParameter", Category = "Parameter", Description = "Modifies a project parameter")]
         public static string ModifyProjectParameter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -332,6 +335,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Deletes a project parameter
         /// </summary>
+        [MCPMethod("deleteProjectParameter", Category = "Parameter", Description = "Deletes a project parameter")]
         public static string DeleteProjectParameter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -420,6 +424,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a new shared parameter definition
         /// </summary>
+        [MCPMethod("createSharedParameter", Category = "Parameter", Description = "Creates a new shared parameter definition")]
         public static string CreateSharedParameter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -602,6 +607,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Loads shared parameters from a file
         /// </summary>
+        [MCPMethod("loadSharedParameterFile", Category = "Parameter", Description = "Loads shared parameters from a file")]
         public static string LoadSharedParameterFile(UIApplication uiApp, JObject parameters)
         {
             try
@@ -670,6 +676,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all shared parameters in the project
         /// </summary>
+        [MCPMethod("getSharedParameters", Category = "Parameter", Description = "Gets all shared parameters in the project")]
         public static string GetSharedParameters(UIApplication uiApp, JObject parameters)
         {
             try
@@ -728,6 +735,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets shared parameter definitions from file
         /// </summary>
+        [MCPMethod("getSharedParameterDefinitions", Category = "Parameter", Description = "Gets shared parameter definitions from file")]
         public static string GetSharedParameterDefinitions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -814,6 +822,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Binds a shared parameter to categories
         /// </summary>
+        [MCPMethod("bindSharedParameter", Category = "Parameter", Description = "Binds a shared parameter to categories")]
         public static string BindSharedParameter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -961,6 +970,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets parameter value from an element
         /// </summary>
+        [MCPMethod("getParameterValue", Category = "Parameter", Description = "Gets parameter value from an element")]
         public static string GetParameterValue(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1050,6 +1060,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets parameter value for an element
         /// </summary>
+        [MCPMethod("setParameterValue", Category = "Parameter", Description = "Sets parameter value for an element")]
         public static string SetParameterValue(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1168,6 +1179,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all parameters for an element
         /// </summary>
+        [MCPMethod("getElementParameters", Category = "Parameter", Description = "Gets all parameters for an element")]
         public static string GetElementParameters(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1265,6 +1277,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets multiple parameter values for an element
         /// </summary>
+        [MCPMethod("setMultipleParameterValues", Category = "Parameter", Description = "Sets multiple parameter values for an element")]
         public static string SetMultipleParameterValues(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1420,6 +1433,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all parameter groups
         /// </summary>
+        [MCPMethod("getParameterGroups", Category = "Parameter", Description = "Gets all parameter groups")]
         public static string GetParameterGroups(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1505,6 +1519,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a new parameter group
         /// </summary>
+        [MCPMethod("createParameterGroup", Category = "Parameter", Description = "Creates a new parameter group")]
         public static string CreateParameterGroup(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1572,6 +1587,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Finds all elements with a specific parameter value
         /// </summary>
+        [MCPMethod("findElementsByParameterValue", Category = "Parameter", Description = "Finds all elements with a specific parameter value")]
         public static string FindElementsByParameterValue(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1760,6 +1776,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Searches for parameters by name
         /// </summary>
+        [MCPMethod("searchParameters", Category = "Parameter", Description = "Searches for parameters by name")]
         public static string SearchParameters(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1912,6 +1929,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets parameter definition information
         /// </summary>
+        [MCPMethod("getParameterDefinition", Category = "Parameter", Description = "Gets parameter definition information")]
         public static string GetParameterDefinition(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2032,6 +2050,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all available parameter types
         /// </summary>
+        [MCPMethod("getParameterTypes", Category = "Parameter", Description = "Gets all available parameter types")]
         public static string GetParameterTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2137,6 +2156,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a global parameter
         /// </summary>
+        [MCPMethod("createGlobalParameter", Category = "Parameter", Description = "Creates a global parameter")]
         public static string CreateGlobalParameter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2247,6 +2267,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all global parameters
         /// </summary>
+        [MCPMethod("getGlobalParameters", Category = "Parameter", Description = "Gets all global parameters")]
         public static string GetGlobalParameters(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2304,6 +2325,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies a global parameter value
         /// </summary>
+        [MCPMethod("modifyGlobalParameter", Category = "Parameter", Description = "Modifies a global parameter value")]
         public static string ModifyGlobalParameter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2425,6 +2447,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Deletes a global parameter
         /// </summary>
+        [MCPMethod("deleteGlobalParameter", Category = "Parameter", Description = "Deletes a global parameter")]
         public static string DeleteGlobalParameter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2502,6 +2525,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets a formula for a parameter
         /// </summary>
+        [MCPMethod("setParameterFormula", Category = "Parameter", Description = "Sets a formula for a parameter")]
         public static string SetParameterFormula(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2602,6 +2626,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets the formula for a parameter
         /// </summary>
+        [MCPMethod("getParameterFormula", Category = "Parameter", Description = "Gets the formula for a parameter")]
         public static string GetParameterFormula(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2722,6 +2747,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Copies parameter values from one element to another
         /// </summary>
+        [MCPMethod("copyParameterValues", Category = "Parameter", Description = "Copies parameter values from one element to another")]
         public static string CopyParameterValues(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2942,6 +2968,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets the same parameter value for multiple elements
         /// </summary>
+        [MCPMethod("setParameterForMultipleElements", Category = "Parameter", Description = "Sets the same parameter value for multiple elements")]
         public static string SetParameterForMultipleElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3099,6 +3126,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Checks if a parameter exists on an element
         /// </summary>
+        [MCPMethod("parameterExists", Category = "Parameter", Description = "Checks if a parameter exists on an element")]
         public static string ParameterExists(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3167,6 +3195,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets parameter storage type
         /// </summary>
+        [MCPMethod("getParameterStorageType", Category = "Parameter", Description = "Gets parameter storage type")]
         public static string GetParameterStorageType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3265,6 +3294,7 @@ namespace RevitMCPBridge2026
         ///    "targetParameter": "Cost Code", "targetValue": "ALU-STD"}
         /// </param>
         /// <returns>JSON response with update results</returns>
+        [MCPMethod("bulkSetParameterConditional", Category = "Parameter", Description = "Updates parameters on multiple elements based on conditional logic")]
         public static string BulkSetParameterConditional(UIApplication uiApp, JObject parameters)
         {
             try

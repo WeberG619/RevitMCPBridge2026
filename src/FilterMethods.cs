@@ -22,6 +22,7 @@ namespace RevitMCPBridge2026
         /// <param name="uiApp">The Revit UI Application</param>
         /// <param name="parameters">JSON parameters containing filterName, categories, rules</param>
         /// <returns>JSON response with success status and filter ID</returns>
+        [MCPMethod("createViewFilter", Category = "Filter", Description = "Creates a new view filter (parameter filter)")]
         public static string CreateViewFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -84,6 +85,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all view filters in the project
         /// </summary>
+        [MCPMethod("getAllViewFilters", Category = "Filter", Description = "Gets all view filters in the project")]
         public static string GetAllViewFilters(UIApplication uiApp, JObject parameters)
         {
             try
@@ -142,6 +144,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets information about a specific view filter
         /// </summary>
+        [MCPMethod("getViewFilterInfo", Category = "Filter", Description = "Gets information about a specific view filter")]
         public static string GetViewFilterInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -215,6 +218,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies a view filter
         /// </summary>
+        [MCPMethod("modifyViewFilter", Category = "Filter", Description = "Modifies an existing view filter")]
         public static string ModifyViewFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -294,6 +298,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Deletes a view filter
         /// </summary>
+        [MCPMethod("deleteViewFilter", Category = "Filter", Description = "Deletes a view filter")]
         public static string DeleteViewFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -363,6 +368,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a filter rule for parameter-based filtering
         /// </summary>
+        [MCPMethod("createFilterRule", Category = "Filter", Description = "Creates a filter rule for parameter-based filtering")]
         public static string CreateFilterRule(UIApplication uiApp, JObject parameters)
         {
             try
@@ -413,6 +419,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Adds a rule to an existing view filter
         /// </summary>
+        [MCPMethod("addRuleToFilter", Category = "Filter", Description = "Adds a rule to an existing view filter")]
         public static string AddRuleToFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -550,6 +557,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all rules for a view filter
         /// </summary>
+        [MCPMethod("getFilterRules", Category = "Filter", Description = "Gets all rules for a view filter")]
         public static string GetFilterRules(UIApplication uiApp, JObject parameters)
         {
             try
@@ -631,6 +639,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Removes a rule from a view filter
         /// </summary>
+        [MCPMethod("removeRuleFromFilter", Category = "Filter", Description = "Removes a rule from a view filter")]
         public static string RemoveRuleFromFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -745,6 +754,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Applies a view filter to a view with graphics overrides
         /// </summary>
+        [MCPMethod("applyFilterToView", Category = "Filter", Description = "Applies a view filter to a view with graphics overrides")]
         public static string ApplyFilterToView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -827,6 +837,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Removes a filter from a view
         /// </summary>
+        [MCPMethod("removeFilterFromView", Category = "Filter", Description = "Removes a filter from a view")]
         public static string RemoveFilterFromView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -892,6 +903,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all filters applied to a view
         /// </summary>
+        [MCPMethod("getFiltersInView", Category = "Filter", Description = "Gets all filters applied to a view")]
         public static string GetFiltersInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -961,6 +973,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets graphics overrides for a filter in a view
         /// </summary>
+        [MCPMethod("setFilterOverrides", Category = "Filter", Description = "Sets graphics overrides for a filter in a view")]
         public static string SetFilterOverrides(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1063,6 +1076,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets graphics overrides for a filter in a view
         /// </summary>
+        [MCPMethod("getFilterOverrides", Category = "Filter", Description = "Gets graphics overrides for a filter in a view")]
         public static string GetFilterOverrides(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1159,6 +1173,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a selection filter to select elements by criteria
         /// </summary>
+        [MCPMethod("selectElementsByFilter", Category = "Filter", Description = "Selects elements matching filter criteria")]
         public static string SelectElementsByFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1298,6 +1313,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Counts elements matching filter criteria
         /// </summary>
+        [MCPMethod("countElementsByFilter", Category = "Filter", Description = "Counts elements matching filter criteria")]
         public static string CountElementsByFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1439,6 +1455,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a category filter for element collection
         /// </summary>
+        [MCPMethod("createCategoryFilter", Category = "Filter", Description = "Creates a category filter for element collection")]
         public static string CreateCategoryFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1487,6 +1504,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all categories in a filter
         /// </summary>
+        [MCPMethod("getFilterCategories", Category = "Filter", Description = "Gets all categories assigned to a filter")]
         public static string GetFilterCategories(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1553,6 +1571,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Adds categories to a filter
         /// </summary>
+        [MCPMethod("addCategoriesToFilter", Category = "Filter", Description = "Adds categories to a filter")]
         public static string AddCategoriesToFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1636,6 +1655,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Removes categories from a filter
         /// </summary>
+        [MCPMethod("removeCategoriesFromFilter", Category = "Filter", Description = "Removes categories from a filter")]
         public static string RemoveCategoriesFromFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1734,6 +1754,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a filter from a template/preset
         /// </summary>
+        [MCPMethod("createFilterFromTemplate", Category = "Filter", Description = "Creates a filter from a template or preset")]
         public static string CreateFilterFromTemplate(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1839,6 +1860,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Duplicates an existing filter
         /// </summary>
+        [MCPMethod("duplicateFilter", Category = "Filter", Description = "Duplicates an existing filter")]
         public static string DuplicateFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1923,6 +1945,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Finds views where a filter is applied
         /// </summary>
+        [MCPMethod("findViewsUsingFilter", Category = "Filter", Description = "Finds all views where a filter is applied")]
         public static string FindViewsUsingFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2006,6 +2029,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Tests a filter to see which elements it would select
         /// </summary>
+        [MCPMethod("testFilter", Category = "Filter", Description = "Tests a filter to preview which elements it would select")]
         public static string TestFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2085,6 +2109,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Analyzes filter performance and element count
         /// </summary>
+        [MCPMethod("analyzeFilter", Category = "Filter", Description = "Analyzes filter performance and element count")]
         public static string AnalyzeFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2185,6 +2210,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all filterable parameters for a category
         /// </summary>
+        [MCPMethod("getFilterableParameters", Category = "Filter", Description = "Gets all filterable parameters for a category")]
         public static string GetFilterableParameters(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2261,6 +2287,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Validates filter rules
         /// </summary>
+        [MCPMethod("validateFilterRules", Category = "Filter", Description = "Validates filter rules for correctness")]
         public static string ValidateFilterRules(UIApplication uiApp, JObject parameters)
         {
             try

@@ -173,6 +173,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// List all available firm profiles
         /// </summary>
+        [MCPMethod("listProfiles", Category = "FirmProfile", Description = "List all available firm profiles")]
         public static string ListProfiles(UIApplication uiApp, JObject parameters)
         {
             try
@@ -221,6 +222,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get details of a specific profile
         /// </summary>
+        [MCPMethod("getProfile", Category = "FirmProfile", Description = "Get details of a specific firm profile")]
         public static string GetProfile(UIApplication uiApp, JObject parameters)
         {
             try
@@ -265,6 +267,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the currently active profile (or auto-detect if none set)
         /// </summary>
+        [MCPMethod("getCurrentProfile", Category = "FirmProfile", Description = "Get the currently active firm profile, auto-detecting if none is set")]
         public static string GetCurrentProfile(UIApplication uiApp, JObject parameters)
         {
             try
@@ -316,6 +319,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set the active profile manually
         /// </summary>
+        [MCPMethod("setProfile", Category = "FirmProfile", Description = "Manually set the active firm profile")]
         public static string SetProfile(UIApplication uiApp, JObject parameters)
         {
             try
@@ -367,6 +371,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Auto-detect the appropriate profile based on project info
         /// </summary>
+        [MCPMethod("detectProfile", Category = "FirmProfile", Description = "Auto-detect the appropriate firm profile based on project info")]
         public static string DetectProfile(UIApplication uiApp, JObject parameters)
         {
             try
@@ -407,6 +412,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get a specific setting from the current profile
         /// </summary>
+        [MCPMethod("getProfileSetting", Category = "FirmProfile", Description = "Get a specific setting from the current firm profile")]
         public static string GetProfileSetting(UIApplication uiApp, JObject parameters)
         {
             try
@@ -468,6 +474,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the correct text type name for the current firm
         /// </summary>
+        [MCPMethod("getTextTypeForProfile", Category = "FirmProfile", Description = "Get the correct text type name for the current firm profile")]
         public static string GetTextTypeForProfile(UIApplication uiApp, JObject parameters)
         {
             try
@@ -519,6 +526,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the correct dimension type for the current firm
         /// </summary>
+        [MCPMethod("getDimensionTypeForProfile", Category = "FirmProfile", Description = "Get the correct dimension type for the current firm profile")]
         public static string GetDimensionTypeForProfile(UIApplication uiApp, JObject parameters)
         {
             try
@@ -560,6 +568,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the sheet number format/pattern for the current firm
         /// </summary>
+        [MCPMethod("getSheetNumberFormat", Category = "FirmProfile", Description = "Get the sheet number format and pattern for the current firm profile")]
         public static string GetSheetNumberFormat(UIApplication uiApp, JObject parameters)
         {
             try
@@ -594,6 +603,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get view naming rules for the current firm
         /// </summary>
+        [MCPMethod("getViewNamingConvention", Category = "FirmProfile", Description = "Get view naming rules and conventions for the current firm profile")]
         public static string GetViewNamingConvention(UIApplication uiApp, JObject parameters)
         {
             try
@@ -835,6 +845,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Refresh profiles from disk (call after editing profile files)
         /// </summary>
+        [MCPMethod("refreshProfiles", Category = "FirmProfile", Description = "Refresh firm profiles from disk after editing profile files")]
         public static string RefreshProfiles(UIApplication uiApp, JObject parameters)
         {
             try

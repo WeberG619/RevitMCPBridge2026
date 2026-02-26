@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RevitMCPBridge;
 using RevitMCPBridge.Helpers;
 
 namespace RevitMCPBridge2026
@@ -22,6 +23,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all text types in the current document
         /// </summary>
+        [MCPMethod("getTextTypes", Category = "BatchText", Description = "Get all text types in the current document")]
         public static string GetTextTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -65,6 +67,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates or gets a standard text type with specified parameters
         /// </summary>
+        [MCPMethod("createStandardTextType", Category = "BatchText", Description = "Create or get a standard text type with specified parameters")]
         public static string CreateStandardTextType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -182,6 +185,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all text notes in current document
         /// </summary>
+        [MCPMethod("getTextNotes", Category = "BatchText", Description = "Get all text notes in the current document")]
         public static string GetTextNotes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -225,6 +229,7 @@ namespace RevitMCPBridge2026
         /// - Changes all TextNote types to specified type
         /// - Converts all text to UPPERCASE
         /// </summary>
+        [MCPMethod("standardizeDocumentText", Category = "BatchText", Description = "Standardize all text notes in the document to a specified type and optionally uppercase")]
         public static string StandardizeDocumentText(UIApplication uiApp, JObject parameters)
         {
             try
@@ -393,6 +398,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Opens a detail file, standardizes text, and saves it
         /// </summary>
+        [MCPMethod("processDetailFile", Category = "BatchText", Description = "Open a detail file, standardize text, and save it")]
         public static string ProcessDetailFile(UIApplication uiApp, JObject parameters)
         {
             try
@@ -598,6 +604,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets list of all RVT files in the detail library
         /// </summary>
+        [MCPMethod("getDetailLibraryFiles", Category = "BatchText", Description = "Get a list of all RVT files in the detail library")]
         public static string GetDetailLibraryFiles(UIApplication uiApp, JObject parameters)
         {
             try
@@ -648,6 +655,7 @@ namespace RevitMCPBridge2026
         /// Batch process all detail files in library - call from external orchestrator
         /// Returns next file to process or completion status
         /// </summary>
+        [MCPMethod("getNextFileToProcess", Category = "BatchText", Description = "Get the next detail library file to process in a batch operation")]
         public static string GetNextFileToProcess(UIApplication uiApp, JObject parameters)
         {
             try
@@ -714,6 +722,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Mark a file as processed in the progress tracker
         /// </summary>
+        [MCPMethod("markFileProcessed", Category = "BatchText", Description = "Mark a detail library file as processed in the batch progress tracker")]
         public static string MarkFileProcessed(UIApplication uiApp, JObject parameters)
         {
             try
@@ -815,6 +824,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Standardizes dimension text font and size across all dimension types
         /// </summary>
+        [MCPMethod("standardizeDimensionText", Category = "BatchText", Description = "Standardize dimension text font and size across all dimension types")]
         public static string StandardizeDimensionText(UIApplication uiApp, JObject parameters)
         {
             try
@@ -897,6 +907,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Renames all dimension types with a prefix and ensures consistent font/size
         /// </summary>
+        [MCPMethod("renameDimensionTypes", Category = "BatchText", Description = "Rename all dimension types with a prefix and standardize font and size")]
         public static string RenameDimensionTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1038,6 +1049,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Standardizes all text note types to a consistent font and size
         /// </summary>
+        [MCPMethod("standardizeTextNoteTypes", Category = "BatchText", Description = "Standardize all text note types to a consistent font and size")]
         public static string StandardizeTextNoteTypes(UIApplication uiApp, JObject parameters)
         {
             try

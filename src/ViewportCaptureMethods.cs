@@ -33,6 +33,7 @@ namespace RevitMCPBridge
         /// - quality (optional): Image quality 1-100 for JPG. Default 90.
         /// - fitToView (optional): If true, fits content to image. Default true.
         /// </param>
+        [MCPMethod("captureViewport", Category = "ViewportCapture", Description = "Capture the current view or a specified view to an image file")]
         public static string CaptureViewport(UIApplication uiApp, JObject parameters)
         {
             try
@@ -195,6 +196,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Capture viewport and return image as Base64 string (for direct transmission).
         /// </summary>
+        [MCPMethod("captureViewportToBase64", Category = "ViewportCapture", Description = "Capture viewport and return image as Base64 string")]
         public static string CaptureViewportToBase64(UIApplication uiApp, JObject parameters)
         {
             try
@@ -253,6 +255,7 @@ namespace RevitMCPBridge
         /// - targetPosition: Look-at point {x, y, z} in feet.
         /// - upDirection (optional): Up vector {x, y, z}. Default {0, 0, 1}.
         /// </param>
+        [MCPMethod("setCamera", Category = "ViewportCapture", Description = "Set camera position and orientation for a 3D view")]
         public static string SetCamera(UIApplication uiApp, JObject parameters)
         {
             try
@@ -379,6 +382,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get current camera position and orientation for a 3D view.
         /// </summary>
+        [MCPMethod("getCamera", Category = "ViewportCapture", Description = "Get current camera position and orientation for a 3D view")]
         public static string GetCamera(UIApplication uiApp, JObject parameters)
         {
             try
@@ -458,6 +462,7 @@ namespace RevitMCPBridge
         /// - displayStyle: One of: Wireframe, HiddenLine, Shaded, ShadedWithEdges, Consistent, Realistic, Rendering, RaytracedRendering
         /// - detailLevel (optional): One of: Coarse, Medium, Fine
         /// </param>
+        [MCPMethod("setViewStyle", Category = "ViewportCapture", Description = "Set the visual style of a view")]
         public static string SetViewStyle(UIApplication uiApp, JObject parameters)
         {
             try
@@ -559,6 +564,7 @@ namespace RevitMCPBridge
         /// - viewType (optional): Filter by type: FloorPlan, CeilingPlan, Elevation, Section, ThreeD, Schedule, etc.
         /// - includeTemplates (optional): Include view templates. Default false.
         /// </param>
+        [MCPMethod("listViews", Category = "ViewportCapture", Description = "List all views in the document")]
         public static string ListViews(UIApplication uiApp, JObject parameters)
         {
             try
@@ -624,6 +630,7 @@ namespace RevitMCPBridge
         /// - eyePosition (optional for perspective): Camera position {x, y, z}.
         /// - targetPosition (optional for perspective): Look-at point {x, y, z}.
         /// </param>
+        [MCPMethod("create3DView", Category = "ViewportCapture", Description = "Create a new 3D view")]
         public static string Create3DView(UIApplication uiApp, JObject parameters)
         {
             try

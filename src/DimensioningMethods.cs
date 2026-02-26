@@ -1519,6 +1519,7 @@ namespace RevitMCPBridge
         /// Parameters: viewId, wallIds (optional - dimensions all windows if not provided),
         ///             offset (optional, default 2'), includeJambs (optional)
         /// </summary>
+        [MCPMethod("batchDimensionWindows", Category = "Dimensioning", Description = "Batch create dimensions for all windows in a view")]
         public static string BatchDimensionWindows(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1643,6 +1644,7 @@ namespace RevitMCPBridge
         /// Parameters: viewId, dimensionIds (optional - processes all if not provided),
         ///             tolerance (optional, default 0.5')
         /// </summary>
+        [MCPMethod("autoAlignDimensions", Category = "Dimensioning", Description = "Auto-align dimensions by cleaning up witness lines to snap to nearest grid or reference")]
         public static string AutoAlignDimensions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1758,6 +1760,7 @@ namespace RevitMCPBridge
         /// Create equality (EQ) dimension for evenly spaced elements
         /// Parameters: viewId, elementIds, dimLinePoint: [x,y] (optional)
         /// </summary>
+        [MCPMethod("createEqualityDimension", Category = "Dimensioning", Description = "Create an equality (EQ) dimension for evenly spaced elements")]
         public static string CreateEqualityDimension(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1894,6 +1897,7 @@ namespace RevitMCPBridge
         /// Get all available dimension types/styles in the document
         /// Returns type ID, name, and key properties for each dimension type
         /// </summary>
+        [MCPMethod("getDimensionTypes", Category = "Dimensioning", Description = "Get all available dimension types and styles in the document")]
         public static string GetDimensionTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2006,6 +2010,7 @@ namespace RevitMCPBridge
         /// Get detailed information about a dimension's segments
         /// Returns each segment's value, references, text override, prefix, and suffix
         /// </summary>
+        [MCPMethod("getDimensionSegments", Category = "Dimensioning", Description = "Get detailed information about a dimension's segments including values and text overrides")]
         public static string GetDimensionSegments(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2207,6 +2212,7 @@ namespace RevitMCPBridge
         ///   direction: "horizontal" or "vertical"
         ///   dimensionTypeId: (optional) ID of dimension type to use
         /// </summary>
+        [MCPMethod("createCustomDimensionString", Category = "Dimensioning", Description = "Create a custom dimension string with explicit control over reference sequence and types")]
         public static string CreateCustomDimensionString(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2485,6 +2491,7 @@ namespace RevitMCPBridge
         ///   below: (optional) Text below the dimension line
         ///   clearOverrides: (optional) If true, clears all text modifications
         /// </summary>
+        [MCPMethod("modifyDimensionText", Category = "Dimensioning", Description = "Modify dimension text including overrides, prefix, suffix, above, and below text")]
         public static string ModifyDimensionText(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2678,6 +2685,7 @@ namespace RevitMCPBridge
         ///   elementId: ID of the element to search for
         ///   viewId: (optional) Limit search to a specific view
         /// </summary>
+        [MCPMethod("findDimensionsByElement", Category = "Dimensioning", Description = "Find all dimensions that reference a specific element")]
         public static string FindDimensionsByElement(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2812,6 +2820,7 @@ namespace RevitMCPBridge
         ///   dimensionTypeId: ID of the new dimension type (or dimensionTypeName)
         ///   dimensionTypeName: (alternative) Name of the new dimension type
         /// </summary>
+        [MCPMethod("setDimensionType", Category = "Dimensioning", Description = "Change the dimension type or style of an existing dimension")]
         public static string SetDimensionType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2897,6 +2906,7 @@ namespace RevitMCPBridge
         ///   newReference: { elementId, referenceType, faceSide (optional) }
         ///   insertAtIndex: (optional) Where to insert (default = append at end)
         /// </summary>
+        [MCPMethod("addSegmentToDimension", Category = "Dimensioning", Description = "Add a reference to an existing dimension to extend the dimension string")]
         public static string AddSegmentToDimension(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3069,6 +3079,7 @@ namespace RevitMCPBridge
         ///   dimensionId: ID of the dimension to trim
         ///   segmentIndex: Index of the reference to remove (0-based)
         /// </summary>
+        [MCPMethod("removeSegmentFromDimension", Category = "Dimensioning", Description = "Remove a reference from an existing dimension to trim the dimension string")]
         public static string RemoveSegmentFromDimension(UIApplication uiApp, JObject parameters)
         {
             try

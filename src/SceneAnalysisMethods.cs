@@ -23,6 +23,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Collect all visible elements in the current 3D view, grouped by category with material data.
         /// </summary>
+        [MCPMethod("getVisibleElements", Category = "SceneAnalysis", Description = "Collect all visible elements in the current 3D view grouped by category")]
         public static string GetVisibleElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -131,6 +132,7 @@ namespace RevitMCPBridge
         /// Get material data for the current view - lighter version focused on prompt building.
         /// Returns dominant colors and a one-line material summary.
         /// </summary>
+        [MCPMethod("getViewMaterials", Category = "SceneAnalysis", Description = "Get material data for the current view focused on prompt building")]
         public static string GetViewMaterials(UIApplication uiApp, JObject parameters)
         {
             try
@@ -254,6 +256,7 @@ namespace RevitMCPBridge
         /// Auto-generate a natural language scene description and suggested Flux prompt.
         /// Detects interior vs exterior, identifies room type, builds material descriptions.
         /// </summary>
+        [MCPMethod("getSceneDescription", Category = "SceneAnalysis", Description = "Auto-generate a natural language scene description and suggested render prompt")]
         public static string GetSceneDescription(UIApplication uiApp, JObject parameters)
         {
             try
@@ -392,6 +395,7 @@ namespace RevitMCPBridge
         /// Temporarily sets Realistic display, hides annotations, exports image,
         /// then restores original settings.
         /// </summary>
+        [MCPMethod("exportViewForRender", Category = "SceneAnalysis", Description = "Clean high-res export plus scene analysis in one call")]
         public static string ExportViewForRender(UIApplication uiApp, JObject parameters)
         {
             try

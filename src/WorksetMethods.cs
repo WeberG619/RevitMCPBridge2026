@@ -23,6 +23,7 @@ namespace RevitMCPBridge2026
         /// <param name="uiApp">The Revit UI Application</param>
         /// <param name="parameters">JSON parameters containing worksetName</param>
         /// <returns>JSON response with success status and workset ID</returns>
+        [MCPMethod("createWorkset", Category = "Workset", Description = "Creates a new workset in a workshared document")]
         public static string CreateWorkset(UIApplication uiApp, JObject parameters)
         {
             try
@@ -85,6 +86,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all worksets in the project
         /// </summary>
+        [MCPMethod("getAllWorksets", Category = "Workset", Description = "Gets all worksets in the project")]
         public static string GetAllWorksets(UIApplication uiApp, JObject parameters)
         {
             try
@@ -149,6 +151,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets information about a specific workset
         /// </summary>
+        [MCPMethod("getWorksetInfo", Category = "Workset", Description = "Gets detailed information about a specific workset")]
         public static string GetWorksetInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -211,6 +214,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Renames a workset
         /// </summary>
+        [MCPMethod("renameWorkset", Category = "Workset", Description = "Renames an existing workset")]
         public static string RenameWorkset(UIApplication uiApp, JObject parameters)
         {
             try
@@ -260,6 +264,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Deletes a workset
         /// </summary>
+        [MCPMethod("deleteWorkset", Category = "Workset", Description = "Deletes a workset from the project")]
         public static string DeleteWorkset(UIApplication uiApp, JObject parameters)
         {
             try
@@ -306,6 +311,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets the workset for an element
         /// </summary>
+        [MCPMethod("setElementWorkset", Category = "Workset", Description = "Assigns an element to a specific workset")]
         public static string SetElementWorkset(UIApplication uiApp, JObject parameters)
         {
             try
@@ -363,6 +369,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets the workset for an element
         /// </summary>
+        [MCPMethod("getElementWorkset", Category = "Workset", Description = "Gets the workset an element belongs to")]
         public static string GetElementWorkset(UIApplication uiApp, JObject parameters)
         {
             try
@@ -404,6 +411,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all elements in a workset
         /// </summary>
+        [MCPMethod("getElementsInWorkset", Category = "Workset", Description = "Gets all elements belonging to a specific workset")]
         public static string GetElementsInWorkset(UIApplication uiApp, JObject parameters)
         {
             try
@@ -448,6 +456,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Moves elements to a different workset
         /// </summary>
+        [MCPMethod("moveElementsToWorkset", Category = "Workset", Description = "Moves multiple elements to a different workset")]
         public static string MoveElementsToWorkset(UIApplication uiApp, JObject parameters)
         {
             try
@@ -525,6 +534,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets workset visibility in a view
         /// </summary>
+        [MCPMethod("setWorksetVisibility", Category = "Workset", Description = "Sets workset visibility override in a view")]
         public static string SetWorksetVisibility(UIApplication uiApp, JObject parameters)
         {
             try
@@ -612,6 +622,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets workset visibility settings for a view
         /// </summary>
+        [MCPMethod("getWorksetVisibilityInView", Category = "Workset", Description = "Gets workset visibility settings for a view")]
         public static string GetWorksetVisibilityInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -679,6 +690,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets global workset visibility
         /// </summary>
+        [MCPMethod("setGlobalWorksetVisibility", Category = "Workset", Description = "Sets global visibility for a workset across all views")]
         public static string SetGlobalWorksetVisibility(UIApplication uiApp, JObject parameters)
         {
             try
@@ -731,6 +743,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Checks if a workset is editable by current user
         /// </summary>
+        [MCPMethod("isWorksetEditable", Category = "Workset", Description = "Checks if a workset is editable by the current user")]
         public static string IsWorksetEditable(UIApplication uiApp, JObject parameters)
         {
             try
@@ -778,6 +791,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Checks if an element is borrowed by current user
         /// </summary>
+        [MCPMethod("isElementBorrowed", Category = "Workset", Description = "Checks if an element is borrowed by the current user")]
         public static string IsElementBorrowed(UIApplication uiApp, JObject parameters)
         {
             try
@@ -843,6 +857,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Relinquishes ownership of elements/worksets
         /// </summary>
+        [MCPMethod("relinquishOwnership", Category = "Workset", Description = "Relinquishes ownership of borrowed elements or worksets")]
         public static string RelinquishOwnership(UIApplication uiApp, JObject parameters)
         {
             try
@@ -901,6 +916,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets checkout status for elements
         /// </summary>
+        [MCPMethod("getCheckoutStatus", Category = "Workset", Description = "Gets the checkout and ownership status for elements")]
         public static string GetCheckoutStatus(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1037,6 +1053,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Checks if the document is workshared
         /// </summary>
+        [MCPMethod("isWorkshared", Category = "Workset", Description = "Checks if the document has worksharing enabled")]
         public static string IsWorkshared(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1085,6 +1102,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets worksharing options for the document
         /// </summary>
+        [MCPMethod("getWorksharingOptions", Category = "Workset", Description = "Gets worksharing configuration options for the document")]
         public static string GetWorksharingOptions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1141,6 +1159,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Synchronizes with central model
         /// </summary>
+        [MCPMethod("synchronizeWithCentral", Category = "Workset", Description = "Synchronizes the local file with the central model")]
         public static string SynchronizeWithCentral(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1199,6 +1218,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Reloads latest changes from central
         /// </summary>
+        [MCPMethod("reloadLatest", Category = "Workset", Description = "Reloads the latest changes from the central model")]
         public static string ReloadLatest(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1238,6 +1258,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets synchronization history
         /// </summary>
+        [MCPMethod("getSyncHistory", Category = "Workset", Description = "Gets the synchronization history with central")]
         public static string GetSyncHistory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1289,6 +1310,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets worksets by category
         /// </summary>
+        [MCPMethod("getWorksetsByCategory", Category = "Workset", Description = "Gets workset assignments grouped by element category")]
         public static string GetWorksetsByCategory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1385,6 +1407,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates workset naming scheme
         /// </summary>
+        [MCPMethod("createWorksetNamingScheme", Category = "Workset", Description = "Creates worksets based on a defined naming scheme")]
         public static string CreateWorksetNamingScheme(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1537,6 +1560,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets active workset for the session
         /// </summary>
+        [MCPMethod("getActiveWorkset", Category = "Workset", Description = "Gets the active workset for the current session")]
         public static string GetActiveWorkset(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1594,6 +1618,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets active workset for the session
         /// </summary>
+        [MCPMethod("setActiveWorkset", Category = "Workset", Description = "Sets the active workset for the current session")]
         public static string SetActiveWorkset(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1689,6 +1714,7 @@ namespace RevitMCPBridge2026
         ///    {"category": "OST_MechanicalEquipment", "worksetName": "MEP"}]
         /// </param>
         /// <returns>JSON response with assignment results</returns>
+        [MCPMethod("bulkSetWorksetsByCategory", Category = "Workset", Description = "Assigns elements to worksets in bulk based on their category")]
         public static string BulkSetWorksetsByCategory(UIApplication uiApp, JObject parameters)
         {
             try

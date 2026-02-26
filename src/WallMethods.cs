@@ -19,6 +19,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a wall from two points
         /// </summary>
+        [MCPMethod("createWallByPoints", "createWall", Category = "Wall", Description = "Create a wall between two XYZ points")]
         public static string CreateWallByPoints(UIApplication uiApp, JObject parameters)
         {
             try
@@ -98,6 +99,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create multiple walls from a series of points (polyline)
         /// </summary>
+        [MCPMethod("createWallsFromPolyline", Category = "Wall", Description = "Create walls from a polyline of points")]
         public static string CreateWallsFromPolyline(UIApplication uiApp, JObject parameters)
         {
             try
@@ -179,6 +181,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get wall information
         /// </summary>
+        [MCPMethod("getWallInfo", Category = "Wall", Description = "Get detailed info about a specific wall")]
         public static string GetWallInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -239,6 +242,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Modify wall properties
         /// </summary>
+        [MCPMethod("modifyWallProperties", "modifyWall", Category = "Wall", Description = "Modify wall properties (type, height, offset, etc.)")]
         public static string ModifyWallProperties(UIApplication uiApp, JObject parameters)
         {
             try
@@ -389,6 +393,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Split a wall at a point
         /// </summary>
+        [MCPMethod("splitWall", Category = "Wall", Description = "Split a wall at a given point")]
         public static string SplitWall(UIApplication uiApp, JObject parameters)
         {
             try
@@ -522,6 +527,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Join two walls
         /// </summary>
+        [MCPMethod("joinWalls", Category = "Wall", Description = "Join two walls together")]
         public static string JoinWalls(UIApplication uiApp, JObject parameters)
         {
             try
@@ -572,6 +578,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Unjoin two walls
         /// </summary>
+        [MCPMethod("unjoinWalls", Category = "Wall", Description = "Unjoin two previously joined walls")]
         public static string UnjoinWalls(UIApplication uiApp, JObject parameters)
         {
             try
@@ -621,6 +628,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all walls in the document with geometry
         /// </summary>
+        [MCPMethod("getWalls", Category = "Wall", Description = "Get all walls in the active document")]
         public static string GetWalls(UIApplication uiApp, JObject parameters)
         {
             try
@@ -682,6 +690,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all walls in a view
         /// </summary>
+        [MCPMethod("getWallsInView", Category = "Wall", Description = "Get walls visible in a specific view")]
         public static string GetWallsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -732,6 +741,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all available wall types
         /// </summary>
+        [MCPMethod("getWallTypes", Category = "Wall", Description = "Get all wall types in the document")]
         public static string GetWallTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -767,6 +777,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Duplicate a wall type with a new name
         /// </summary>
+        [MCPMethod("duplicateWallType", Category = "Wall", Description = "Duplicate a wall type with a new name")]
         public static string DuplicateWallType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -833,6 +844,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Flip wall orientation
         /// </summary>
+        [MCPMethod("flipWall", Category = "Wall", Description = "Flip a wall's interior/exterior face")]
         public static string FlipWall(UIApplication uiApp, JObject parameters)
         {
             try
@@ -878,6 +890,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a wall
         /// </summary>
+        [MCPMethod("deleteWall", Category = "Wall", Description = "Delete a wall by element ID")]
         public static string DeleteWall(UIApplication uiApp, JObject parameters)
         {
             try
@@ -913,6 +926,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create multiple walls in a single transaction (batch operation to avoid timeouts)
         /// </summary>
+        [MCPMethod("batchCreateWalls", Category = "Wall", Description = "Create multiple walls in a single transaction")]
         public static string BatchCreateWalls(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1030,6 +1044,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Change the type of an existing wall
         /// </summary>
+        [MCPMethod("modifyWallType", Category = "Wall", Description = "Modify wall type properties (layers, function, etc.)")]
         public static string ModifyWallType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1090,6 +1105,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Batch modify wall types for multiple walls
         /// </summary>
+        [MCPMethod("batchModifyWallTypes", Category = "Wall", Description = "Modify multiple wall types in a single transaction")]
         public static string BatchModifyWallTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1164,6 +1180,7 @@ namespace RevitMCPBridge
         /// <param name="wallId">ID of the wall to modify</param>
         /// <param name="endIndex">0 for start point, 1 for end point</param>
         /// <param name="newPoint">New coordinates [x, y, z] in feet</param>
+        [MCPMethod("setWallEndpoint", Category = "Wall", Description = "Set the start or end point of a wall")]
         public static string SetWallEndpoint(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1266,6 +1283,7 @@ namespace RevitMCPBridge
         /// <param name="wallId">ID of the wall to extend</param>
         /// <param name="endIndex">0 for start point, 1 for end point</param>
         /// <param name="targetElementId">ID of the element to extend to</param>
+        [MCPMethod("extendWallToElement", Category = "Wall", Description = "Extend a wall to meet another element")]
         public static string ExtendWallToElement(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1430,6 +1448,7 @@ namespace RevitMCPBridge
         /// <param name="wallId">ID of the wall to trim</param>
         /// <param name="endIndex">0 for start point, 1 for end point</param>
         /// <param name="targetElementId">ID of the element to trim to</param>
+        [MCPMethod("trimWallToElement", Category = "Wall", Description = "Trim a wall to another element")]
         public static string TrimWallToElement(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1583,6 +1602,7 @@ namespace RevitMCPBridge
         /// <param name="wallId">ID of the wall to modify</param>
         /// <param name="endIndex">0 for start point, 1 for end point</param>
         /// <param name="targetPoint">Target point [x, y, z] - wall endpoint will project to this</param>
+        [MCPMethod("extendWallToPoint", Category = "Wall", Description = "Extend a wall to a specific XYZ point")]
         public static string ExtendWallToPoint(UIApplication uiApp, JObject parameters)
         {
             try

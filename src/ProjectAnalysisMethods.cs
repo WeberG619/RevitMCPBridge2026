@@ -22,6 +22,7 @@ namespace RevitMCPBridge
         /// Comprehensive project state analysis - returns full project model
         /// This is the master method that provides complete project overview
         /// </summary>
+        [MCPMethod("analyzeProjectState", Category = "ProjectAnalysis", Description = "Comprehensive project state analysis")]
         public static string AnalyzeProjectState(UIApplication uiApp, JObject parameters)
         {
             try
@@ -166,6 +167,7 @@ namespace RevitMCPBridge
         /// Get the complete sheet-to-view relationship matrix
         /// Shows which views are on which sheets
         /// </summary>
+        [MCPMethod("getSheetViewMatrix", Category = "ProjectAnalysis", Description = "Get the complete sheet-to-view relationship matrix")]
         public static string GetSheetViewMatrix(UIApplication uiApp, JObject parameters)
         {
             try
@@ -246,6 +248,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get detailed view placement status - which views are placed and where
         /// </summary>
+        [MCPMethod("getViewPlacementStatus", Category = "ProjectAnalysis", Description = "Get detailed view placement status")]
         public static string GetViewPlacementStatus(UIApplication uiApp, JObject parameters)
         {
             try
@@ -355,6 +358,7 @@ namespace RevitMCPBridge
         /// Analyze what views exist for each level
         /// Critical for detecting missing floor plans, RCPs, etc.
         /// </summary>
+        [MCPMethod("getLevelViewCoverage", Category = "ProjectAnalysis", Description = "Analyze what views exist for each level")]
         public static string GetLevelViewCoverage(UIApplication uiApp, JObject parameters)
         {
             try
@@ -472,6 +476,7 @@ namespace RevitMCPBridge
         /// Detect naming patterns used in the project
         /// Helps understand conventions for consistent suggestions
         /// </summary>
+        [MCPMethod("detectNamingPatterns", Category = "ProjectAnalysis", Description = "Detect naming patterns used in the project")]
         public static string DetectNamingPatterns(UIApplication uiApp, JObject parameters)
         {
             try
@@ -514,6 +519,7 @@ namespace RevitMCPBridge
         /// Working views and draft schedules are intentionally ignored - only flags
         /// REQUIRED elements that are missing or not placed on sheets.
         /// </summary>
+        [MCPMethod("analyzeProjectGaps", Category = "ProjectAnalysis", Description = "Analyze project gaps for CD set completeness")]
         public static string AnalyzeProjectGaps(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1263,6 +1269,7 @@ namespace RevitMCPBridge
         /// Extract comprehensive project data matrix with element relationships.
         /// Returns all elements with their hosts, parameters, and relationships.
         /// </summary>
+        [MCPMethod("extractProjectDataMatrix", Category = "ProjectAnalysis", Description = "Extract comprehensive project data matrix with element relationships")]
         public static string ExtractProjectDataMatrix(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1422,6 +1429,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Analyze circulation patterns - corridor efficiency, adjacencies, egress paths.
         /// </summary>
+        [MCPMethod("analyzeCirculationPatterns", Category = "ProjectAnalysis", Description = "Analyze circulation patterns including corridor efficiency and egress paths")]
         public static string AnalyzeCirculationPatterns(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1564,6 +1572,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Validate room sizes against architectural standards.
         /// </summary>
+        [MCPMethod("validateSpaceEfficiency", Category = "ProjectAnalysis", Description = "Validate room sizes against architectural standards")]
         public static string ValidateSpaceEfficiency(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1701,6 +1710,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Extract building envelope metrics - WWR, wall area, glazing analysis.
         /// </summary>
+        [MCPMethod("extractBuildingEnvelopeMetrics", Category = "ProjectAnalysis", Description = "Extract building envelope metrics including WWR and glazing analysis")]
         public static string ExtractBuildingEnvelopeMetrics(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1860,6 +1870,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Extract acoustic properties based on wall assemblies.
         /// </summary>
+        [MCPMethod("extractAcousticProperties", Category = "ProjectAnalysis", Description = "Extract acoustic properties based on wall assemblies")]
         public static string ExtractAcousticProperties(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2009,6 +2020,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Extract daylighting analysis - window-to-floor ratios, orientation analysis.
         /// </summary>
+        [MCPMethod("extractDaylightingAnalysis", Category = "ProjectAnalysis", Description = "Extract daylighting analysis including window-to-floor ratios")]
         public static string ExtractDaylightingAnalysis(UIApplication uiApp, JObject parameters)
         {
             try

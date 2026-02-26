@@ -21,6 +21,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Run all compliance checks on the current model
         /// </summary>
+        [MCPMethod("runComplianceCheck", Category = "Compliance", Description = "Run all compliance checks on the current model")]
         public static string RunComplianceCheck(UIApplication uiApp, JObject parameters)
         {
             try
@@ -103,6 +104,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Check corridor widths against code requirements
         /// </summary>
+        [MCPMethod("checkCorridorWidths", Category = "Compliance", Description = "Check corridor widths against code requirements")]
         public static string CheckCorridorWidths(UIApplication uiApp, JObject parameters)
         {
             try
@@ -166,6 +168,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Check door clear widths
         /// </summary>
+        [MCPMethod("checkDoorWidths", Category = "Compliance", Description = "Check door clear widths against ADA and code requirements")]
         public static string CheckDoorWidths(UIApplication uiApp, JObject parameters)
         {
             try
@@ -244,6 +247,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Check room areas against minimums
         /// </summary>
+        [MCPMethod("checkRoomAreas", Category = "Compliance", Description = "Check room areas against minimum code requirements")]
         public static string CheckRoomAreas(UIApplication uiApp, JObject parameters)
         {
             try
@@ -322,6 +326,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Check ADA toilet clearances
         /// </summary>
+        [MCPMethod("checkToiletClearances", Category = "Compliance", Description = "Check ADA toilet clearance requirements in bathroom spaces")]
         public static string CheckToiletClearances(UIApplication uiApp, JObject parameters)
         {
             try
@@ -396,6 +401,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Check door swing direction (egress direction check)
         /// </summary>
+        [MCPMethod("checkDoorSwing", Category = "Compliance", Description = "Check door swing direction for egress compliance")]
         public static string CheckDoorSwing(UIApplication uiApp, JObject parameters)
         {
             try
@@ -479,6 +485,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Check stair dimensions against code requirements
         /// </summary>
+        [MCPMethod("checkStairDimensions", Category = "Compliance", Description = "Check stair dimensions including riser height and tread depth against code")]
         public static string CheckStairDimensions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -576,6 +583,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Check ceiling heights against code requirements
         /// </summary>
+        [MCPMethod("checkCeilingHeights", Category = "Compliance", Description = "Check ceiling heights against minimum code requirements")]
         public static string CheckCeilingHeights(UIApplication uiApp, JObject parameters)
         {
             try
@@ -673,6 +681,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Check wall fire ratings
         /// </summary>
+        [MCPMethod("checkWallFireRatings", Category = "Compliance", Description = "Check wall fire ratings against required ratings for occupancy and construction type")]
         public static string CheckWallFireRatings(UIApplication uiApp, JObject parameters)
         {
             try
@@ -759,6 +768,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Generate a full compliance report
         /// </summary>
+        [MCPMethod("generateComplianceReport", Category = "Compliance", Description = "Generate a comprehensive compliance report for the model")]
         public static string GenerateComplianceReport(UIApplication uiApp, JObject parameters)
         {
             try

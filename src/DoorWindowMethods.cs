@@ -17,6 +17,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Place a door in a wall
         /// </summary>
+        [MCPMethod("placeDoor", Category = "DoorWindow", Description = "Place a door in a wall")]
         public static string PlaceDoor(UIApplication uiApp, JObject parameters)
         {
             try
@@ -165,6 +166,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Place a window in a wall
         /// </summary>
+        [MCPMethod("placeWindow", Category = "DoorWindow", Description = "Place a window in a wall")]
         public static string PlaceWindow(UIApplication uiApp, JObject parameters)
         {
             try
@@ -874,6 +876,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get ALL doors in the entire model (not view-specific)
         /// </summary>
+        [MCPMethod("getDoors", Category = "DoorWindow", Description = "Get all doors in the entire model")]
         public static string GetDoors(UIApplication uiApp, JObject parameters)
         {
             try
@@ -935,6 +938,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get ALL windows in the entire model (not view-specific)
         /// </summary>
+        [MCPMethod("getWindows", Category = "DoorWindow", Description = "Get all windows in the entire model")]
         public static string GetWindows(UIApplication uiApp, JObject parameters)
         {
             try

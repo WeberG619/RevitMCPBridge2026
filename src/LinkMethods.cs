@@ -19,6 +19,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all Revit links in the model
         /// </summary>
+        [MCPMethod("getRevitLinks", Category = "Link", Description = "Get all Revit links in the model")]
         public static string GetRevitLinks(UIApplication uiApp, JObject parameters)
         {
             try
@@ -54,6 +55,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get Revit link types
         /// </summary>
+        [MCPMethod("getRevitLinkTypes", Category = "Link", Description = "Get all Revit link types in the model")]
         public static string GetRevitLinkTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -88,6 +90,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Load a Revit link
         /// </summary>
+        [MCPMethod("loadRevitLink", Category = "Link", Description = "Load a Revit link from a file path")]
         public static string LoadRevitLink(UIApplication uiApp, JObject parameters)
         {
             try
@@ -139,6 +142,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Reload a Revit link
         /// </summary>
+        [MCPMethod("reloadRevitLink", Category = "Link", Description = "Reload a Revit link from its source file")]
         public static string ReloadRevitLink(UIApplication uiApp, JObject parameters)
         {
             try
@@ -176,6 +180,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Unload a Revit link
         /// </summary>
+        [MCPMethod("unloadRevitLink", Category = "Link", Description = "Unload a Revit link without removing it")]
         public static string UnloadRevitLink(UIApplication uiApp, JObject parameters)
         {
             try
@@ -213,6 +218,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a Revit link (type and all instances)
         /// </summary>
+        [MCPMethod("deleteRevitLink", Category = "Link", Description = "Delete a Revit link type and all its instances")]
         public static string DeleteRevitLink(UIApplication uiApp, JObject parameters)
         {
             try
@@ -248,6 +254,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all CAD imports/links in the model
         /// </summary>
+        [MCPMethod("getCADLinks", Category = "Link", Description = "Get all CAD imports and links in the model")]
         public static string GetCADLinks(UIApplication uiApp, JObject parameters)
         {
             try
@@ -281,6 +288,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Import a CAD file
         /// </summary>
+        [MCPMethod("importCAD", Category = "Link", Description = "Import a CAD file into the model")]
         public static string ImportCAD(UIApplication uiApp, JObject parameters)
         {
             try
@@ -367,6 +375,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a CAD import/link
         /// </summary>
+        [MCPMethod("deleteCADLink", Category = "Link", Description = "Delete a CAD import or link from the model")]
         public static string DeleteCADLink(UIApplication uiApp, JObject parameters)
         {
             try
@@ -402,6 +411,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get link instance position/transform
         /// </summary>
+        [MCPMethod("getLinkTransform", Category = "Link", Description = "Get the position and transform of a link instance")]
         public static string GetLinkTransform(UIApplication uiApp, JObject parameters)
         {
             try
@@ -442,6 +452,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Move a link instance
         /// </summary>
+        [MCPMethod("moveLinkInstance", Category = "Link", Description = "Move a link instance to a new position")]
         public static string MoveLinkInstance(UIApplication uiApp, JObject parameters)
         {
             try
@@ -496,6 +507,7 @@ namespace RevitMCPBridge
         /// 3. Call this to extract the geometry
         /// 4. Use extracted lines to create walls
         /// </summary>
+        [MCPMethod("getCADGeometry", Category = "Link", Description = "Extract geometry lines and arcs from an imported CAD file")]
         public static string GetCADGeometry(UIApplication uiApp, JObject parameters)
         {
             try
@@ -658,6 +670,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Filter CAD geometry to find likely wall lines (long, orthogonal lines)
         /// </summary>
+        [MCPMethod("getCADWallCandidates", Category = "Link", Description = "Filter CAD geometry to find likely wall lines based on length and orientation")]
         public static string GetCADWallCandidates(UIApplication uiApp, JObject parameters)
         {
             try
@@ -784,6 +797,7 @@ namespace RevitMCPBridge
         /// Traces continuous wall paths, identifies openings (doors/windows), and classifies elements
         /// Returns a structured floor plan ready for Revit model creation
         /// </summary>
+        [MCPMethod("analyzeCADFloorPlan", Category = "Link", Description = "Analyze a CAD floor plan to identify walls, openings, and structural elements for model creation")]
         public static string AnalyzeCADFloorPlan(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1299,6 +1313,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Query elements in linked models with their coordinates in host model space.
         /// </summary>
+        [MCPMethod("queryLinkedElementCoordinates", Category = "Link", Description = "Query elements in linked models and return their coordinates in host model space")]
         public static string QueryLinkedElementCoordinates(UIApplication uiApp, JObject parameters)
         {
             try

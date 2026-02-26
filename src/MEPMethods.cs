@@ -26,6 +26,7 @@ namespace RevitMCPBridge2026
         /// <param name="uiApp">The Revit UI Application</param>
         /// <param name="parameters">JSON parameters containing startPoint, endPoint, ductTypeId, systemTypeId, levelId</param>
         /// <returns>JSON response with success status and duct element ID</returns>
+        [MCPMethod("createDuct", Category = "MEP", Description = "Creates a duct between two points in the model")]
         public static string CreateDuct(UIApplication uiApp, JObject parameters)
         {
             try
@@ -175,6 +176,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets detailed information about a duct
         /// </summary>
+        [MCPMethod("getDuctInfo", Category = "MEP", Description = "Gets detailed information about a duct element")]
         public static string GetDuctInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -286,6 +288,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a duct fitting (elbow, tee, cross, transition, etc.)
         /// </summary>
+        [MCPMethod("createDuctFitting", Category = "MEP", Description = "Creates a duct fitting at a connector location")]
         public static string CreateDuctFitting(UIApplication uiApp, JObject parameters)
         {
             try
@@ -440,6 +443,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a duct accessory (damper, VAV, diffuser, etc.)
         /// </summary>
+        [MCPMethod("createDuctAccessory", Category = "MEP", Description = "Places a duct accessory on an existing duct")]
         public static string CreateDuctAccessory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -487,6 +491,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all ducts in a view or system
         /// </summary>
+        [MCPMethod("getDuctsInView", Category = "MEP", Description = "Gets all duct elements visible in the active view")]
         public static string GetDuctsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -602,6 +607,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a pipe between two points
         /// </summary>
+        [MCPMethod("createPipe", Category = "MEP", Description = "Creates a pipe segment between two points")]
         public static string CreatePipe(UIApplication uiApp, JObject parameters)
         {
             try
@@ -751,6 +757,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets detailed information about a pipe
         /// </summary>
+        [MCPMethod("getPipeInfo", Category = "MEP", Description = "Gets detailed information about a pipe element")]
         public static string GetPipeInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -863,6 +870,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a pipe fitting (elbow, tee, cross, coupling, etc.)
         /// </summary>
+        [MCPMethod("createPipeFitting", Category = "MEP", Description = "Creates a pipe fitting at a connector location")]
         public static string CreatePipeFitting(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1017,6 +1025,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a pipe accessory (valve, strainer, union, etc.)
         /// </summary>
+        [MCPMethod("createPipeAccessory", Category = "MEP", Description = "Places a pipe accessory on an existing pipe")]
         public static string CreatePipeAccessory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1064,6 +1073,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all pipes in a view or system
         /// </summary>
+        [MCPMethod("getPipesInView", Category = "MEP", Description = "Gets all pipe elements visible in the active view")]
         public static string GetPipesInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1176,6 +1186,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a cable tray between two points
         /// </summary>
+        [MCPMethod("createCableTray", Category = "MEP", Description = "Creates a cable tray segment between two points")]
         public static string CreateCableTray(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1301,6 +1312,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a conduit between two points
         /// </summary>
+        [MCPMethod("createConduit", Category = "MEP", Description = "Creates an electrical conduit segment between two points")]
         public static string CreateConduit(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1426,6 +1438,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets information about a cable tray or conduit
         /// </summary>
+        [MCPMethod("getElectricalPathInfo", Category = "MEP", Description = "Gets routing and path information for an electrical element")]
         public static string GetElectricalPathInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1502,6 +1515,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places an electrical fixture (light fixture, switch, outlet, etc.)
         /// </summary>
+        [MCPMethod("placeElectricalFixture", Category = "MEP", Description = "Places an electrical fixture family instance at a specified location")]
         public static string PlaceElectricalFixture(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1699,6 +1713,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places electrical equipment (panel, transformer, switchboard, etc.)
         /// </summary>
+        [MCPMethod("placeElectricalEquipment", Category = "MEP", Description = "Places electrical equipment such as a panel or transformer at a specified location")]
         public static string PlaceElectricalEquipment(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1845,6 +1860,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets electrical circuits and their properties
         /// </summary>
+        [MCPMethod("getElectricalCircuits", Category = "MEP", Description = "Gets all electrical circuits in the model or on a panel")]
         public static string GetElectricalCircuits(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1921,6 +1937,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates or modifies an electrical circuit
         /// </summary>
+        [MCPMethod("createElectricalCircuit", Category = "MEP", Description = "Creates an electrical circuit connecting fixtures to a panel")]
         public static string CreateElectricalCircuit(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1992,6 +2009,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places mechanical equipment (air handler, boiler, chiller, etc.)
         /// </summary>
+        [MCPMethod("placeMechanicalEquipment", Category = "MEP", Description = "Places mechanical equipment such as an AHU or RTU at a specified location")]
         public static string PlaceMechanicalEquipment(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2138,6 +2156,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places plumbing fixtures (sink, toilet, urinal, water heater, etc.)
         /// </summary>
+        [MCPMethod("placePlumbingFixture", Category = "MEP", Description = "Places a plumbing fixture at a specified location")]
         public static string PlacePlumbingFixture(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2335,6 +2354,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets equipment information
         /// </summary>
+        [MCPMethod("getEquipmentInfo", Category = "MEP", Description = "Gets detailed information about a MEP equipment element")]
         public static string GetEquipmentInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2400,6 +2420,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a new MEP system
         /// </summary>
+        [MCPMethod("createMEPSystem", Category = "MEP", Description = "Creates a MEP system connecting related elements")]
         public static string CreateMEPSystem(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2447,6 +2468,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all MEP systems in the project
         /// </summary>
+        [MCPMethod("getMEPSystems", Category = "MEP", Description = "Gets all MEP systems in the model optionally filtered by type")]
         public static string GetMEPSystems(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2522,6 +2544,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets system information and analysis data
         /// </summary>
+        [MCPMethod("getSystemInfo", Category = "MEP", Description = "Gets detailed information about a MEP system")]
         public static string GetSystemInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2597,6 +2620,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Adds or removes elements from a system
         /// </summary>
+        [MCPMethod("modifySystemElements", Category = "MEP", Description = "Adds or removes elements from a MEP system")]
         public static string ModifySystemElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2639,6 +2663,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates an MEP space
         /// </summary>
+        [MCPMethod("createMEPSpace", Category = "MEP", Description = "Creates a MEP space for load calculations in a room or area")]
         public static string CreateMEPSpace(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2758,6 +2783,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets space information and properties
         /// </summary>
+        [MCPMethod("getSpaceInfo", Category = "MEP", Description = "Gets detailed information about a MEP space element")]
         public static string GetSpaceInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2837,6 +2863,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a zone and assigns spaces to it
         /// </summary>
+        [MCPMethod("createZone", Category = "MEP", Description = "Creates an HVAC zone grouping related MEP spaces")]
         public static string CreateZone(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2904,6 +2931,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Tags an MEP space
         /// </summary>
+        [MCPMethod("tagSpace", Category = "MEP", Description = "Places a tag on a MEP space element in the active view")]
         public static string TagSpace(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2964,6 +2992,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets connector information for MEP elements
         /// </summary>
+        [MCPMethod("getConnectors", Category = "MEP", Description = "Gets all connectors on a specified MEP element")]
         public static string GetConnectors(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3071,6 +3100,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Connects two MEP elements via their connectors
         /// </summary>
+        [MCPMethod("connectElements", Category = "MEP", Description = "Connects two MEP elements at their compatible connectors")]
         public static string ConnectElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3178,6 +3208,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Performs duct sizing calculations
         /// </summary>
+        [MCPMethod("calculateDuctSizing", Category = "MEP", Description = "Calculates and applies duct sizing based on airflow requirements")]
         public static string CalculateDuctSizing(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3294,6 +3325,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Performs pipe sizing calculations
         /// </summary>
+        [MCPMethod("calculatePipeSizing", Category = "MEP", Description = "Calculates and applies pipe sizing based on flow rate requirements")]
         public static string CalculatePipeSizing(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3407,6 +3439,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Calculates heating and cooling loads for spaces
         /// </summary>
+        [MCPMethod("calculateLoads", Category = "MEP", Description = "Calculates heating and cooling loads for MEP spaces or zones")]
         public static string CalculateLoads(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3503,6 +3536,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all MEP element types (duct types, pipe types, etc.)
         /// </summary>
+        [MCPMethod("getMEPTypes", Category = "MEP", Description = "Gets all available MEP element types for a specified category")]
         public static string GetMEPTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3571,6 +3605,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Deletes an MEP element
         /// </summary>
+        [MCPMethod("deleteMEPElement", Category = "MEP", Description = "Deletes a MEP element by element ID")]
         public static string DeleteMEPElement(UIApplication uiApp, JObject parameters)
         {
             try

@@ -24,6 +24,7 @@ namespace RevitMCPBridge2026
         /// <param name="uiApp">The Revit UI Application</param>
         /// <param name="parameters">JSON parameters containing scheduleName, category, viewId (optional)</param>
         /// <returns>JSON response with success status and schedule view ID</returns>
+        [MCPMethod("createSchedule", Category = "Schedule", Description = "Creates a new schedule for a specified category")]
         public static string CreateSchedule(UIApplication uiApp, JObject parameters)
         {
             try
@@ -100,6 +101,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a key schedule
         /// </summary>
+        [MCPMethod("createKeySchedule", Category = "Schedule", Description = "Creates a key schedule")]
         public static string CreateKeySchedule(UIApplication uiApp, JObject parameters)
         {
             try
@@ -177,6 +179,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a material takeoff schedule
         /// </summary>
+        [MCPMethod("createMaterialTakeoff", Category = "Schedule", Description = "Creates a material takeoff schedule")]
         public static string CreateMaterialTakeoff(UIApplication uiApp, JObject parameters)
         {
             try
@@ -254,6 +257,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a sheet list schedule
         /// </summary>
+        [MCPMethod("createSheetList", Category = "Schedule", Description = "Creates a sheet list schedule")]
         public static string CreateSheetList(UIApplication uiApp, JObject parameters)
         {
             try
@@ -317,6 +321,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Adds a field (column) to a schedule
         /// </summary>
+        [MCPMethod("addScheduleField", Category = "Schedule", Description = "Adds a field (column) to a schedule")]
         public static string AddScheduleField(UIApplication uiApp, JObject parameters)
         {
             try
@@ -467,6 +472,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Removes a field from a schedule
         /// </summary>
+        [MCPMethod("removeScheduleField", Category = "Schedule", Description = "Removes a field from a schedule")]
         public static string RemoveScheduleField(UIApplication uiApp, JObject parameters)
         {
             try
@@ -551,6 +557,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Reorders fields in a schedule
         /// </summary>
+        [MCPMethod("reorderScheduleFields", Category = "Schedule", Description = "Reorders fields in a schedule")]
         public static string ReorderScheduleFields(UIApplication uiApp, JObject parameters)
         {
             try
@@ -662,6 +669,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all fields (columns) in a schedule
         /// </summary>
+        [MCPMethod("getScheduleFields", Category = "Schedule", Description = "Gets all fields (columns) in a schedule")]
         public static string GetScheduleFields(UIApplication uiApp, JObject parameters)
         {
             try
@@ -756,6 +764,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies a schedule field's properties
         /// </summary>
+        [MCPMethod("modifyScheduleField", Category = "Schedule", Description = "Modifies a schedule field's properties")]
         public static string ModifyScheduleField(UIApplication uiApp, JObject parameters)
         {
             try
@@ -879,6 +888,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all available schedulable fields for a schedule (not just added fields)
         /// </summary>
+        [MCPMethod("getAvailableSchedulableFields", Category = "Schedule", Description = "Gets all available schedulable fields for a schedule")]
         public static string GetAvailableSchedulableFields(UIApplication uiApp, JObject parameters)
         {
             try
@@ -981,6 +991,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Adds a filter to a schedule
         /// </summary>
+        [MCPMethod("addScheduleFilter", Category = "Schedule", Description = "Adds a filter to a schedule")]
         public static string AddScheduleFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1142,6 +1153,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Removes a filter from a schedule
         /// </summary>
+        [MCPMethod("removeScheduleFilter", Category = "Schedule", Description = "Removes a filter from a schedule")]
         public static string RemoveScheduleFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1227,6 +1239,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all filters in a schedule
         /// </summary>
+        [MCPMethod("getScheduleFilters", Category = "Schedule", Description = "Gets all filters in a schedule")]
         public static string GetScheduleFilters(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1315,6 +1328,7 @@ namespace RevitMCPBridge2026
         /// Filters a schedule by level, excluding specified levels.
         /// Adds Level as a hidden field if not already present, then applies filters.
         /// </summary>
+        [MCPMethod("filterScheduleByLevel", Category = "Schedule", Description = "Filters a schedule by level")]
         public static string FilterScheduleByLevel(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1481,6 +1495,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies an existing schedule filter
         /// </summary>
+        [MCPMethod("modifyScheduleFilter", Category = "Schedule", Description = "Modifies an existing schedule filter")]
         public static string ModifyScheduleFilter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1629,6 +1644,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Adds sorting to a schedule field
         /// </summary>
+        [MCPMethod("addScheduleSorting", Category = "Schedule", Description = "Adds sorting to a schedule field")]
         public static string AddScheduleSorting(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1715,6 +1731,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Adds grouping to a schedule field
         /// </summary>
+        [MCPMethod("addScheduleGrouping", Category = "Schedule", Description = "Adds grouping to a schedule field")]
         public static string AddScheduleGrouping(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1805,6 +1822,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all sorting and grouping settings
         /// </summary>
+        [MCPMethod("getScheduleSortGrouping", Category = "Schedule", Description = "Gets all sorting and grouping settings for a schedule")]
         public static string GetScheduleSortGrouping(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1896,6 +1914,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Removes sorting or grouping from a field
         /// </summary>
+        [MCPMethod("removeScheduleSorting", Category = "Schedule", Description = "Removes sorting or grouping from a schedule field")]
         public static string RemoveScheduleSorting(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1995,6 +2014,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets schedule appearance properties
         /// </summary>
+        [MCPMethod("formatScheduleAppearance", Category = "Schedule", Description = "Sets schedule appearance properties")]
         public static string FormatScheduleAppearance(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2085,6 +2105,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets conditional formatting for a field
         /// </summary>
+        [MCPMethod("setConditionalFormatting", Category = "Schedule", Description = "Sets conditional formatting for a schedule field")]
         public static string SetConditionalFormatting(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2160,6 +2181,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets column width for a field
         /// </summary>
+        [MCPMethod("setColumnWidth", Category = "Schedule", Description = "Sets column width for a schedule field")]
         public static string SetColumnWidth(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2250,6 +2272,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets text alignment for a field
         /// </summary>
+        [MCPMethod("setFieldAlignment", Category = "Schedule", Description = "Sets text alignment for a schedule field")]
         public static string SetFieldAlignment(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2355,6 +2378,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all data from a schedule as JSON
         /// </summary>
+        [MCPMethod("getScheduleData", Category = "Schedule", Description = "Gets all data from a schedule as JSON")]
         public static string GetScheduleData(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2447,6 +2471,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Exports schedule data to CSV format
         /// </summary>
+        [MCPMethod("exportScheduleToCSV", Category = "Schedule", Description = "Exports schedule data to CSV format")]
         public static string ExportScheduleToCSV(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2576,6 +2601,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets a specific cell value from a schedule
         /// </summary>
+        [MCPMethod("getScheduleCellValue", Category = "Schedule", Description = "Gets a specific cell value from a schedule")]
         public static string GetScheduleCellValue(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2702,6 +2728,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets schedule totals and calculations
         /// </summary>
+        [MCPMethod("getScheduleTotals", Category = "Schedule", Description = "Gets schedule totals and calculations")]
         public static string GetScheduleTotals(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2809,6 +2836,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies schedule properties
         /// </summary>
+        [MCPMethod("modifyScheduleProperties", Category = "Schedule", Description = "Modifies schedule properties")]
         public static string ModifyScheduleProperties(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2918,6 +2946,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Duplicates an existing schedule
         /// </summary>
+        [MCPMethod("duplicateSchedule", Category = "Schedule", Description = "Duplicates an existing schedule")]
         public static string DuplicateSchedule(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3003,6 +3032,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Adds a calculated value field to a schedule
         /// </summary>
+        [MCPMethod("addCalculatedField", Category = "Schedule", Description = "Adds a calculated value field to a schedule")]
         public static string AddCalculatedField(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3103,6 +3133,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies a calculated field formula
         /// </summary>
+        [MCPMethod("modifyCalculatedField", Category = "Schedule", Description = "Modifies a calculated field formula")]
         public static string ModifyCalculatedField(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3213,6 +3244,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all schedules in the project
         /// </summary>
+        [MCPMethod("getAllSchedules", Category = "Schedule", Description = "Gets all schedules in the project")]
         public static string GetAllSchedules(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3310,6 +3342,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets schedule information
         /// </summary>
+        [MCPMethod("getScheduleInfo", Category = "Schedule", Description = "Gets detailed information about a schedule")]
         public static string GetScheduleInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3420,6 +3453,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Deletes a schedule
         /// </summary>
+        [MCPMethod("deleteSchedule", Category = "Schedule", Description = "Deletes a schedule from the project")]
         public static string DeleteSchedule(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3481,6 +3515,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Refreshes schedule data
         /// </summary>
+        [MCPMethod("refreshSchedule", Category = "Schedule", Description = "Refreshes schedule data")]
         public static string RefreshSchedule(UIApplication uiApp, JObject parameters)
         {
             try

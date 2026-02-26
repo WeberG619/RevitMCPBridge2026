@@ -25,6 +25,7 @@ namespace RevitMCPBridge2026
         /// <param name="uiApp">The Revit UI Application</param>
         /// <param name="parameters">JSON parameters containing location, columnTypeId, levelId, height, rotation</param>
         /// <returns>JSON response with success status and column element ID</returns>
+        [MCPMethod("placeStructuralColumn", Category = "Structural", Description = "Places a structural column at a specified point")]
         public static string PlaceStructuralColumn(UIApplication uiApp, JObject parameters)
         {
             try
@@ -175,6 +176,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets detailed information about a structural column
         /// </summary>
+        [MCPMethod("getStructuralColumnInfo", Category = "Structural", Description = "Gets detailed information about a structural column")]
         public static string GetStructuralColumnInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -223,6 +225,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies properties of a structural column
         /// </summary>
+        [MCPMethod("modifyStructuralColumn", Category = "Structural", Description = "Modifies properties of an existing structural column")]
         public static string ModifyStructuralColumn(UIApplication uiApp, JObject parameters)
         {
             try
@@ -379,6 +382,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all structural column types in the project
         /// </summary>
+        [MCPMethod("getStructuralColumnTypes", Category = "Structural", Description = "Gets all available structural column family types")]
         public static string GetStructuralColumnTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -418,6 +422,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a structural beam between two points
         /// </summary>
+        [MCPMethod("createStructuralBeam", Category = "Structural", Description = "Creates a structural beam between two points")]
         public static string CreateStructuralBeam(UIApplication uiApp, JObject parameters)
         {
             try
@@ -505,6 +510,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets detailed information about a structural beam
         /// </summary>
+        [MCPMethod("getStructuralBeamInfo", Category = "Structural", Description = "Gets detailed information about a structural beam")]
         public static string GetStructuralBeamInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -551,6 +557,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies properties of a structural beam
         /// </summary>
+        [MCPMethod("modifyStructuralBeam", Category = "Structural", Description = "Modifies properties of an existing structural beam")]
         public static string ModifyStructuralBeam(UIApplication uiApp, JObject parameters)
         {
             try
@@ -658,6 +665,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all structural beam types in the project
         /// </summary>
+        [MCPMethod("getStructuralBeamTypes", Category = "Structural", Description = "Gets all available structural beam family types")]
         public static string GetStructuralBeamTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -698,6 +706,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a structural foundation at a specified location
         /// </summary>
+        [MCPMethod("createFoundation", Category = "Structural", Description = "Creates a structural foundation element")]
         public static string CreateFoundation(UIApplication uiApp, JObject parameters)
         {
             try
@@ -794,6 +803,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets information about a foundation element
         /// </summary>
+        [MCPMethod("getFoundationInfo", Category = "Structural", Description = "Gets detailed information about a structural foundation")]
         public static string GetFoundationInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -851,6 +861,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all foundation types in the project
         /// </summary>
+        [MCPMethod("getFoundationTypes", Category = "Structural", Description = "Gets all available structural foundation family types")]
         public static string GetFoundationTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -890,6 +901,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places structural framing (bracing, trusses, etc.)
         /// </summary>
+        [MCPMethod("placeStructuralFraming", Category = "Structural", Description = "Places a structural framing member between two points")]
         public static string PlaceStructuralFraming(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1000,6 +1012,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all structural framing elements in a view
         /// </summary>
+        [MCPMethod("getStructuralFramingInView", Category = "Structural", Description = "Gets all structural framing elements visible in the active view")]
         public static string GetStructuralFramingInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1062,6 +1075,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a structural connection between elements
         /// </summary>
+        [MCPMethod("createStructuralConnection", Category = "Structural", Description = "Creates a structural connection between elements")]
         public static string CreateStructuralConnection(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1137,6 +1151,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets information about a structural connection
         /// </summary>
+        [MCPMethod("getConnectionInfo", Category = "Structural", Description = "Gets information about a structural connection")]
         public static string GetConnectionInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1199,6 +1214,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets the analytical model for a structural element
         /// </summary>
+        [MCPMethod("getAnalyticalModel", Category = "Structural", Description = "Gets the analytical model data for a structural element")]
         public static string GetAnalyticalModel(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1275,6 +1291,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets analytical model properties for a structural element
         /// </summary>
+        [MCPMethod("setAnalyticalProperties", Category = "Structural", Description = "Sets analytical model properties on a structural element")]
         public static string SetAnalyticalProperties(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1343,6 +1360,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates rebar in a structural element
         /// </summary>
+        [MCPMethod("createRebar", Category = "Structural", Description = "Creates rebar reinforcement within a host structural element")]
         public static string CreateRebar(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1472,6 +1490,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets rebar information from a structural element
         /// </summary>
+        [MCPMethod("getRebarInfo", Category = "Structural", Description = "Gets detailed information about a rebar element")]
         public static string GetRebarInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1551,6 +1570,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a point load on a structural element
         /// </summary>
+        [MCPMethod("createPointLoad", Category = "Structural", Description = "Creates a point load at a specified location")]
         public static string CreatePointLoad(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1644,6 +1664,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a line load on a structural element
         /// </summary>
+        [MCPMethod("createLineLoad", Category = "Structural", Description = "Creates a line load along a structural element")]
         public static string CreateLineLoad(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1744,6 +1765,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates an area load
         /// </summary>
+        [MCPMethod("createAreaLoad", Category = "Structural", Description = "Creates an area load over a surface or slab element")]
         public static string CreateAreaLoad(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1848,6 +1870,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all loads on a structural element
         /// </summary>
+        [MCPMethod("getElementLoads", Category = "Structural", Description = "Gets all structural loads applied to a specified element")]
         public static string GetElementLoads(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1936,6 +1959,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets structural analysis results for an element
         /// </summary>
+        [MCPMethod("getAnalysisResults", Category = "Structural", Description = "Gets structural analysis results for an element or the model")]
         public static string GetAnalysisResults(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2046,6 +2070,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all structural elements in the project
         /// </summary>
+        [MCPMethod("getAllStructuralElements", Category = "Structural", Description = "Gets all structural elements in the model optionally filtered by type")]
         public static string GetAllStructuralElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2219,6 +2244,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Deletes a structural element
         /// </summary>
+        [MCPMethod("deleteStructuralElement", Category = "Structural", Description = "Deletes a structural element by element ID")]
         public static string DeleteStructuralElement(UIApplication uiApp, JObject parameters)
         {
             try

@@ -50,6 +50,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a floor plan view
         /// </summary>
+        [MCPMethod("createFloorPlan", Category = "View", Description = "Create a floor plan view for a given level")]
         public static string CreateFloorPlan(UIApplication uiApp, JObject parameters)
         {
             try
@@ -119,6 +120,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a ceiling plan view
         /// </summary>
+        [MCPMethod("createCeilingPlan", Category = "View", Description = "Create a ceiling plan view for a given level")]
         public static string CreateCeilingPlan(UIApplication uiApp, JObject parameters)
         {
             try
@@ -188,6 +190,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a section view
         /// </summary>
+        [MCPMethod("createSection", Category = "View", Description = "Create a section view from a crop box region")]
         public static string CreateSection(UIApplication uiApp, JObject parameters)
         {
             try
@@ -266,6 +269,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create an elevation view
         /// </summary>
+        [MCPMethod("createElevation", Category = "View", Description = "Create an elevation view")]
         public static string CreateElevation(UIApplication uiApp, JObject parameters)
         {
             try
@@ -334,6 +338,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a drafting view for 2D detailing
         /// </summary>
+        [MCPMethod("createDraftingView", Category = "View", Description = "Create a drafting view for 2D detailing")]
         public static string CreateDraftingView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -390,6 +395,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Duplicate a view
         /// </summary>
+        [MCPMethod("duplicateView", Category = "View", Description = "Duplicate an existing view")]
         public static string DuplicateView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -454,6 +460,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Apply a view template
         /// </summary>
+        [MCPMethod("applyViewTemplate", Category = "View", Description = "Apply a view template to a view")]
         public static string ApplyViewTemplate(UIApplication uiApp, JObject parameters)
         {
             try
@@ -504,6 +511,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all views in the project
         /// </summary>
+        [MCPMethod("getAllViews", Category = "View", Description = "Get all views in the project")]
         public static string GetAllViews(UIApplication uiApp, JObject parameters)
         {
             try
@@ -609,6 +617,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all view templates
         /// </summary>
+        [MCPMethod("getViewTemplates", Category = "View", Description = "Get all view templates in the document")]
         public static string GetViewTemplates(UIApplication uiApp, JObject parameters)
         {
             try
@@ -643,6 +652,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set view crop box
         /// </summary>
+        [MCPMethod("setViewCropBox", Category = "View", Description = "Set the crop box region for a view")]
         public static string SetViewCropBox(UIApplication uiApp, JObject parameters)
         {
             try
@@ -870,6 +880,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get view crop box coordinates
         /// </summary>
+        [MCPMethod("getViewCropBox", Category = "View", Description = "Get the crop box coordinates for a view")]
         public static string GetViewCropBox(UIApplication uiApp, JObject parameters)
         {
             try
@@ -916,6 +927,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Rename a view
         /// </summary>
+        [MCPMethod("renameView", Category = "View", Description = "Rename an existing view")]
         public static string RenameView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -963,6 +975,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a view
         /// </summary>
+        [MCPMethod("deleteView", Category = "View", Description = "Delete a view from the document")]
         public static string DeleteView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -999,6 +1012,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set view scale
         /// </summary>
+        [MCPMethod("setViewScale", Category = "View", Description = "Set the scale of a view")]
         public static string SetViewScale(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1046,6 +1060,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the active view in Revit
         /// </summary>
+        [MCPMethod("getActiveView", Category = "View", Description = "Get the currently active view")]
         public static string GetActiveView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1090,6 +1105,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set the active view in Revit
         /// </summary>
+        [MCPMethod("setActiveView", Category = "View", Description = "Set the active view by ID or name")]
         public static string SetActiveView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1157,6 +1173,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Zoom to fit all elements in the active view
         /// </summary>
+        [MCPMethod("zoomToFit", Category = "View", Description = "Zoom to fit all elements in the active view")]
         public static string ZoomToFit(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1253,6 +1270,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Zoom to a specific element in the active view
         /// </summary>
+        [MCPMethod("zoomToElement", Category = "View", Description = "Zoom to a specific element in the active view")]
         public static string ZoomToElement(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1374,6 +1392,7 @@ namespace RevitMCPBridge
         /// Zoom to a specific region defined by min/max coordinates.
         /// Used for autonomous visual inspection.
         /// </summary>
+        [MCPMethod("zoomToRegion", Category = "View", Description = "Zoom to a region defined by min/max coordinates")]
         public static string ZoomToRegion(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1473,6 +1492,7 @@ namespace RevitMCPBridge
         /// Zoom to area around a grid intersection.
         /// Used for autonomous visual inspection at specific grid locations.
         /// </summary>
+        [MCPMethod("zoomToGridIntersection", Category = "View", Description = "Zoom to area around a grid intersection")]
         public static string ZoomToGridIntersection(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1625,6 +1645,7 @@ namespace RevitMCPBridge
         /// This is the "open it up for me" command - finds where an element is and displays it.
         /// Works for elements on sheets (text notes, viewports, etc.) and model elements.
         /// </summary>
+        [MCPMethod("showElement", Category = "View", Description = "Find and display an element by opening its view and zooming to it")]
         public static string ShowElement(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1827,6 +1848,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a legend view
         /// </summary>
+        [MCPMethod("createLegendView", Category = "View", Description = "Create a legend view")]
         public static string CreateLegendView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1888,6 +1910,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all legend views in the document
         /// </summary>
+        [MCPMethod("getLegendViews", Category = "View", Description = "Get all legend views in the document")]
         public static string GetLegendViews(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1928,6 +1951,7 @@ namespace RevitMCPBridge
         /// - includeAnnotations: (optional) Include annotation elements (default true)
         /// - limit: (optional) Maximum number of elements to return (default 500)
         /// </summary>
+        [MCPMethod("getElementsInView", Category = "View", Description = "Get all elements visible in a specific view")]
         public static string GetElementsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2137,6 +2161,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set far clip offset for elevation/section views
         /// </summary>
+        [MCPMethod("setViewFarClip", Category = "View", Description = "Set the far clip offset for elevation or section views")]
         public static string SetViewFarClip(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2252,6 +2277,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Hide or show a category in a view
         /// </summary>
+        [MCPMethod("setCategoryHidden", Category = "View", Description = "Hide or show a category in a view")]
         public static string SetCategoryHidden(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2359,6 +2385,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Hide multiple categories in a view at once
         /// </summary>
+        [MCPMethod("hideCategoriesInView", Category = "View", Description = "Hide multiple categories in a view at once")]
         public static string HideCategoriesInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2463,6 +2490,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Hide specific elements in a view
         /// </summary>
+        [MCPMethod("hideElementsInView", Category = "View", Description = "Hide specific elements in a view")]
         public static string HideElementsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2535,6 +2563,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Unhide specific elements in a view
         /// </summary>
+        [MCPMethod("unhideElementsInView", Category = "View", Description = "Unhide specific elements in a view")]
         public static string UnhideElementsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2607,6 +2636,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get room tags in a view with their associated room IDs
         /// </summary>
+        [MCPMethod("getRoomTagsInView", Category = "View", Description = "Get room tags in a view with their associated room IDs")]
         public static string GetRoomTagsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2678,6 +2708,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Force regeneration of view/document to update displayed values
         /// </summary>
+        [MCPMethod("regenerateView", Category = "View", Description = "Force regeneration of a view to update displayed values")]
         public static string RegenerateView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2727,6 +2758,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Verify room parameter values match expected values (for validation after batch operations)
         /// </summary>
+        [MCPMethod("verifyRoomValues", Category = "View", Description = "Verify room parameter values match expected values")]
         public static string VerifyRoomValues(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2813,6 +2845,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Compare expected vs actual element parameter values across multiple elements
         /// </summary>
+        [MCPMethod("compareExpectedActual", Category = "View", Description = "Compare expected vs actual element parameter values")]
         public static string CompareExpectedActual(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2935,6 +2968,7 @@ namespace RevitMCPBridge
         /// Create a view template from an existing view
         /// Parameters: sourceViewId, templateName
         /// </summary>
+        [MCPMethod("createViewTemplate", Category = "View", Description = "Create a view template from an existing view")]
         public static string CreateViewTemplate(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2992,6 +3026,7 @@ namespace RevitMCPBridge
         /// Duplicate an existing view template
         /// Parameters: templateId, newName
         /// </summary>
+        [MCPMethod("duplicateViewTemplate", Category = "View", Description = "Duplicate an existing view template")]
         public static string DuplicateViewTemplate(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3053,6 +3088,7 @@ namespace RevitMCPBridge
         /// Get all scope boxes in the document
         /// Parameters: none
         /// </summary>
+        [MCPMethod("getScopeBoxes", Category = "View", Description = "Get all scope boxes in the document")]
         public static string GetScopeBoxes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3092,6 +3128,7 @@ namespace RevitMCPBridge
         /// Create a new scope box
         /// Parameters: name, minPoint {x, y, z}, maxPoint {x, y, z}
         /// </summary>
+        [MCPMethod("createScopeBox", Category = "View", Description = "Create a new scope box with defined extents")]
         public static string CreateScopeBox(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3184,6 +3221,7 @@ namespace RevitMCPBridge
         /// Apply a scope box to views
         /// Parameters: scopeBoxId, viewIds (array)
         /// </summary>
+        [MCPMethod("applyScopeBoxToView", Category = "View", Description = "Apply a scope box to one or more views")]
         public static string ApplyScopeBoxToView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3271,6 +3309,7 @@ namespace RevitMCPBridge
         /// Remove scope box from views (set to None)
         /// Parameters: viewIds (array)
         /// </summary>
+        [MCPMethod("removeScopeBoxFromView", Category = "View", Description = "Remove scope box from one or more views")]
         public static string RemoveScopeBoxFromView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3348,6 +3387,7 @@ namespace RevitMCPBridge
         /// Get all legend views in the document
         /// Parameters: none
         /// </summary>
+        [MCPMethod("getLegends", Category = "View", Description = "Get all legend views in the document")]
         public static string GetLegends(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3384,6 +3424,7 @@ namespace RevitMCPBridge
         /// Create a new legend view by duplicating an existing one
         /// Parameters: name, sourceLegendId (optional - will use first existing legend if not provided), scale (optional)
         /// </summary>
+        [MCPMethod("createLegend", Category = "View", Description = "Create a new legend view")]
         public static string CreateLegend(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3456,6 +3497,7 @@ namespace RevitMCPBridge
         /// Get legend components (symbols that can be placed in legends)
         /// Parameters: category (optional filter)
         /// </summary>
+        [MCPMethod("getLegendComponents", Category = "View", Description = "Get legend components available for placement in legends")]
         public static string GetLegendComponents(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3514,6 +3556,7 @@ namespace RevitMCPBridge
         /// Create an assembly from selected elements
         /// Parameters: elementIds (array of element IDs), name (optional)
         /// </summary>
+        [MCPMethod("createAssembly", Category = "View", Description = "Create an assembly from selected elements")]
         public static string CreateAssembly(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3588,6 +3631,7 @@ namespace RevitMCPBridge
         /// Create views for an assembly
         /// Note: AssemblyViewUtils is not fully available in Revit 2026 API, use manual view creation instead
         /// </summary>
+        [MCPMethod("createAssemblyViews", Category = "View", Description = "Create views for an assembly instance")]
         public static string CreateAssemblyViews(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3639,6 +3683,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all assemblies in the document
         /// </summary>
+        [MCPMethod("getAssemblies", Category = "View", Description = "Get all assemblies in the document")]
         public static string GetAssemblies(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3708,6 +3753,7 @@ namespace RevitMCPBridge
         /// viewNames (optional): Array of specific view names to import
         /// importAll (optional): Boolean to import all importable views (default: false)
         /// </param>
+        [MCPMethod("insertViewsFromFile", Category = "View", Description = "Insert views from another Revit file into the current document")]
         public static string InsertViewsFromFile(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4055,6 +4101,7 @@ namespace RevitMCPBridge
         /// Get the color fill scheme for a view and category
         /// Parameters: viewId, categoryName (optional, defaults to "Rooms")
         /// </summary>
+        [MCPMethod("getColorFillScheme", Category = "View", Description = "Get the color fill scheme applied to a view")]
         public static string GetColorFillScheme(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4112,6 +4159,7 @@ namespace RevitMCPBridge
         /// Set the color fill scheme for a view and category
         /// Parameters: viewId, schemeId, categoryName (optional, defaults to "Rooms")
         /// </summary>
+        [MCPMethod("setColorFillScheme", Category = "View", Description = "Set the color fill scheme for a view")]
         public static string SetColorFillScheme(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4167,6 +4215,7 @@ namespace RevitMCPBridge
         /// Copy color fill scheme from one view to another
         /// Parameters: sourceViewId, targetViewId (or targetViewIds array), categoryName (optional)
         /// </summary>
+        [MCPMethod("copyColorFillScheme", Category = "View", Description = "Copy a color fill scheme from one view to another")]
         public static string CopyColorFillScheme(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4279,6 +4328,7 @@ namespace RevitMCPBridge
         /// Get all color fill schemes in the document
         /// Parameters: categoryName (optional, defaults to "Rooms")
         /// </summary>
+        [MCPMethod("getAllColorFillSchemes", Category = "View", Description = "Get all color fill schemes in the document")]
         public static string GetAllColorFillSchemes(UIApplication uiApp, JObject parameters)
         {
             try

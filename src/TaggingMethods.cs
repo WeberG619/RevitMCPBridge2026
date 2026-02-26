@@ -17,6 +17,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Tag a single door element
         /// </summary>
+        [MCPMethod("tagDoor", Category = "Tagging", Description = "Tag a single door element")]
         public static string TagDoor(UIApplication uiApp, JObject parameters)
         {
             try
@@ -96,6 +97,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Tag a single room element
         /// </summary>
+        [MCPMethod("tagRoom", Category = "Tagging", Description = "Tag a single room element")]
         public static string TagRoom(UIApplication uiApp, JObject parameters)
         {
             try
@@ -167,6 +169,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Tag a single wall element
         /// </summary>
+        [MCPMethod("tagWall", Category = "Tagging", Description = "Tag a single wall element")]
         public static string TagWall(UIApplication uiApp, JObject parameters)
         {
             try
@@ -248,6 +251,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Tag any element by category
         /// </summary>
+        [MCPMethod("tagElement", Category = "Tagging", Description = "Tag any element by category")]
         public static string TagElement(UIApplication uiApp, JObject parameters)
         {
             try
@@ -354,6 +358,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Tag all doors in a view
         /// </summary>
+        [MCPMethod("batchTagDoors", Category = "Tagging", Description = "Tag all doors in a view")]
         public static string BatchTagDoors(UIApplication uiApp, JObject parameters)
         {
             try
@@ -441,6 +446,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Tag all rooms in a view
         /// </summary>
+        [MCPMethod("batchTagRooms", Category = "Tagging", Description = "Tag all rooms in a view")]
         public static string BatchTagRooms(UIApplication uiApp, JObject parameters)
         {
             try
@@ -523,6 +529,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all tags in a view
         /// </summary>
+        [MCPMethod("getTagsInView", Category = "Tagging", Description = "Get all tags in a view")]
         public static string GetTagsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -594,6 +601,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a tag by ID
         /// </summary>
+        [MCPMethod("deleteTag", Category = "Tagging", Description = "Delete a tag by ID")]
         public static string DeleteTag(UIApplication uiApp, JObject parameters)
         {
             try
@@ -643,6 +651,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Gets detailed information about a specific tag including position
         /// </summary>
+        [MCPMethod("getTagInfo", Category = "Tagging", Description = "Get detailed information about a specific tag including position")]
         public static string GetTagInfo(UIApplication uiApp, JObject parameters)
         {
             try

@@ -20,6 +20,7 @@ namespace RevitMCPBridge
         /// Get the view's crop region bounds in view coordinates.
         /// Returns the min/max XY of the crop box plus annotation crop info.
         /// </summary>
+        [MCPMethod("getViewCropRegion", Category = "ViewAnnotation", Description = "Get the view's crop region bounds in view coordinates")]
         public static string GetViewCropRegion(UIApplication uiApp, JObject parameters)
         {
             try
@@ -128,6 +129,7 @@ namespace RevitMCPBridge
         /// Expand the view's crop region to include the specified point.
         /// Useful for ensuring annotations are visible.
         /// </summary>
+        [MCPMethod("expandViewCropRegion", Category = "ViewAnnotation", Description = "Expand the view's crop region to include the specified point")]
         public static string ExpandViewCropRegion(UIApplication uiApp, JObject parameters)
         {
             try
@@ -246,6 +248,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the location and properties of a text note.
         /// </summary>
+        [MCPMethod("getTextNoteLocation", Category = "ViewAnnotation", Description = "Get the location and properties of a text note")]
         public static string GetTextNoteLocation(UIApplication uiApp, JObject parameters)
         {
             try
@@ -306,6 +309,7 @@ namespace RevitMCPBridge
         /// Create a text note with automatic crop region expansion.
         /// Ensures the text will be visible in the view.
         /// </summary>
+        [MCPMethod("createTextNoteInCrop", Category = "ViewAnnotation", Description = "Create a text note with automatic crop region expansion")]
         public static string CreateTextNoteInCrop(UIApplication uiApp, JObject parameters)
         {
             try
@@ -441,6 +445,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a linear dimension between two points.
         /// </summary>
+        [MCPMethod("createLinearDimension", Category = "ViewAnnotation", Description = "Create a linear dimension between two points")]
         public static string CreateLinearDimension(UIApplication uiApp, JObject parameters)
         {
             try
@@ -553,6 +558,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a text note with a leader line pointing to a specific location.
         /// </summary>
+        [MCPMethod("createTextNoteWithLeader", Category = "ViewAnnotation", Description = "Create a text note with a leader line pointing to a specific location")]
         public static string CreateTextNoteWithLeader(UIApplication uiApp, JObject parameters)
         {
             try
@@ -716,6 +722,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Move an existing text note to a new location.
         /// </summary>
+        [MCPMethod("moveTextNote", Category = "ViewAnnotation", Description = "Move an existing text note to a new location")]
         public static string MoveTextNote(UIApplication uiApp, JObject parameters)
         {
             try
@@ -780,6 +787,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all text note types available in the document.
         /// </summary>
+        [MCPMethod("getTextNoteTypes", Category = "ViewAnnotation", Description = "Get all text note types available in the document")]
         public static string GetTextNoteTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -819,6 +827,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Add a leader to an existing text note.
         /// </summary>
+        [MCPMethod("addLeaderToTextNote", Category = "ViewAnnotation", Description = "Add a leader to an existing text note")]
         public static string AddLeaderToTextNote(UIApplication uiApp, JObject parameters)
         {
             try
@@ -910,6 +919,7 @@ namespace RevitMCPBridge
         /// Set/reposition an existing leader's endpoint on a text note.
         /// If leaderIndex is not specified, repositions the first leader.
         /// </summary>
+        [MCPMethod("setTextNoteLeaderEndpoint", Category = "ViewAnnotation", Description = "Set or reposition an existing leader's endpoint on a text note")]
         public static string SetTextNoteLeaderEndpoint(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1008,6 +1018,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Remove all leaders from a text note, optionally add a new one with specified endpoint.
         /// </summary>
+        [MCPMethod("resetTextNoteLeaders", Category = "ViewAnnotation", Description = "Remove all leaders from a text note, optionally adding a new one")]
         public static string ResetTextNoteLeaders(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1092,6 +1103,7 @@ namespace RevitMCPBridge
         /// Get positions of all text notes in a view for alignment reference.
         /// Returns text notes sorted by position for easy alignment decisions.
         /// </summary>
+        [MCPMethod("getTextNotePositions", Category = "ViewAnnotation", Description = "Get positions of all text notes in a view for alignment reference")]
         public static string GetTextNotePositions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1188,6 +1200,7 @@ namespace RevitMCPBridge
         /// referencePosition: the value to align to
         /// textNoteIds: array of text note IDs to align
         /// </summary>
+        [MCPMethod("alignTextNotes", Category = "ViewAnnotation", Description = "Align multiple text notes to a reference X or Y position")]
         public static string AlignTextNotes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1267,6 +1280,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a text note aligned with an existing text note (same X position).
         /// </summary>
+        [MCPMethod("createTextNoteAlignedWith", Category = "ViewAnnotation", Description = "Create a text note aligned with an existing text note")]
         public static string CreateTextNoteAlignedWith(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1368,6 +1382,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all detail component families loaded in the project.
         /// </summary>
+        [MCPMethod("getDetailComponentFamiliesVA", Category = "ViewAnnotation", Description = "Get all detail component families loaded in the project")]
         public static string GetDetailComponentFamilies(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1406,6 +1421,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all types for a specific detail component family.
         /// </summary>
+        [MCPMethod("getDetailComponentTypesVA", Category = "ViewAnnotation", Description = "Get all types for a specific detail component family")]
         public static string GetDetailComponentTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1492,6 +1508,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Place a detail component in a view.
         /// </summary>
+        [MCPMethod("placeDetailComponentVA", Category = "ViewAnnotation", Description = "Place a detail component in a view")]
         public static string PlaceDetailComponent(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1608,6 +1625,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all detail components in a view.
         /// </summary>
+        [MCPMethod("getDetailComponentsInViewVA", Category = "ViewAnnotation", Description = "Get all detail components in a view")]
         public static string GetDetailComponentsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1674,6 +1692,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Move a detail component to a new location.
         /// </summary>
+        [MCPMethod("moveDetailComponent", Category = "ViewAnnotation", Description = "Move a detail component to a new location")]
         public static string MoveDetailComponent(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1754,6 +1773,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Rotate a detail component.
         /// </summary>
+        [MCPMethod("rotateDetailComponent", Category = "ViewAnnotation", Description = "Rotate a detail component")]
         public static string RotateDetailComponent(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1818,6 +1838,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a detail line in a view.
         /// </summary>
+        [MCPMethod("createDetailLineVA", Category = "ViewAnnotation", Description = "Create a detail line in a view")]
         public static string CreateDetailLine(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1914,6 +1935,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get available line styles in the document.
         /// </summary>
+        [MCPMethod("getLineStylesVA", Category = "ViewAnnotation", Description = "Get available line styles in the document")]
         public static string GetLineStyles(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1952,6 +1974,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a detail arc in a view.
         /// </summary>
+        [MCPMethod("createDetailArcVA", Category = "ViewAnnotation", Description = "Create a detail arc in a view")]
         public static string CreateDetailArc(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2053,6 +2076,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all filled region types available in the document.
         /// </summary>
+        [MCPMethod("getFilledRegionTypesVA", Category = "ViewAnnotation", Description = "Get all filled region types available in the document")]
         public static string GetFilledRegionTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2090,6 +2114,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a rectangular filled region in a view.
         /// </summary>
+        [MCPMethod("createFilledRegionVA", Category = "ViewAnnotation", Description = "Create a rectangular filled region in a view")]
         public static string CreateFilledRegion(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2195,6 +2220,7 @@ namespace RevitMCPBridge
         /// Get the layer structure of a wall type.
         /// Returns all layers with material, thickness, and function.
         /// </summary>
+        [MCPMethod("getWallTypeLayers", Category = "ViewAnnotation", Description = "Get the layer structure of a wall type")]
         public static string GetWallTypeLayers(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2293,6 +2319,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the layer structure of a roof type.
         /// </summary>
+        [MCPMethod("getRoofTypeLayers", Category = "ViewAnnotation", Description = "Get the layer structure of a roof type")]
         public static string GetRoofTypeLayers(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2390,6 +2417,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the layer structure of a floor type.
         /// </summary>
+        [MCPMethod("getFloorTypeLayers", Category = "ViewAnnotation", Description = "Get the layer structure of a floor type")]
         public static string GetFloorTypeLayers(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2491,6 +2519,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the bounding box of an element in a specific view's coordinate system.
         /// </summary>
+        [MCPMethod("getElementBoundingBoxInView", Category = "ViewAnnotation", Description = "Get the bounding box of an element in a specific view's coordinate system")]
         public static string GetElementBoundingBoxInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2590,6 +2619,7 @@ namespace RevitMCPBridge
         /// Create a filled region from an array of points (polygon).
         /// Points should be in order to form a closed loop.
         /// </summary>
+        [MCPMethod("createFilledRegionFromPoints", Category = "ViewAnnotation", Description = "Create a filled region from an array of points")]
         public static string CreateFilledRegionFromPoints(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2703,6 +2733,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all filled regions in a view.
         /// </summary>
+        [MCPMethod("getFilledRegionsInViewVA", Category = "ViewAnnotation", Description = "Get all filled regions in a view")]
         public static string GetFilledRegionsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2773,6 +2804,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all detail lines/curves in a view.
         /// </summary>
+        [MCPMethod("getDetailLinesInViewVA", Category = "ViewAnnotation", Description = "Get all detail lines/curves in a view")]
         public static string GetDetailLinesInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2844,6 +2876,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create multiple detail lines from an array of points (polyline).
         /// </summary>
+        [MCPMethod("createDetailLinesFromPoints", Category = "ViewAnnotation", Description = "Create multiple detail lines from an array of points")]
         public static string CreateDetailLinesFromPoints(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2973,6 +3006,7 @@ namespace RevitMCPBridge
         /// Analyze a detail view comprehensively.
         /// Returns all elements, their positions, and what might be missing.
         /// </summary>
+        [MCPMethod("analyzeDetailView", Category = "ViewAnnotation", Description = "Analyze a detail view comprehensively")]
         public static string AnalyzeDetailView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3128,6 +3162,7 @@ namespace RevitMCPBridge
         /// <param name="scaleFactor">The scale factor (e.g., 2.0 = double size)</param>
         /// <param name="centerX">Optional center X for scaling (default: centroid of elements)</param>
         /// <param name="centerY">Optional center Y for scaling (default: centroid of elements)</param>
+        [MCPMethod("scaleDetailViewElements", Category = "ViewAnnotation", Description = "Scale all elements in a drafting view by a given factor")]
         public static string ScaleDetailViewElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3454,6 +3489,7 @@ namespace RevitMCPBridge
         /// Mirror all elements in a drafting view about an axis.
         /// Axis can be "horizontal", "vertical", or custom line defined by two points.
         /// </summary>
+        [MCPMethod("mirrorDetailViewElements", Category = "ViewAnnotation", Description = "Mirror all elements in a drafting view about an axis")]
         public static string MirrorDetailViewElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3675,6 +3711,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Rotate all elements in a drafting view about a center point.
         /// </summary>
+        [MCPMethod("rotateDetailViewElements", Category = "ViewAnnotation", Description = "Rotate all elements in a drafting view about a center point")]
         public static string RotateDetailViewElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3906,6 +3943,7 @@ namespace RevitMCPBridge
         /// Align elements in a view to a common edge or center.
         /// Works on selected element IDs or all elements of a type.
         /// </summary>
+        [MCPMethod("alignElements", Category = "ViewAnnotation", Description = "Align elements in a view to a common edge or center")]
         public static string AlignElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4039,6 +4077,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Distribute elements evenly between the first and last element.
         /// </summary>
+        [MCPMethod("distributeElements", Category = "ViewAnnotation", Description = "Distribute elements evenly between the first and last element")]
         public static string DistributeElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4145,6 +4184,7 @@ namespace RevitMCPBridge
         /// Find duplicate or overlapping elements in the model.
         /// Checks walls, columns, beams, detail lines for identical positions.
         /// </summary>
+        [MCPMethod("findDuplicateElements", Category = "ViewAnnotation", Description = "Find duplicate or overlapping elements in the model")]
         public static string FindDuplicateElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4242,6 +4282,7 @@ namespace RevitMCPBridge
         /// Automatically tag all untagged elements of a category in a view.
         /// Uses smart placement to avoid overlapping existing tags.
         /// </summary>
+        [MCPMethod("autoTagUntagged", Category = "ViewAnnotation", Description = "Automatically tag all untagged elements of a category in a view")]
         public static string AutoTagUntagged(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4444,6 +4485,7 @@ namespace RevitMCPBridge
         /// Offset detail curves (lines, arcs) by a specified distance.
         /// Creates new curves parallel to existing ones.
         /// </summary>
+        [MCPMethod("offsetDetailCurves", Category = "ViewAnnotation", Description = "Offset detail curves by a specified distance")]
         public static string OffsetDetailCurves(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4567,6 +4609,7 @@ namespace RevitMCPBridge
         /// Update parameters conditionally based on rules.
         /// Example: If room area > 200 SF, set "Large Room" = true
         /// </summary>
+        [MCPMethod("conditionalParameterUpdate", Category = "ViewAnnotation", Description = "Update parameters conditionally based on rules")]
         public static string ConditionalParameterUpdate(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4706,6 +4749,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Update titleblock parameters across all sheets.
         /// </summary>
+        [MCPMethod("batchUpdateTitleblocks", Category = "ViewAnnotation", Description = "Update titleblock parameters across all sheets")]
         public static string BatchUpdateTitleblocks(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4808,6 +4852,7 @@ namespace RevitMCPBridge
         /// Replace all instances of one element type with another type.
         /// Example: Swap all "Door-Single-Panel" with "Door-Single-Glass"
         /// </summary>
+        [MCPMethod("batchSwapTypes", Category = "ViewAnnotation", Description = "Replace all instances of one element type with another type")]
         public static string BatchSwapTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4910,6 +4955,7 @@ namespace RevitMCPBridge
         /// Copy properties from one element to multiple target elements.
         /// Like a "Format Painter" for Revit elements.
         /// </summary>
+        [MCPMethod("matchElementProperties", Category = "ViewAnnotation", Description = "Copy properties from one element to multiple target elements")]
         public static string MatchElementProperties(UIApplication uiApp, JObject parameters)
         {
             try
@@ -5048,6 +5094,7 @@ namespace RevitMCPBridge
         /// Detect elements that intersect/clash with each other.
         /// Useful for coordination and QC.
         /// </summary>
+        [MCPMethod("detectElementClashes", Category = "ViewAnnotation", Description = "Detect elements that intersect or clash with each other")]
         public static string DetectElementClashes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -5152,6 +5199,7 @@ namespace RevitMCPBridge
         /// Create floor plan views automatically for each room.
         /// Views are cropped to room boundaries with optional padding.
         /// </summary>
+        [MCPMethod("createViewsFromRooms", Category = "ViewAnnotation", Description = "Create floor plan views automatically for each room")]
         public static string CreateViewsFromRooms(UIApplication uiApp, JObject parameters)
         {
             try
@@ -5276,6 +5324,7 @@ namespace RevitMCPBridge
         /// Copy parameter values from one element to all similar elements.
         /// Similar = same category and type.
         /// </summary>
+        [MCPMethod("propagateParameterValues", Category = "ViewAnnotation", Description = "Copy parameter values from one element to all similar elements")]
         public static string PropagateParameterValues(UIApplication uiApp, JObject parameters)
         {
             try
@@ -5426,6 +5475,7 @@ namespace RevitMCPBridge
         /// Returns boundary curves for walls, floors, roofs with their material layers.
         /// This allows accurate replication of section cut geometry in drafting views.
         /// </summary>
+        [MCPMethod("getSectionCutGeometry", Category = "ViewAnnotation", Description = "Extract element geometry as it appears cut in a section view")]
         public static string GetSectionCutGeometry(UIApplication uiApp, JObject parameters)
         {
             try
