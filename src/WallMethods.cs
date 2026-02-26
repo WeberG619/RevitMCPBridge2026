@@ -106,11 +106,7 @@ namespace RevitMCPBridge
             {
                 if (uiApp == null || uiApp.ActiveUIDocument == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "[v2024-11-24-2020] No active document. Please ensure a Revit project is open and active."
-                    });
+                    return ResponseBuilder.Error("No active document. Please ensure a Revit project is open and active.", "NO_ACTIVE_DOCUMENT").Build();
                 }
 
                 var doc = uiApp.ActiveUIDocument.Document;
@@ -163,13 +159,11 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        wallCount = wallIds.Count,
-                        wallIds = wallIds,
-                        closed = closed
-                    });
+                    return ResponseBuilder.Success()
+                        .With("wallCount", wallIds.Count)
+                        .With("wallIds", wallIds)
+                        .With("closed", closed)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -192,11 +186,7 @@ namespace RevitMCPBridge
 
                 if (wall == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall not found"
-                    });
+                    return ResponseBuilder.Error("Wall not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 var wallType = wall.WallType;
@@ -214,24 +204,22 @@ namespace RevitMCPBridge
                     endPoint = new[] { end.X, end.Y, end.Z };
                 }
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    wallId = (int)wall.Id.Value,
-                    wallType = wallType?.Name ?? "Unknown",
-                    wallTypeId = wallType != null ? (int)wallType.Id.Value : -1,
-                    level = level?.Name,
-                    levelId = (int)wall.LevelId.Value,
-                    length = wall.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH)?.AsDouble() ?? 0,
-                    height = wall.get_Parameter(BuiltInParameter.WALL_USER_HEIGHT_PARAM)?.AsDouble() ?? 0,
-                    width = wall.Width,
-                    area = wall.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED)?.AsDouble() ?? 0,
-                    volume = wall.get_Parameter(BuiltInParameter.HOST_VOLUME_COMPUTED)?.AsDouble() ?? 0,
-                    structural = wall.get_Parameter(BuiltInParameter.WALL_STRUCTURAL_SIGNIFICANT)?.AsInteger() == 1,
-                    startPoint = startPoint,
-                    endPoint = endPoint,
-                    hasCurve = curve != null
-                });
+                return ResponseBuilder.Success()
+                    .With("wallId", (int)wall.Id.Value)
+                    .With("wallType", wallType?.Name ?? "Unknown")
+                    .With("wallTypeId", wallType != null ? (int)wallType.Id.Value : -1)
+                    .With("level", level?.Name)
+                    .With("levelId", (int)wall.LevelId.Value)
+                    .With("length", wall.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH)?.AsDouble() ?? 0)
+                    .With("height", wall.get_Parameter(BuiltInParameter.WALL_USER_HEIGHT_PARAM)?.AsDouble() ?? 0)
+                    .With("width", wall.Width)
+                    .With("area", wall.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED)?.AsDouble() ?? 0)
+                    .With("volume", wall.get_Parameter(BuiltInParameter.HOST_VOLUME_COMPUTED)?.AsDouble() ?? 0)
+                    .With("structural", wall.get_Parameter(BuiltInParameter.WALL_STRUCTURAL_SIGNIFICANT)?.AsInteger() == 1)
+                    .With("startPoint", startPoint)
+                    .With("endPoint", endPoint)
+                    .With("hasCurve", curve != null)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -253,11 +241,7 @@ namespace RevitMCPBridge
 
                 if (wall == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall not found"
-                    });
+                    return ResponseBuilder.Error("Wall not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 using (var trans = new Transaction(doc, "Modify Wall Properties"))
@@ -351,11 +335,7 @@ namespace RevitMCPBridge
                                     locationLine = WallLocationLine.CoreInterior;
                                     break;
                                 default:
-                                    return JsonConvert.SerializeObject(new
-                                    {
-                                        success = false,
-                                        error = $"Invalid locationLine value: {locationLineStr}. Valid values: WallCenterline, CoreCenterline, FinishFaceExterior, FinishFaceInterior, CoreExterior, CoreInterior"
-                                    });
+                                    return ResponseBuilder.Error($"Invalid locationLine value: {locationLineStr}. Valid values: WallCenterline, CoreCenterline, FinishFaceExterior, FinishFaceInterior, CoreExterior, CoreInterior", "INVALID_PARAMETER").Build();
                             }
 
                             locationLineParam.Set((int)locationLine);
@@ -376,12 +356,10 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        wallId = (int)wall.Id.Value,
-                        modified = modified
-                    });
+                    return ResponseBuilder.Success()
+                        .With("wallId", (int)wall.Id.Value)
+                        .With("modified", modified)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -405,11 +383,7 @@ namespace RevitMCPBridge
 
                 if (wall == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall not found"
-                    });
+                    return ResponseBuilder.Error("Wall not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 using (var trans = new Transaction(doc, "Split Wall"))
@@ -426,11 +400,7 @@ namespace RevitMCPBridge
                     if (locationCurve == null)
                     {
                         trans.RollBack();
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = false,
-                            error = "Wall does not have a valid location curve"
-                        });
+                        return ResponseBuilder.Error("Wall does not have a valid location curve", "INVALID_GEOMETRY").Build();
                     }
                     var curve = locationCurve.Curve;
 
@@ -439,11 +409,7 @@ namespace RevitMCPBridge
                     if (result == null)
                     {
                         trans.RollBack();
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = false,
-                            error = "Point cannot be projected onto wall"
-                        });
+                        return ResponseBuilder.Error("Point cannot be projected onto wall", "INVALID_GEOMETRY").Build();
                     }
 
                     var splitParameter = result.Parameter;
@@ -459,11 +425,7 @@ namespace RevitMCPBridge
                     if (level == null)
                     {
                         trans.RollBack();
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = false,
-                            error = "Wall level not found"
-                        });
+                        return ResponseBuilder.Error("Wall level not found", "ELEMENT_NOT_FOUND").Build();
                     }
 
                     var height = wall.get_Parameter(BuiltInParameter.WALL_USER_HEIGHT_PARAM)?.AsDouble() ?? 10.0;
@@ -509,13 +471,11 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        originalWallId = (int)wallId.Value,
-                        newWallIds = new List<int> { (int)wall1.Id.Value, (int)wall2.Id.Value },
-                        splitPoint = new[] { result.XYZPoint.X, result.XYZPoint.Y, result.XYZPoint.Z }
-                    });
+                    return ResponseBuilder.Success()
+                        .With("originalWallId", (int)wallId.Value)
+                        .With("newWallIds", new List<int> { (int)wall1.Id.Value, (int)wall2.Id.Value })
+                        .With("splitPoint", new[] { result.XYZPoint.X, result.XYZPoint.Y, result.XYZPoint.Z })
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -541,11 +501,7 @@ namespace RevitMCPBridge
 
                 if (wall1 == null || wall2 == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "One or both walls not found"
-                    });
+                    return ResponseBuilder.Error("One or both walls not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 using (var trans = new Transaction(doc, "Join Walls"))
@@ -560,13 +516,11 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        wall1Id = (int)wall1Id.Value,
-                        wall2Id = (int)wall2Id.Value,
-                        message = "Walls joined successfully"
-                    });
+                    return ResponseBuilder.Success()
+                        .With("wall1Id", (int)wall1Id.Value)
+                        .With("wall2Id", (int)wall2Id.Value)
+                        .WithMessage("Walls joined successfully")
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -592,11 +546,7 @@ namespace RevitMCPBridge
 
                 if (wall1 == null || wall2 == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "One or both walls not found"
-                    });
+                    return ResponseBuilder.Error("One or both walls not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 using (var trans = new Transaction(doc, "Unjoin Walls"))
@@ -610,13 +560,11 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        wall1Id = (int)wall1Id.Value,
-                        wall2Id = (int)wall2Id.Value,
-                        message = "Walls unjoined successfully"
-                    });
+                    return ResponseBuilder.Success()
+                        .With("wall1Id", (int)wall1Id.Value)
+                        .With("wall2Id", (int)wall2Id.Value)
+                        .WithMessage("Walls unjoined successfully")
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -674,12 +622,10 @@ namespace RevitMCPBridge
                     })
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    wallCount = walls.Count,
-                    walls = walls
-                });
+                return ResponseBuilder.Success()
+                    .With("wallCount", walls.Count)
+                    .WithList("walls", walls)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -701,11 +647,7 @@ namespace RevitMCPBridge
 
                 if (view == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "View not found"
-                    });
+                    return ResponseBuilder.Error("View not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 var walls = new FilteredElementCollector(doc, viewId)
@@ -723,14 +665,12 @@ namespace RevitMCPBridge
                     })
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    viewId = (int)viewId.Value,
-                    viewName = view.Name,
-                    wallCount = walls.Count,
-                    walls = walls
-                });
+                return ResponseBuilder.Success()
+                    .With("viewId", (int)viewId.Value)
+                    .With("viewName", view.Name)
+                    .With("wallCount", walls.Count)
+                    .WithList("walls", walls)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -761,12 +701,10 @@ namespace RevitMCPBridge
                     })
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    wallTypeCount = wallTypes.Count,
-                    wallTypes = wallTypes
-                });
+                return ResponseBuilder.Success()
+                    .With("wallTypeCount", wallTypes.Count)
+                    .WithList("wallTypes", wallTypes)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -790,11 +728,7 @@ namespace RevitMCPBridge
                 var sourceType = doc.GetElement(sourceTypeId) as WallType;
                 if (sourceType == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Source wall type not found"
-                    });
+                    return ResponseBuilder.Error("Source wall type not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 // Check if type with this name already exists
@@ -805,13 +739,11 @@ namespace RevitMCPBridge
 
                 if (existingType != null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        newTypeId = (int)existingType.Id.Value,
-                        newTypeName = existingType.Name,
-                        message = "Wall type with this name already exists"
-                    });
+                    return ResponseBuilder.Success()
+                        .With("newTypeId", (int)existingType.Id.Value)
+                        .With("newTypeName", existingType.Name)
+                        .WithMessage("Wall type with this name already exists")
+                        .Build();
                 }
 
                 using (var trans = new Transaction(doc, "Duplicate Wall Type"))
@@ -825,14 +757,12 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        newTypeId = (int)newType.Id.Value,
-                        newTypeName = newType.Name,
-                        sourceTypeName = sourceType.Name,
-                        width = newType.Width
-                    });
+                    return ResponseBuilder.Success()
+                        .With("newTypeId", (int)newType.Id.Value)
+                        .With("newTypeName", newType.Name)
+                        .With("sourceTypeName", sourceType.Name)
+                        .With("width", newType.Width)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -855,11 +785,7 @@ namespace RevitMCPBridge
 
                 if (wall == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall not found"
-                    });
+                    return ResponseBuilder.Error("Wall not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 using (var trans = new Transaction(doc, "Flip Wall"))
@@ -873,12 +799,10 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        wallId = (int)wallId.Value,
-                        message = "Wall flipped successfully"
-                    });
+                    return ResponseBuilder.Success()
+                        .With("wallId", (int)wallId.Value)
+                        .WithMessage("Wall flipped successfully")
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -909,12 +833,10 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        wallId = (int)wallId.Value,
-                        message = "Wall deleted successfully"
-                    });
+                    return ResponseBuilder.Success()
+                        .With("wallId", (int)wallId.Value)
+                        .WithMessage("Wall deleted successfully")
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -933,11 +855,7 @@ namespace RevitMCPBridge
             {
                 if (uiApp == null || uiApp.ActiveUIDocument == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "[v2024-11-24-2020] No active document. Please ensure a Revit project is open and active."
-                    });
+                    return ResponseBuilder.Error("No active document. Please ensure a Revit project is open and active.", "NO_ACTIVE_DOCUMENT").Build();
                 }
 
                 var doc = uiApp.ActiveUIDocument.Document;
@@ -1025,14 +943,12 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        createdCount = createdWalls.Count,
-                        failedCount = failedWalls.Count,
-                        createdWalls = createdWalls,
-                        failedWalls = failedWalls
-                    });
+                    return ResponseBuilder.Success()
+                        .With("createdCount", createdWalls.Count)
+                        .With("failedCount", failedWalls.Count)
+                        .With("createdWalls", createdWalls)
+                        .With("failedWalls", failedWalls)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -1057,21 +973,13 @@ namespace RevitMCPBridge
                 var wall = doc.GetElement(wallId) as Wall;
                 if (wall == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall not found"
-                    });
+                    return ResponseBuilder.Error("Wall not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 var newType = doc.GetElement(newTypeId) as WallType;
                 if (newType == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall type not found"
-                    });
+                    return ResponseBuilder.Error("Wall type not found", "TYPE_NOT_FOUND").Build();
                 }
 
                 var oldTypeName = wall.WallType.Name;
@@ -1087,13 +995,11 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        wallId = (int)wallId.Value,
-                        oldType = oldTypeName,
-                        newType = newType.Name
-                    });
+                    return ResponseBuilder.Success()
+                        .With("wallId", (int)wallId.Value)
+                        .With("oldType", oldTypeName)
+                        .With("newType", newType.Name)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -1118,11 +1024,7 @@ namespace RevitMCPBridge
                 var newType = doc.GetElement(newTypeId) as WallType;
                 if (newType == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall type not found"
-                    });
+                    return ResponseBuilder.Error("Wall type not found", "TYPE_NOT_FOUND").Build();
                 }
 
                 var modifiedCount = 0;
@@ -1158,13 +1060,11 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        modifiedCount = modifiedCount,
-                        failedCount = failedCount,
-                        newTypeName = newType.Name
-                    });
+                    return ResponseBuilder.Success()
+                        .With("modifiedCount", modifiedCount)
+                        .With("failedCount", failedCount)
+                        .With("newTypeName", newType.Name)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -1187,11 +1087,7 @@ namespace RevitMCPBridge
             {
                 if (uiApp == null || uiApp.ActiveUIDocument == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No active document. Please ensure a Revit project is open."
-                    });
+                    return ResponseBuilder.Error("No active document. Please ensure a Revit project is open.", "NO_ACTIVE_DOCUMENT").Build();
                 }
 
                 var doc = uiApp.ActiveUIDocument.Document;
@@ -1204,21 +1100,13 @@ namespace RevitMCPBridge
                 var wall = doc.GetElement(wallId) as Wall;
                 if (wall == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = $"Wall with ID {wallId.Value} not found"
-                    });
+                    return ResponseBuilder.Error($"Wall with ID {wallId.Value} not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 var locationCurve = wall.Location as LocationCurve;
                 if (locationCurve == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall does not have a valid location curve"
-                    });
+                    return ResponseBuilder.Error("Wall does not have a valid location curve", "INVALID_GEOMETRY").Build();
                 }
 
                 var curve = locationCurve.Curve;
@@ -1256,19 +1144,17 @@ namespace RevitMCPBridge
                     var updatedStart = updatedCurve.GetEndPoint(0);
                     var updatedEnd = updatedCurve.GetEndPoint(1);
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        wallId = (int)wallId.Value,
-                        endIndex = endIndex,
-                        oldPoint = endIndex == 0
+                    return ResponseBuilder.Success()
+                        .With("wallId", (int)wallId.Value)
+                        .With("endIndex", endIndex)
+                        .With("oldPoint", endIndex == 0
                             ? new[] { oldStart.X, oldStart.Y, oldStart.Z }
-                            : new[] { oldEnd.X, oldEnd.Y, oldEnd.Z },
-                        newPoint = new[] { newXYZ.X, newXYZ.Y, newXYZ.Z },
-                        updatedStartPoint = new[] { updatedStart.X, updatedStart.Y, updatedStart.Z },
-                        updatedEndPoint = new[] { updatedEnd.X, updatedEnd.Y, updatedEnd.Z },
-                        newLength = updatedCurve.Length
-                    });
+                            : new[] { oldEnd.X, oldEnd.Y, oldEnd.Z })
+                        .With("newPoint", new[] { newXYZ.X, newXYZ.Y, newXYZ.Z })
+                        .With("updatedStartPoint", new[] { updatedStart.X, updatedStart.Y, updatedStart.Z })
+                        .With("updatedEndPoint", new[] { updatedEnd.X, updatedEnd.Y, updatedEnd.Z })
+                        .With("newLength", updatedCurve.Length)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -1290,11 +1176,7 @@ namespace RevitMCPBridge
             {
                 if (uiApp == null || uiApp.ActiveUIDocument == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No active document. Please ensure a Revit project is open."
-                    });
+                    return ResponseBuilder.Error("No active document. Please ensure a Revit project is open.", "NO_ACTIVE_DOCUMENT").Build();
                 }
 
                 var doc = uiApp.ActiveUIDocument.Document;
@@ -1306,41 +1188,25 @@ namespace RevitMCPBridge
                 var wall = doc.GetElement(wallId) as Wall;
                 if (wall == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = $"Wall with ID {wallId.Value} not found"
-                    });
+                    return ResponseBuilder.Error($"Wall with ID {wallId.Value} not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 var targetElement = doc.GetElement(targetElementId);
                 if (targetElement == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = $"Target element with ID {targetElementId.Value} not found"
-                    });
+                    return ResponseBuilder.Error($"Target element with ID {targetElementId.Value} not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 var locationCurve = wall.Location as LocationCurve;
                 if (locationCurve == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall does not have a valid location curve"
-                    });
+                    return ResponseBuilder.Error("Wall does not have a valid location curve", "INVALID_GEOMETRY").Build();
                 }
 
                 var curve = locationCurve.Curve as Line;
                 if (curve == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall curve is not a line (curved walls not supported)"
-                    });
+                    return ResponseBuilder.Error("Wall curve is not a line (curved walls not supported)", "INVALID_GEOMETRY").Build();
                 }
 
                 // Get target curve/plane to intersect with
@@ -1364,11 +1230,7 @@ namespace RevitMCPBridge
 
                 if (targetCurve == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Target element does not have a valid curve for intersection"
-                    });
+                    return ResponseBuilder.Error("Target element does not have a valid curve for intersection", "INVALID_GEOMETRY").Build();
                 }
 
                 // Find intersection point
@@ -1392,11 +1254,7 @@ namespace RevitMCPBridge
 
                 if (setCompResult != SetComparisonResult.Overlap || resultArray == null || resultArray.Size == 0)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall line does not intersect with target element"
-                    });
+                    return ResponseBuilder.Error("Wall line does not intersect with target element", "INVALID_GEOMETRY").Build();
                 }
 
                 var intersectionPoint = resultArray.get_Item(0).XYZPoint;
@@ -1425,15 +1283,13 @@ namespace RevitMCPBridge
 
                     var updatedCurve = (wall.Location as LocationCurve).Curve;
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        wallId = (int)wallId.Value,
-                        endIndex = endIndex,
-                        targetElementId = (int)targetElementId.Value,
-                        intersectionPoint = new[] { intersectionPoint.X, intersectionPoint.Y, intersectionPoint.Z },
-                        newLength = updatedCurve.Length
-                    });
+                    return ResponseBuilder.Success()
+                        .With("wallId", (int)wallId.Value)
+                        .With("endIndex", endIndex)
+                        .With("targetElementId", (int)targetElementId.Value)
+                        .With("intersectionPoint", new[] { intersectionPoint.X, intersectionPoint.Y, intersectionPoint.Z })
+                        .With("newLength", updatedCurve.Length)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -1455,11 +1311,7 @@ namespace RevitMCPBridge
             {
                 if (uiApp == null || uiApp.ActiveUIDocument == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No active document. Please ensure a Revit project is open."
-                    });
+                    return ResponseBuilder.Error("No active document. Please ensure a Revit project is open.", "NO_ACTIVE_DOCUMENT").Build();
                 }
 
                 var doc = uiApp.ActiveUIDocument.Document;
@@ -1471,41 +1323,25 @@ namespace RevitMCPBridge
                 var wall = doc.GetElement(wallId) as Wall;
                 if (wall == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = $"Wall with ID {wallId.Value} not found"
-                    });
+                    return ResponseBuilder.Error($"Wall with ID {wallId.Value} not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 var targetElement = doc.GetElement(targetElementId);
                 if (targetElement == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = $"Target element with ID {targetElementId.Value} not found"
-                    });
+                    return ResponseBuilder.Error($"Target element with ID {targetElementId.Value} not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 var locationCurve = wall.Location as LocationCurve;
                 if (locationCurve == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall does not have a valid location curve"
-                    });
+                    return ResponseBuilder.Error("Wall does not have a valid location curve", "INVALID_GEOMETRY").Build();
                 }
 
                 var curve = locationCurve.Curve as Line;
                 if (curve == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall curve is not a line (curved walls not supported)"
-                    });
+                    return ResponseBuilder.Error("Wall curve is not a line (curved walls not supported)", "INVALID_GEOMETRY").Build();
                 }
 
                 // Get target curve
@@ -1528,11 +1364,7 @@ namespace RevitMCPBridge
 
                 if (targetCurve == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Target element does not have a valid curve for intersection"
-                    });
+                    return ResponseBuilder.Error("Target element does not have a valid curve for intersection", "INVALID_GEOMETRY").Build();
                 }
 
                 // Find intersection
@@ -1541,11 +1373,7 @@ namespace RevitMCPBridge
 
                 if (setCompResult != SetComparisonResult.Overlap || resultArray == null || resultArray.Size == 0)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall does not intersect with target element"
-                    });
+                    return ResponseBuilder.Error("Wall does not intersect with target element", "INVALID_GEOMETRY").Build();
                 }
 
                 var intersectionPoint = resultArray.get_Item(0).XYZPoint;
@@ -1578,15 +1406,13 @@ namespace RevitMCPBridge
 
                     var updatedCurve = (wall.Location as LocationCurve).Curve;
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        wallId = (int)wallId.Value,
-                        endIndex = endIndex,
-                        targetElementId = (int)targetElementId.Value,
-                        trimPoint = new[] { intersectionPoint.X, intersectionPoint.Y, intersectionPoint.Z },
-                        newLength = updatedCurve.Length
-                    });
+                    return ResponseBuilder.Success()
+                        .With("wallId", (int)wallId.Value)
+                        .With("endIndex", endIndex)
+                        .With("targetElementId", (int)targetElementId.Value)
+                        .With("trimPoint", new[] { intersectionPoint.X, intersectionPoint.Y, intersectionPoint.Z })
+                        .With("newLength", updatedCurve.Length)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -1609,11 +1435,7 @@ namespace RevitMCPBridge
             {
                 if (uiApp == null || uiApp.ActiveUIDocument == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No active document. Please ensure a Revit project is open."
-                    });
+                    return ResponseBuilder.Error("No active document. Please ensure a Revit project is open.", "NO_ACTIVE_DOCUMENT").Build();
                 }
 
                 var doc = uiApp.ActiveUIDocument.Document;
@@ -1625,31 +1447,19 @@ namespace RevitMCPBridge
                 var wall = doc.GetElement(wallId) as Wall;
                 if (wall == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = $"Wall with ID {wallId.Value} not found"
-                    });
+                    return ResponseBuilder.Error($"Wall with ID {wallId.Value} not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 var locationCurve = wall.Location as LocationCurve;
                 if (locationCurve == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall does not have a valid location curve"
-                    });
+                    return ResponseBuilder.Error("Wall does not have a valid location curve", "INVALID_GEOMETRY").Build();
                 }
 
                 var curve = locationCurve.Curve as Line;
                 if (curve == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall curve is not a line"
-                    });
+                    return ResponseBuilder.Error("Wall curve is not a line", "INVALID_GEOMETRY").Build();
                 }
 
                 var wallStart = curve.GetEndPoint(0);
@@ -1690,16 +1500,14 @@ namespace RevitMCPBridge
                     var updatedStart = updatedCurve.GetEndPoint(0);
                     var updatedEnd = updatedCurve.GetEndPoint(1);
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        wallId = (int)wallId.Value,
-                        endIndex = endIndex,
-                        newEndpoint = new[] { newEndpoint.X, newEndpoint.Y, newEndpoint.Z },
-                        updatedStartPoint = new[] { updatedStart.X, updatedStart.Y, updatedStart.Z },
-                        updatedEndPoint = new[] { updatedEnd.X, updatedEnd.Y, updatedEnd.Z },
-                        newLength = updatedCurve.Length
-                    });
+                    return ResponseBuilder.Success()
+                        .With("wallId", (int)wallId.Value)
+                        .With("endIndex", endIndex)
+                        .With("newEndpoint", new[] { newEndpoint.X, newEndpoint.Y, newEndpoint.Z })
+                        .With("updatedStartPoint", new[] { updatedStart.X, updatedStart.Y, updatedStart.Z })
+                        .With("updatedEndPoint", new[] { updatedEnd.X, updatedEnd.Y, updatedEnd.Z })
+                        .With("newLength", updatedCurve.Length)
+                        .Build();
                 }
             }
             catch (Exception ex)

@@ -533,25 +533,22 @@ namespace RevitMCPBridge
             {
                 var doc = uiApp.ActiveUIDocument.Document;
 
-                if (parameters["sheetId"] == null)
-                    return JsonConvert.SerializeObject(new { success = false, error = "sheetId is required" });
+                var pv = new ParameterValidator(parameters, "getSheetPrintableArea");
+                pv.Require("sheetId").IsType<int>();
+                pv.ThrowIfInvalid();
 
-                var sheetId = new ElementId(int.Parse(parameters["sheetId"].ToString()));
-                var sheet = doc.GetElement(sheetId) as ViewSheet;
-
-                if (sheet == null)
-                    return JsonConvert.SerializeObject(new { success = false, error = "Sheet not found" });
+                var sheetIdInt = pv.GetRequired<int>("sheetId");
+                var sheet = ElementLookup.GetSheet(doc, sheetIdInt);
+                var sheetId = sheet.Id;
 
                 double marginInches = parameters["marginInches"]?.Value<double>() ?? 1.0;
 
                 var area = GetSheetPrintableArea(doc, sheet, marginInches);
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    sheetId = (int)sheetId.Value,
-                    sheetNumber = sheet.SheetNumber,
-                    printableArea = new
+                return ResponseBuilder.Success()
+                    .With("sheetId", (int)sheetId.Value)
+                    .With("sheetNumber", sheet.SheetNumber)
+                    .With("printableArea", new
                     {
                         minX = Math.Round(area.MinX, 4),
                         minY = Math.Round(area.MinY, 4),
@@ -563,10 +560,10 @@ namespace RevitMCPBridge
                         heightInches = Math.Round(area.Height * 12, 2),
                         centerX = Math.Round(area.CenterX, 4),
                         centerY = Math.Round(area.CenterY, 4)
-                    },
-                    detectionSource = area.Source,
-                    appliedMarginInches = area.AppliedMargin
-                });
+                    })
+                    .With("detectionSource", area.Source)
+                    .With("appliedMarginInches", area.AppliedMargin)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -587,27 +584,21 @@ namespace RevitMCPBridge
                 var doc = uiDoc.Document;
 
                 // Validate required parameters
-                if (parameters["sheetId"] == null)
-                {
-                    return JsonConvert.SerializeObject(new { success = false, error = "sheetId is required" });
-                }
-                if (parameters["viewId"] == null)
-                {
-                    return JsonConvert.SerializeObject(new { success = false, error = "viewId is required" });
-                }
+                var pv = new ParameterValidator(parameters, "placeViewOnSheet");
+                pv.Require("sheetId").IsType<int>();
+                pv.Require("viewId").IsType<int>();
+                pv.ThrowIfInvalid();
 
-                var sheetId = new ElementId(int.Parse(parameters["sheetId"].ToString()));
-                var viewId = new ElementId(int.Parse(parameters["viewId"].ToString()));
+                var sheetIdInt = pv.GetRequired<int>("sheetId");
+                var viewIdInt = pv.GetRequired<int>("viewId");
+                var sheetId = new ElementId(sheetIdInt);
+                var viewId = new ElementId(viewIdInt);
 
                 // Validate sheet exists
                 var sheet = doc.GetElement(sheetId) as ViewSheet;
                 if (sheet == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = $"Sheet with ID {sheetId.Value} not found or is not a ViewSheet"
-                    });
+                    return ResponseBuilder.Error($"Sheet with ID {sheetId.Value} not found or is not a ViewSheet", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 // AUTO-SWITCH: Switch to the sheet before working on it (default: true)
@@ -681,11 +672,7 @@ namespace RevitMCPBridge
                 var view = doc.GetElement(viewId) as View;
                 if (view == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = $"View with ID {viewId.Value} not found or is not a View"
-                    });
+                    return ResponseBuilder.Error($"View with ID {viewId.Value} not found or is not a View", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 // Check if view can be placed on sheet (Revit API validation)
@@ -717,14 +704,11 @@ namespace RevitMCPBridge
                         }
                     }
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = $"Cannot place view '{view.Name}' on sheet '{sheet.SheetNumber}': {reason}",
-                        viewName = view.Name,
-                        viewType = view.ViewType.ToString(),
-                        sheetNumber = sheet.SheetNumber
-                    });
+                    return ResponseBuilder.Error($"Cannot place view '{view.Name}' on sheet '{sheet.SheetNumber}': {reason}", "CANNOT_PLACE_VIEW")
+                        .With("viewName", view.Name)
+                        .With("viewType", view.ViewType.ToString())
+                        .With("sheetNumber", sheet.SheetNumber)
+                        .Build();
                 }
 
                 // For drafting views, ensure the view has been opened/activated at least once
@@ -792,14 +776,11 @@ namespace RevitMCPBridge
                     if (viewport == null && createException != null)
                     {
                         trans.RollBack();
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = false,
-                            error = $"Viewport.Create threw exception: {createException.Message}",
-                            viewType = view.ViewType.ToString(),
-                            viewName = view.Name,
-                            canAddViewToSheet = canAdd
-                        });
+                        return ResponseBuilder.Error($"Viewport.Create threw exception: {createException.Message}", "VIEWPORT_CREATE_FAILED")
+                            .With("viewType", view.ViewType.ToString())
+                            .With("viewName", view.Name)
+                            .With("canAddViewToSheet", canAdd)
+                            .Build();
                     }
 
                     if (viewport == null)
@@ -815,35 +796,32 @@ namespace RevitMCPBridge
                         catch { }
 
                         trans.RollBack();
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = false,
-                            error = elementCount == 0
+                        return ResponseBuilder.Error(
+                            elementCount == 0
                                 ? "Viewport.Create returned null - view appears to be empty (no elements). Import the detail again or add content to the view first."
                                 : "Viewport.Create returned null - placement failed. Try regenerating the view or reopening Revit.",
-                            viewType = view.ViewType.ToString(),
-                            viewName = view.Name,
-                            canAddViewToSheet = canAdd,
-                            sheetNumber = sheet.SheetNumber,
-                            location = new[] { x, y },
-                            viewElementCount = elementCount
-                        });
+                            "VIEWPORT_CREATE_NULL")
+                            .With("viewType", view.ViewType.ToString())
+                            .With("viewName", view.Name)
+                            .With("canAddViewToSheet", canAdd)
+                            .With("sheetNumber", sheet.SheetNumber)
+                            .With("location", new[] { x, y })
+                            .With("viewElementCount", elementCount)
+                            .Build();
                     }
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        viewportId = (int)viewport.Id.Value,
-                        sheetId = (int)sheetId.Value,
-                        viewId = (int)viewId.Value,
-                        viewName = view.Name,
-                        sheetNumber = sheet.SheetNumber,
-                        location = new[] { point.X, point.Y, 0.0 },
-                        positionConstrained = wasConstrained,
-                        originalLocation = wasConstrained ? new[] { originalX, originalY } : null,
-                        printableArea = new
+                    return ResponseBuilder.Success()
+                        .With("viewportId", (int)viewport.Id.Value)
+                        .With("sheetId", (int)sheetId.Value)
+                        .With("viewId", (int)viewId.Value)
+                        .With("viewName", view.Name)
+                        .With("sheetNumber", sheet.SheetNumber)
+                        .With("location", new[] { point.X, point.Y, 0.0 })
+                        .With("positionConstrained", wasConstrained)
+                        .With("originalLocation", wasConstrained ? new[] { originalX, originalY } : null)
+                        .With("printableArea", new
                         {
                             minX = Math.Round(printMinX, 4),
                             minY = Math.Round(printMinY, 4),
@@ -851,8 +829,8 @@ namespace RevitMCPBridge
                             maxY = Math.Round(printMaxY, 4),
                             centerX = Math.Round(centerX, 4),
                             centerY = Math.Round(centerY, 4)
-                        }
-                    });
+                        })
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -1055,11 +1033,7 @@ namespace RevitMCPBridge
                 var viewport = doc.GetElement(viewportId) as Viewport;
                 if (viewport == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Viewport not found"
-                    });
+                    return ResponseBuilder.Error("Viewport not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 // Get current center
@@ -1150,21 +1124,19 @@ namespace RevitMCPBridge
                     // Verify the final position
                     var actualCenter = viewport.GetBoxCenter();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        viewportId = (int)viewportId.Value,
-                        requestedLocation = new[] { targetPoint.X, targetPoint.Y, 0.0 },
-                        previousCenter = new[] { currentCenter.X, currentCenter.Y, currentCenter.Z },
-                        actualCenter = new[] { actualCenter.X, actualCenter.Y, actualCenter.Z },
-                        delta = new[] { delta.X, delta.Y, delta.Z },
-                        moved = moved,
-                        methodUsed = methodUsed,
-                        positionError = new[] {
+                    return ResponseBuilder.Success()
+                        .With("viewportId", (int)viewportId.Value)
+                        .With("requestedLocation", new[] { targetPoint.X, targetPoint.Y, 0.0 })
+                        .With("previousCenter", new[] { currentCenter.X, currentCenter.Y, currentCenter.Z })
+                        .With("actualCenter", new[] { actualCenter.X, actualCenter.Y, actualCenter.Z })
+                        .With("delta", new[] { delta.X, delta.Y, delta.Z })
+                        .With("moved", moved)
+                        .With("methodUsed", methodUsed)
+                        .With("positionError", new[] {
                             Math.Round(Math.Abs(actualCenter.X - targetPoint.X), 4),
                             Math.Round(Math.Abs(actualCenter.Y - targetPoint.Y), 4)
-                        }
-                    });
+                        })
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -1196,12 +1168,10 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        sheetId = (int)sheetId.Value,
-                        message = "Sheet deleted successfully"
-                    });
+                    return ResponseBuilder.Success()
+                        .With("sheetId", (int)sheetId.Value)
+                        .WithMessage("Sheet deleted successfully")
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -1233,12 +1203,10 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        viewportId = (int)viewportId.Value,
-                        message = "Viewport removed successfully"
-                    });
+                    return ResponseBuilder.Success()
+                        .With("viewportId", (int)viewportId.Value)
+                        .WithMessage("Viewport removed successfully")
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -1270,12 +1238,10 @@ namespace RevitMCPBridge
                     })
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    titleblockCount = titleblocks.Count,
-                    titleblocks = titleblocks
-                });
+                return ResponseBuilder.Success()
+                    .WithCount(titleblocks.Count, "titleblockCount")
+                    .With("titleblocks", titleblocks)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -1303,11 +1269,7 @@ namespace RevitMCPBridge
                 var sheet = doc.GetElement(sheetId) as ViewSheet;
                 if (sheet == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Sheet not found"
-                    });
+                    return ResponseBuilder.Error("Sheet not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 using (var trans = new Transaction(doc, "Duplicate Sheet"))
@@ -1325,11 +1287,7 @@ namespace RevitMCPBridge
                     if (titleblockId == ElementId.InvalidElementId)
                     {
                         trans.RollBack();
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = false,
-                            error = "No titleblock found on original sheet"
-                        });
+                        return ResponseBuilder.Error("No titleblock found on original sheet", "NO_TITLEBLOCK").Build();
                     }
 
                     var titleblock = doc.GetElement(titleblockId) as FamilyInstance;
@@ -1366,16 +1324,12 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        originalSheetId = (int)sheetId.Value,
-                        newSheetId = (int)newSheet.Id.Value,
-                        newSheetNumber = newSheet.SheetNumber,
-                        newSheetName = newSheet.Name,
-                        duplicatedViewports = newViewportIds.Count,
-                        viewportIds = newViewportIds
-                    });
+                    return ResponseBuilder.Success()
+                        .With("originalSheetId", (int)sheetId.Value)
+                        .WithSheet((int)newSheet.Id.Value, newSheet.SheetNumber, newSheet.Name)
+                        .With("duplicatedViewports", newViewportIds.Count)
+                        .With("viewportIds", newViewportIds)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -1400,11 +1354,7 @@ namespace RevitMCPBridge
                 var viewport = doc.GetElement(viewportId) as Viewport;
                 if (viewport == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Viewport not found"
-                    });
+                    return ResponseBuilder.Error("Viewport not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 using (var trans = new Transaction(doc, "Set Viewport Type"))
@@ -1418,12 +1368,10 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        viewportId = (int)viewportId.Value,
-                        newTypeId = (int)typeId.Value
-                    });
+                    return ResponseBuilder.Success()
+                        .With("viewportId", (int)viewportId.Value)
+                        .With("newTypeId", (int)typeId.Value)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -1442,38 +1390,28 @@ namespace RevitMCPBridge
             {
                 var doc = uiApp.ActiveUIDocument.Document;
 
-                if (parameters?["viewportId"] == null)
-                {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "viewportId is required"
-                    });
-                }
+                var pvg = new ParameterValidator(parameters, "getViewportLabelOffset");
+                pvg.Require("viewportId").IsType<int>();
+                pvg.ThrowIfInvalid();
 
-                var viewportId = new ElementId(int.Parse(parameters["viewportId"].ToString()));
+                var viewportIdInt = pvg.GetRequired<int>("viewportId");
+                var viewportId = new ElementId(viewportIdInt);
                 var viewport = doc.GetElement(viewportId) as Viewport;
 
                 if (viewport == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Viewport not found"
-                    });
+                    return ResponseBuilder.Error("Viewport not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 var labelOffset = viewport.LabelOffset;
                 var boxCenter = viewport.GetBoxCenter();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    viewportId = (int)viewportId.Value,
-                    labelOffset = new[] { labelOffset.X, labelOffset.Y, labelOffset.Z },
-                    boxCenter = new[] { boxCenter.X, boxCenter.Y, boxCenter.Z },
-                    note = "labelOffset is relative to viewport box center. Positive Y moves title up."
-                });
+                return ResponseBuilder.Success()
+                    .With("viewportId", (int)viewportId.Value)
+                    .With("labelOffset", new[] { labelOffset.X, labelOffset.Y, labelOffset.Z })
+                    .With("boxCenter", new[] { boxCenter.X, boxCenter.Y, boxCenter.Z })
+                    .With("note", "labelOffset is relative to viewport box center. Positive Y moves title up.")
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -1491,25 +1429,17 @@ namespace RevitMCPBridge
             {
                 var doc = uiApp.ActiveUIDocument.Document;
 
-                if (parameters?["viewportId"] == null)
-                {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "viewportId is required"
-                    });
-                }
+                var pvs = new ParameterValidator(parameters, "setViewportLabelOffset");
+                pvs.Require("viewportId").IsType<int>();
+                pvs.ThrowIfInvalid();
 
-                var viewportId = new ElementId(int.Parse(parameters["viewportId"].ToString()));
+                var viewportIdInt = pvs.GetRequired<int>("viewportId");
+                var viewportId = new ElementId(viewportIdInt);
                 var viewport = doc.GetElement(viewportId) as Viewport;
 
                 if (viewport == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Viewport not found"
-                    });
+                    return ResponseBuilder.Error("Viewport not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 // Get offset values - can be array or individual x,y,z params
@@ -1544,14 +1474,12 @@ namespace RevitMCPBridge
 
                     var newOffset = viewport.LabelOffset;
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        viewportId = (int)viewportId.Value,
-                        previousOffset = new[] { oldOffset.X, oldOffset.Y, oldOffset.Z },
-                        newOffset = new[] { newOffset.X, newOffset.Y, newOffset.Z },
-                        message = "Label offset updated. Positive Y moves title up, negative moves down."
-                    });
+                    return ResponseBuilder.Success()
+                        .With("viewportId", (int)viewportId.Value)
+                        .With("previousOffset", new[] { oldOffset.X, oldOffset.Y, oldOffset.Z })
+                        .With("newOffset", new[] { newOffset.X, newOffset.Y, newOffset.Z })
+                        .WithMessage("Label offset updated. Positive Y moves title up, negative moves down.")
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -1605,12 +1533,10 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        renumberedCount = renumbered.Count,
-                        sheets = renumbered
-                    });
+                    return ResponseBuilder.Success()
+                        .With("renumberedCount", renumbered.Count)
+                        .With("sheets", renumbered)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -1663,12 +1589,10 @@ namespace RevitMCPBridge
                     })
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    titleblockCount = titleblocks.Count,
-                    titleblocks = titleblocks
-                });
+                return ResponseBuilder.Success()
+                    .With("titleblockCount", titleblocks.Count)
+                    .With("titleblocks", titleblocks)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -1690,7 +1614,7 @@ namespace RevitMCPBridge
 
                 if (sheet == null)
                 {
-                    return JsonConvert.SerializeObject(new { success = false, error = "Sheet not found" });
+                    return ResponseBuilder.Error("Sheet not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 var viewportIds = sheet.GetAllViewports();
@@ -1723,13 +1647,11 @@ namespace RevitMCPBridge
                     }
                 }
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    sheetId = (int)sheetId.Value,
-                    viewportCount = viewportData.Count,
-                    viewports = viewportData
-                });
+                return ResponseBuilder.Success()
+                    .With("sheetId", (int)sheetId.Value)
+                    .With("viewportCount", viewportData.Count)
+                    .With("viewports", viewportData)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -1751,7 +1673,7 @@ namespace RevitMCPBridge
 
                 if (sheet == null)
                 {
-                    return JsonConvert.SerializeObject(new { success = false, error = "Sheet not found" });
+                    return ResponseBuilder.Error("Sheet not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 // Get sheet bounds from titleblock - FIXED VERSION
@@ -1841,25 +1763,23 @@ namespace RevitMCPBridge
                     }
                 }
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    sheetId = (int)sheetId.Value,
-                    sheetWidth = sheetWidth,
-                    sheetHeight = sheetHeight,
-                    sheetWidthInches = sheetWidth * 12,
-                    sheetHeightInches = sheetHeight * 12,
-                    drawingAreaWidth = drawingAreaWidth,
-                    drawingAreaHeight = drawingAreaHeight,
-                    drawingAreaWidthInches = drawingAreaWidth * 12,
-                    drawingAreaHeightInches = drawingAreaHeight * 12,
-                    titleBlockHeight = titleBlockHeight,
-                    viewportCount = viewports.Count,
-                    issueCount = issues.Count,
-                    issues = issues,
-                    hasOverlaps = issues.Any(i => ((dynamic)i).type == "OVERLAP"),
-                    hasOffSheetViews = issues.Any(i => ((dynamic)i).type == "OFF_SHEET")
-                });
+                return ResponseBuilder.Success()
+                    .With("sheetId", (int)sheetId.Value)
+                    .With("sheetWidth", sheetWidth)
+                    .With("sheetHeight", sheetHeight)
+                    .With("sheetWidthInches", sheetWidth * 12)
+                    .With("sheetHeightInches", sheetHeight * 12)
+                    .With("drawingAreaWidth", drawingAreaWidth)
+                    .With("drawingAreaHeight", drawingAreaHeight)
+                    .With("drawingAreaWidthInches", drawingAreaWidth * 12)
+                    .With("drawingAreaHeightInches", drawingAreaHeight * 12)
+                    .With("titleBlockHeight", titleBlockHeight)
+                    .With("viewportCount", viewports.Count)
+                    .With("issueCount", issues.Count)
+                    .With("issues", issues)
+                    .With("hasOverlaps", issues.Any(i => ((dynamic)i).type == "OVERLAP"))
+                    .With("hasOffSheetViews", issues.Any(i => ((dynamic)i).type == "OFF_SHEET"))
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -1883,14 +1803,14 @@ namespace RevitMCPBridge
                 var view = doc.GetElement(viewId) as View;
                 if (view == null)
                 {
-                    return JsonConvert.SerializeObject(new { success = false, error = "View not found" });
+                    return ResponseBuilder.Error("View not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 // Get view crop box extents
                 var cropBox = view.CropBox;
                 if (cropBox == null)
                 {
-                    return JsonConvert.SerializeObject(new { success = false, error = "View has no crop box" });
+                    return ResponseBuilder.Error("View has no crop box", "VALIDATION_ERROR").Build();
                 }
 
                 var viewWidth = cropBox.Max.X - cropBox.Min.X;
@@ -1907,19 +1827,17 @@ namespace RevitMCPBridge
                 var standardScales = new[] { 1, 2, 4, 8, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384 };
                 var closestScale = standardScales.OrderBy(s => Math.Abs(s - recommendedScale)).First();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    viewId = (int)viewId.Value,
-                    viewName = view.Name,
-                    viewWidth = viewWidth,
-                    viewHeight = viewHeight,
-                    targetWidth = targetWidth,
-                    targetHeight = targetHeight,
-                    currentScale = view.Scale,
-                    recommendedScale = closestScale,
-                    scaleDescription = $"1/{closestScale}\""
-                });
+                return ResponseBuilder.Success()
+                    .With("viewId", (int)viewId.Value)
+                    .With("viewName", view.Name)
+                    .With("viewWidth", viewWidth)
+                    .With("viewHeight", viewHeight)
+                    .With("targetWidth", targetWidth)
+                    .With("targetHeight", targetHeight)
+                    .With("currentScale", view.Scale)
+                    .With("recommendedScale", closestScale)
+                    .With("scaleDescription", $"1/{closestScale}\"")
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -1972,12 +1890,10 @@ namespace RevitMCPBridge
                     .ThenBy(tb => tb.typeName)
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    titleBlockCount = titleBlocks.Count,
-                    titleBlocks = titleBlocks
-                });
+                return ResponseBuilder.Success()
+                    .With("titleBlockCount", titleBlocks.Count)
+                    .With("titleBlocks", titleBlocks)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -2033,18 +1949,16 @@ namespace RevitMCPBridge
                     var mostUsed = titleblockUsage.OrderByDescending(kv => kv.Value).First();
                     var titleblock = titleblockInfo[mostUsed.Key];
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        found = true,
-                        titleblockId = (int)titleblock.Id.Value,
-                        familyName = titleblock.FamilyName,
-                        typeName = titleblock.Name,
-                        fullName = $"{titleblock.FamilyName}: {titleblock.Name}",
-                        usageCount = mostUsed.Value,
-                        totalSheetsAnalyzed = existingSheets.Count,
-                        message = $"Detected '{titleblock.FamilyName}: {titleblock.Name}' as the most used titleblock ({mostUsed.Value} of {existingSheets.Count} sheets)"
-                    });
+                    return ResponseBuilder.Success()
+                        .With("found", true)
+                        .With("titleblockId", (int)titleblock.Id.Value)
+                        .With("familyName", titleblock.FamilyName)
+                        .With("typeName", titleblock.Name)
+                        .With("fullName", $"{titleblock.FamilyName}: {titleblock.Name}")
+                        .With("usageCount", mostUsed.Value)
+                        .With("totalSheetsAnalyzed", existingSheets.Count)
+                        .WithMessage($"Detected '{titleblock.FamilyName}: {titleblock.Name}' as the most used titleblock ({mostUsed.Value} of {existingSheets.Count} sheets)")
+                        .Build();
                 }
                 else
                 {
@@ -2057,28 +1971,24 @@ namespace RevitMCPBridge
 
                     if (firstAvailable != null)
                     {
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = true,
-                            found = true,
-                            titleblockId = (int)firstAvailable.Id.Value,
-                            familyName = firstAvailable.FamilyName,
-                            typeName = firstAvailable.Name,
-                            fullName = $"{firstAvailable.FamilyName}: {firstAvailable.Name}",
-                            usageCount = 0,
-                            totalSheetsAnalyzed = existingSheets.Count,
-                            message = "No existing sheets with titleblocks found. Using first available titleblock.",
-                            warning = "No reference sheets found - consider checking if existing sheets have titleblocks"
-                        });
+                        return ResponseBuilder.Success()
+                            .With("found", true)
+                            .With("titleblockId", (int)firstAvailable.Id.Value)
+                            .With("familyName", firstAvailable.FamilyName)
+                            .With("typeName", firstAvailable.Name)
+                            .With("fullName", $"{firstAvailable.FamilyName}: {firstAvailable.Name}")
+                            .With("usageCount", 0)
+                            .With("totalSheetsAnalyzed", existingSheets.Count)
+                            .WithMessage("No existing sheets with titleblocks found. Using first available titleblock.")
+                            .With("warning", "No reference sheets found - consider checking if existing sheets have titleblocks")
+                            .Build();
                     }
                     else
                     {
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = true,
-                            found = false,
-                            message = "No titleblocks found in project. Please load a titleblock family first."
-                        });
+                        return ResponseBuilder.Success()
+                            .With("found", false)
+                            .WithMessage("No titleblocks found in project. Please load a titleblock family first.")
+                            .Build();
                     }
                 }
             }
@@ -2109,7 +2019,7 @@ namespace RevitMCPBridge
 
                 if (parameters?["sheetId"] == null)
                 {
-                    return JsonConvert.SerializeObject(new { success = false, error = "sheetId is required" });
+                    return ResponseBuilder.Error("sheetId is required", "MISSING_PARAMETER").Build();
                 }
 
                 var sheetId = new ElementId(int.Parse(parameters["sheetId"].ToString()));
@@ -2117,7 +2027,7 @@ namespace RevitMCPBridge
 
                 if (sheet == null)
                 {
-                    return JsonConvert.SerializeObject(new { success = false, error = "Sheet not found" });
+                    return ResponseBuilder.Error("Sheet not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 // Get title block to determine sheet size
@@ -2257,15 +2167,11 @@ namespace RevitMCPBridge
                     }
                 }
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    sheetId = (int)sheetId.Value,
-                    sheetNumber = sheet.SheetNumber,
-                    sheetName = sheet.Name,
-
-                    // Sheet bounds (origin at bottom-left)
-                    sheet = new
+                return ResponseBuilder.Success()
+                    .With("sheetId", (int)sheetId.Value)
+                    .With("sheetNumber", sheet.SheetNumber)
+                    .With("sheetName", sheet.Name)
+                    .With("sheet", new
                     {
                         origin = new { x = Math.Round(minX, 4), y = Math.Round(minY, 4) },
                         bounds = new
@@ -2287,10 +2193,8 @@ namespace RevitMCPBridge
                             x = Math.Round((minX + maxX) / 2.0, 4),
                             y = Math.Round((minY + maxY) / 2.0, 4)
                         }
-                    },
-
-                    // Printable area (inside margins)
-                    printableArea = new
+                    })
+                    .With("printableArea", new
                     {
                         bounds = new
                         {
@@ -2311,24 +2215,18 @@ namespace RevitMCPBridge
                             x = Math.Round((printMinX + printMaxX) / 2.0, 4),
                             y = Math.Round((printMinY + printMaxY) / 2.0, 4)
                         }
-                    },
-
-                    // 9-zone grid for placement targeting
-                    zones = zones,
-
-                    // Existing viewports
-                    viewports = existingViewports,
-                    viewportCount = existingViewports.Count,
-
-                    // Instructions for placement
-                    instructions = new
+                    })
+                    .With("zones", zones)
+                    .With("viewports", existingViewports)
+                    .With("viewportCount", existingViewports.Count)
+                    .With("instructions", new
                     {
                         coordinateSystem = "Origin (0,0) is at bottom-left corner of sheet. Coordinates are in FEET.",
                         placementMethod = "Use placeViewOnSheetSmart with targetZone OR targetCenter for accurate placement.",
                         zoneLayout = "Zones numbered like phone keypad: 1-3 bottom, 4-6 middle, 7-9 top. L=Left, C=Center, R=Right.",
                         viewportCenter = "Viewport placement uses CENTER point - the view extends equally in all directions from this center."
-                    }
-                });
+                    })
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -2360,9 +2258,9 @@ namespace RevitMCPBridge
 
                 // Validate required parameters
                 if (parameters["sheetId"] == null)
-                    return JsonConvert.SerializeObject(new { success = false, error = "sheetId is required" });
+                    return ResponseBuilder.Error("sheetId is required", "MISSING_PARAMETER").Build();
                 if (parameters["viewId"] == null)
-                    return JsonConvert.SerializeObject(new { success = false, error = "viewId is required" });
+                    return ResponseBuilder.Error("viewId is required", "MISSING_PARAMETER").Build();
 
                 var sheetId = new ElementId(int.Parse(parameters["sheetId"].ToString()));
                 var viewId = new ElementId(int.Parse(parameters["viewId"].ToString()));
@@ -2370,7 +2268,7 @@ namespace RevitMCPBridge
 
                 var sheet = doc.GetElement(sheetId) as ViewSheet;
                 if (sheet == null)
-                    return JsonConvert.SerializeObject(new { success = false, error = "Sheet not found" });
+                    return ResponseBuilder.Error("Sheet not found", "ELEMENT_NOT_FOUND").Build();
 
                 // AUTO-SWITCH: Switch to the sheet before working on it (default: true)
                 bool switchTo = parameters["switchTo"]?.Value<bool>() ?? true;
@@ -2381,7 +2279,7 @@ namespace RevitMCPBridge
 
                 var view = doc.GetElement(viewId) as View;
                 if (view == null)
-                    return JsonConvert.SerializeObject(new { success = false, error = "View not found" });
+                    return ResponseBuilder.Error("View not found", "ELEMENT_NOT_FOUND").Build();
 
                 // Check if view can be placed
                 if (!Viewport.CanAddViewToSheet(doc, sheetId, viewId))
@@ -2396,7 +2294,7 @@ namespace RevitMCPBridge
                         var existingSheet = doc.GetElement(existingVp.SheetId) as ViewSheet;
                         reason = $"View already placed on sheet '{existingSheet?.SheetNumber}'";
                     }
-                    return JsonConvert.SerializeObject(new { success = false, error = reason });
+                    return ResponseBuilder.Error(reason, "OPERATION_FAILED").Build();
                 }
 
                 // Get sheet dimensions from title block
@@ -2556,21 +2454,19 @@ namespace RevitMCPBridge
                 // If validate only, return without placing
                 if (validateOnly)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        validateOnly = true,
-                        sheetId = (int)sheetId.Value,
-                        viewId = (int)viewId.Value,
-                        viewName = view.Name,
-                        viewScale = viewScale,
-                        target = new
+                    return ResponseBuilder.Success()
+                        .With("validateOnly", true)
+                        .With("sheetId", (int)sheetId.Value)
+                        .With("viewId", (int)viewId.Value)
+                        .With("viewName", view.Name)
+                        .With("viewScale", viewScale)
+                        .With("target", new
                         {
                             description = targetDescription,
                             centerX = Math.Round(targetX, 4),
                             centerY = Math.Round(targetY, 4)
-                        },
-                        predictedViewport = new
+                        })
+                        .With("predictedViewport", new
                         {
                             bounds = new
                             {
@@ -2586,15 +2482,15 @@ namespace RevitMCPBridge
                                 widthInches = Math.Round(viewSheetWidth * 12, 2),
                                 heightInches = Math.Round(viewSheetHeight * 12, 2)
                             }
-                        },
-                        sheet = new
+                        })
+                        .With("sheet", new
                         {
                             bounds = new { minX = sheetMinX, minY = sheetMinY, maxX = sheetMaxX, maxY = sheetMaxY },
                             widthInches = Math.Round(sheetWidth * 12, 2),
                             heightInches = Math.Round(sheetHeight * 12, 2)
-                        },
-                        validation = validation
-                    });
+                        })
+                        .With("validation", validation)
+                        .Build();
                 }
 
                 // Actually place the viewport
@@ -2617,22 +2513,15 @@ namespace RevitMCPBridge
                     catch (Exception createEx)
                     {
                         trans.RollBack();
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = false,
-                            error = $"Viewport.Create failed: {createEx.Message}",
-                            targetCenter = new { x = targetX, y = targetY }
-                        });
+                        return ResponseBuilder.Error($"Viewport.Create failed: {createEx.Message}", "OPERATION_FAILED")
+                            .With("targetCenter", new { x = targetX, y = targetY })
+                            .Build();
                     }
 
                     if (viewport == null)
                     {
                         trans.RollBack();
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = false,
-                            error = "Viewport.Create returned null"
-                        });
+                        return ResponseBuilder.Error("Viewport.Create returned null", "VALIDATION_ERROR").Build();
                     }
 
                     // Check if Revit placed it at the wrong location and correct it
@@ -2669,20 +2558,18 @@ namespace RevitMCPBridge
                     bool actuallyOnSheet = finalVpMinX >= sheetMinX && finalVpMinY >= sheetMinY &&
                                           finalVpMaxX <= sheetMaxX && finalVpMaxY <= sheetMaxY;
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        viewportId = (int)viewport.Id.Value,
-                        sheetId = (int)sheetId.Value,
-                        viewId = (int)viewId.Value,
-                        viewName = view.Name,
-                        viewScale = viewScale,
-                        target = new
+                    return ResponseBuilder.Success()
+                        .With("viewportId", (int)viewport.Id.Value)
+                        .With("sheetId", (int)sheetId.Value)
+                        .With("viewId", (int)viewId.Value)
+                        .With("viewName", view.Name)
+                        .With("viewScale", viewScale)
+                        .With("target", new
                         {
                             description = targetDescription,
                             requestedCenter = new { x = Math.Round(targetX, 4), y = Math.Round(targetY, 4) }
-                        },
-                        actualPlacement = new
+                        })
+                        .With("actualPlacement", new
                         {
                             center = new
                             {
@@ -2701,11 +2588,11 @@ namespace RevitMCPBridge
                                 widthInches = Math.Round((actualOutline.MaximumPoint.X - actualOutline.MinimumPoint.X) * 12, 2),
                                 heightInches = Math.Round((actualOutline.MaximumPoint.Y - actualOutline.MinimumPoint.Y) * 12, 2)
                             }
-                        },
-                        positionCorrected = positionCorrected,
-                        validation = validation,
-                        isOnSheet = actuallyOnSheet
-                    });
+                        })
+                        .With("positionCorrected", positionCorrected)
+                        .With("validation", validation)
+                        .With("isOnSheet", actuallyOnSheet)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -2772,11 +2659,11 @@ namespace RevitMCPBridge
                 }
                 else
                 {
-                    return JsonConvert.SerializeObject(new { success = false, error = "Either sheetId or sheetNumber is required" });
+                    return ResponseBuilder.Error("Either sheetId or sheetNumber is required", "MISSING_PARAMETER").Build();
                 }
 
                 if (sheet == null)
-                    return JsonConvert.SerializeObject(new { success = false, error = "Sheet not found" });
+                    return ResponseBuilder.Error("Sheet not found", "ELEMENT_NOT_FOUND").Build();
 
                 // If no viewIds provided, auto-find unplaced views based on requested type
                 int[] viewIdArray = null;
@@ -2923,7 +2810,7 @@ namespace RevitMCPBridge
                     }
 
                     if (unplacedViews.Count == 0)
-                        return JsonConvert.SerializeObject(new { success = false, error = $"No unplaced {viewTypeDescription} views found" });
+                        return ResponseBuilder.Error($"No unplaced {viewTypeDescription} views found", "VALIDATION_ERROR").Build();
 
                     // FEATURE 1: Content-aware filtering by keywords
                     string contentFilter = parameters["contentFilter"]?.ToString() ?? "";
@@ -2936,10 +2823,7 @@ namespace RevitMCPBridge
                             .ToList();
 
                         if (unplacedViews.Count == 0)
-                            return JsonConvert.SerializeObject(new {
-                                success = false,
-                                error = $"No unplaced {viewTypeDescription} views found matching '{contentFilter}'"
-                            });
+                            return ResponseBuilder.Error($"No unplaced {viewTypeDescription} views found matching '{contentFilter}'", "VALIDATION_ERROR").Build();
                     }
 
                     // FEATURE 2: Group by naming pattern (keeps STAIR 1, STAIR 2, STAIR 3 together)
@@ -2960,7 +2844,7 @@ namespace RevitMCPBridge
                 }
 
                 if (viewIdArray == null || viewIdArray.Length == 0)
-                    return JsonConvert.SerializeObject(new { success = false, error = "No views to place" });
+                    return ResponseBuilder.Error("No views to place", "VALIDATION_ERROR").Build();
 
                 // Check for count limit - randomly select if count is specified
                 int requestedCount = parameters["count"]?.Value<int>() ?? 0;
@@ -3335,15 +3219,14 @@ namespace RevitMCPBridge
                     trans.Commit();
                 }
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = placements.Count > 0,
-                    sheetId = (int)sheetId.Value,
-                    sheetNumber = sheet.SheetNumber,
-                    totalRequested = viewIdArray.Length,
-                    placedCount = placements.Count,
-                    errorCount = errors.Count,
-                    layout = new
+                return ResponseBuilder.Success()
+                    .With("success", placements.Count > 0)
+                    .With("sheetId", (int)sheetId.Value)
+                    .With("sheetNumber", sheet.SheetNumber)
+                    .With("totalRequested", viewIdArray.Length)
+                    .With("placedCount", placements.Count)
+                    .With("errorCount", errors.Count)
+                    .With("layout", new
                     {
                         preset = layoutUsed,
                         columns = columns,
@@ -3358,10 +3241,10 @@ namespace RevitMCPBridge
                             avgViewHeightInches = Math.Round(avgViewHeight * 12, 2),
                             calculatedCapacity = sizeAwareCapacity
                         }
-                    },
-                    boundaryDetection = new
+                    })
+                    .With("boundaryDetection", new
                     {
-                        source = boundarySource, // "titleblock", "guidegrid", "inferred", "default"
+                        source = boundarySource,
                         edgeMarginInches = edgeMarginInches,
                         marginBetweenViewsInches = Math.Round(marginBetweenViews * 12, 2),
                         printableArea = new
@@ -3373,20 +3256,19 @@ namespace RevitMCPBridge
                             widthInches = Math.Round(fullPrintWidth * 12, 2),
                             heightInches = Math.Round(fullPrintHeight * 12, 2)
                         }
-                    },
-                    availableLayouts = new[]
+                    })
+                    .With("availableLayouts", new[]
                     {
                         "auto", "row", "column",
                         "grid-2x2", "grid-2x3", "grid-3x2", "grid-3x3", "grid-4x3", "grid-4x4",
                         "left-column", "right-column", "top-row", "bottom-row"
-                    },
-                    placements = placements,
-                    errors = errors.Count > 0 ? errors : null,
-                    // FEATURE 5: Learning data - Claude should store successful patterns in memory
-                    learnableOutcome = placements.Count > 0 ? new
+                    })
+                    .With("placements", placements)
+                    .With("errors", errors.Count > 0 ? errors : null)
+                    .With("learnableOutcome", placements.Count > 0 ? new
                     {
                         success = true,
-                        sheetType = sheet.SheetNumber.Substring(0, Math.Min(2, sheet.SheetNumber.Length)), // e.g., "A6" for detail sheets
+                        sheetType = sheet.SheetNumber.Substring(0, Math.Min(2, sheet.SheetNumber.Length)),
                         viewCount = placements.Count,
                         effectiveLayout = layoutUsed,
                         effectiveColumns = columns,
@@ -3394,10 +3276,9 @@ namespace RevitMCPBridge
                         marginUsed = Math.Round(marginBetweenViews * 12, 2),
                         startPositionUsed = startPosition,
                         contentFilterUsed = parameters["contentFilter"]?.ToString() ?? "",
-                        // Hints for Claude to store as preferences
                         suggestedMemory = $"For {sheet.SheetNumber.Substring(0, Math.Min(2, sheet.SheetNumber.Length))} sheets with {placements.Count} views, user's successful layout: {layoutUsed}, spacing: {Math.Round(marginBetweenViews * 12, 2)}in"
-                    } : null
-                });
+                    } : null)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -3418,41 +3299,25 @@ namespace RevitMCPBridge
                 // Required parameters
                 if (parameters["viewId"] == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "viewId is required (sheet or view to place image on)"
-                    });
+                    return ResponseBuilder.Error("viewId is required (sheet or view to place image on)", "MISSING_PARAMETER").Build();
                 }
 
                 if (parameters["imagePath"] == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "imagePath is required (full path to image file)"
-                    });
+                    return ResponseBuilder.Error("imagePath is required (full path to image file)", "MISSING_PARAMETER").Build();
                 }
 
                 var viewId = new ElementId(int.Parse(parameters["viewId"].ToString()));
                 var view = doc.GetElement(viewId) as View;
                 if (view == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "View not found with specified viewId"
-                    });
+                    return ResponseBuilder.Error("View not found with specified viewId", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 var imagePath = parameters["imagePath"].ToString();
                 if (!System.IO.File.Exists(imagePath))
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = $"Image file not found: {imagePath}"
-                    });
+                    return ResponseBuilder.Error($"Image file not found: {imagePath}", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 // Optional position (defaults to center of view)
@@ -3482,24 +3347,22 @@ namespace RevitMCPBridge
                     double widthFeet = bbox != null ? bbox.Max.X - bbox.Min.X : 0;
                     double heightFeet = bbox != null ? bbox.Max.Y - bbox.Min.Y : 0;
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        imageInstanceId = (int)imageInstance.Id.Value,
-                        imageTypeId = (int)imageType.Id.Value,
-                        viewId = (int)view.Id.Value,
-                        viewName = view.Name,
-                        imagePath = imagePath,
-                        position = new { x, y },
-                        size = new
+                    return ResponseBuilder.Success()
+                        .With("imageInstanceId", (int)imageInstance.Id.Value)
+                        .With("imageTypeId", (int)imageType.Id.Value)
+                        .With("viewId", (int)view.Id.Value)
+                        .With("viewName", view.Name)
+                        .With("imagePath", imagePath)
+                        .With("position", new { x, y })
+                        .With("size", new
                         {
                             widthFeet,
                             heightFeet,
                             widthInches = Math.Round(widthFeet * 12, 2),
                             heightInches = Math.Round(heightFeet * 12, 2)
-                        },
-                        message = "Image imported successfully"
-                    });
+                        })
+                        .WithMessage("Image imported successfully")
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -3520,22 +3383,14 @@ namespace RevitMCPBridge
 
                 if (parameters["imageId"] == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "imageId is required"
-                    });
+                    return ResponseBuilder.Error("imageId is required", "MISSING_PARAMETER").Build();
                 }
 
                 var imageId = new ElementId(int.Parse(parameters["imageId"].ToString()));
                 var imageInstance = doc.GetElement(imageId) as ImageInstance;
                 if (imageInstance == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Image instance not found"
-                    });
+                    return ResponseBuilder.Error("Image instance not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 using (var trans = new Transaction(doc, "Move Image"))
@@ -3577,12 +3432,10 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        imageId = (int)imageInstance.Id.Value,
-                        message = "Image moved successfully"
-                    });
+                    return ResponseBuilder.Success()
+                        .With("imageId", (int)imageInstance.Id.Value)
+                        .WithMessage("Image moved successfully")
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -3603,11 +3456,7 @@ namespace RevitMCPBridge
 
                 if (parameters["imageId"] == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "imageId is required"
-                    });
+                    return ResponseBuilder.Error("imageId is required", "MISSING_PARAMETER").Build();
                 }
 
                 var imageId = new ElementId(int.Parse(parameters["imageId"].ToString()));
@@ -3618,12 +3467,10 @@ namespace RevitMCPBridge
                     doc.Delete(imageId);
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        deletedImageId = (int)imageId.Value,
-                        message = "Image deleted successfully"
-                    });
+                    return ResponseBuilder.Success()
+                        .With("deletedImageId", (int)imageId.Value)
+                        .WithMessage("Image deleted successfully")
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -3645,20 +3492,12 @@ namespace RevitMCPBridge
 
                 if (parameters["sourceViewId"] == null || parameters["targetViewId"] == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "sourceViewId and targetViewId are required"
-                    });
+                    return ResponseBuilder.Error("sourceViewId and targetViewId are required", "VALIDATION_ERROR").Build();
                 }
 
                 if (parameters["elementIds"] == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "elementIds array is required"
-                    });
+                    return ResponseBuilder.Error("elementIds array is required", "MISSING_PARAMETER").Build();
                 }
 
                 var sourceViewId = new ElementId(int.Parse(parameters["sourceViewId"].ToString()));
@@ -3671,11 +3510,7 @@ namespace RevitMCPBridge
 
                 if (sourceView == null || targetView == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Source or target view not found"
-                    });
+                    return ResponseBuilder.Error("Source or target view not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 using (var trans = new Transaction(doc, "Copy Elements to Sheet"))
@@ -3696,15 +3531,13 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        sourceViewId = (int)sourceViewId.Value,
-                        targetViewId = (int)targetViewId.Value,
-                        originalCount = elementIds.Count,
-                        copiedCount = copiedIds.Count,
-                        copiedIds = copiedIds.Select(id => (int)id.Value).ToArray()
-                    });
+                    return ResponseBuilder.Success()
+                        .With("sourceViewId", (int)sourceViewId.Value)
+                        .With("targetViewId", (int)targetViewId.Value)
+                        .With("originalCount", elementIds.Count)
+                        .With("copiedCount", copiedIds.Count)
+                        .With("copiedIds", copiedIds.Select(id => (int)id.Value).ToArray())
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -3725,20 +3558,12 @@ namespace RevitMCPBridge
 
                 if (parameters["textNoteId"] == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "textNoteId is required"
-                    });
+                    return ResponseBuilder.Error("textNoteId is required", "MISSING_PARAMETER").Build();
                 }
 
                 if (parameters["text"] == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "text is required"
-                    });
+                    return ResponseBuilder.Error("text is required", "MISSING_PARAMETER").Build();
                 }
 
                 var textNoteId = new ElementId(int.Parse(parameters["textNoteId"].ToString()));
@@ -3747,11 +3572,7 @@ namespace RevitMCPBridge
                 var textNote = doc.GetElement(textNoteId) as TextNote;
                 if (textNote == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "TextNote not found with ID: " + textNoteId.Value
-                    });
+                    return ResponseBuilder.Error("TextNote not found with ID: " + textNoteId.Value, "ELEMENT_NOT_FOUND").Build();
                 }
 
                 var oldText = textNote.Text;
@@ -3762,13 +3583,11 @@ namespace RevitMCPBridge
                     textNote.Text = newText;
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        textNoteId = (int)textNoteId.Value,
-                        oldText = oldText,
-                        newText = newText
-                    });
+                    return ResponseBuilder.Success()
+                        .With("textNoteId", (int)textNoteId.Value)
+                        .With("oldText", oldText)
+                        .With("newText", newText)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -3814,11 +3633,7 @@ namespace RevitMCPBridge
 
                 if (sheetIds.Count == 0)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No sheets to export"
-                    });
+                    return ResponseBuilder.Error("No sheets to export", "VALIDATION_ERROR").Build();
                 }
 
                 // Output folder
@@ -3979,17 +3794,15 @@ namespace RevitMCPBridge
                     }
                 }
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    outputFolder = outputFolder,
-                    combine = combineIntoOne,
-                    exportedCount = exportedFiles.Count,
-                    failedCount = failedSheets.Count,
-                    exportedFiles = exportedFiles,
-                    failedSheets = failedSheets,
-                    allPdfs = pdfFiles
-                });
+                return ResponseBuilder.Success()
+                    .With("outputFolder", outputFolder)
+                    .With("combine", combineIntoOne)
+                    .With("exportedCount", exportedFiles.Count)
+                    .With("failedCount", failedSheets.Count)
+                    .With("exportedFiles", exportedFiles)
+                    .With("failedSheets", failedSheets)
+                    .With("allPdfs", pdfFiles)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -4173,10 +3986,8 @@ namespace RevitMCPBridge
                     .ToList();
 
                 // ===== BUILD RESPONSE =====
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    projectInfo = new
+                return ResponseBuilder.Success()
+                    .With("projectInfo", new
                     {
                         name = projectName,
                         path = projectPath,
@@ -4184,8 +3995,8 @@ namespace RevitMCPBridge
                         viewCount = allViews.Count,
                         legendCount = legends.Count,
                         scheduleCount = schedules.Count
-                    },
-                    textStandards = new
+                    })
+                    .With("textStandards", new
                     {
                         allStyles = textStyles,
                         recommended = new
@@ -4195,8 +4006,8 @@ namespace RevitMCPBridge
                             largeText = largeTextStyle != null ? new { largeTextStyle.id, largeTextStyle.name, largeTextStyle.textSizeFraction, largeTextStyle.fontName } : null
                         },
                         primaryFont = textStyles.Where(t => t.usageCount > 0).GroupBy(t => t.fontName).OrderByDescending(g => g.Sum(t => t.usageCount)).FirstOrDefault()?.Key ?? "Unknown"
-                    },
-                    sheetStandards = new
+                    })
+                    .With("sheetStandards", new
                     {
                         primaryTitleblock = primaryTbSymbol != null ? new
                         {
@@ -4208,22 +4019,22 @@ namespace RevitMCPBridge
                         numberingPattern = numberingPattern,
                         existingSheetNumbers = sheetNumbers.Take(10).ToList(),
                         totalSheets = sheets.Count
-                    },
-                    legends = legends,
-                    schedules = schedules.Take(20).ToList(),
-                    viewOrganization = new
+                    })
+                    .With("legends", legends)
+                    .With("schedules", schedules.Take(20).ToList())
+                    .With("viewOrganization", new
                     {
                         byType = viewsByType,
                         templates = viewTemplates
-                    },
-                    dimensionTypes = dimTypes.Take(10).ToList(),
-                    instructions = new
+                    })
+                    .With("dimensionTypes", dimTypes.Take(10).ToList())
+                    .With("instructions", new
                     {
                         textPlacement = "Use the recommended text styles based on usage frequency. Small for notes (3/32\"), Medium for labels (3/16\"), Large for titles (1/4\").",
                         sheetCreation = "Use createSheetAuto to match existing titleblock. Follow the detected numbering pattern.",
                         consistency = "Always match the primary font and text sizes used in this project."
-                    }
-                }, Formatting.Indented);
+                    })
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -4264,20 +4075,12 @@ namespace RevitMCPBridge
 
                 if (string.IsNullOrEmpty(sheetNumber))
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "sheetNumber is required"
-                    });
+                    return ResponseBuilder.Error("sheetNumber is required", "MISSING_PARAMETER").Build();
                 }
 
                 if (string.IsNullOrEmpty(sheetName))
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "sheetName is required"
-                    });
+                    return ResponseBuilder.Error("sheetName is required", "MISSING_PARAMETER").Build();
                 }
 
                 // Get all existing sheets and their titleblocks
@@ -4338,11 +4141,7 @@ namespace RevitMCPBridge
 
                 if (selectedTitleblock == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No titleblock found in project"
-                    });
+                    return ResponseBuilder.Error("No titleblock found in project", "VALIDATION_ERROR").Build();
                 }
 
                 using (var trans = new Transaction(doc, "Create Sheet (Auto)"))
@@ -4382,28 +4181,26 @@ namespace RevitMCPBridge
                         }
                     }
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        sheetId = (int)sheet.Id.Value,
-                        sheetNumber = sheet.SheetNumber,
-                        sheetName = sheet.Name,
-                        titleblock = new
+                    return ResponseBuilder.Success()
+                        .With("sheetId", (int)sheet.Id.Value)
+                        .With("sheetNumber", sheet.SheetNumber)
+                        .With("sheetName", sheet.Name)
+                        .With("titleblock", new
                         {
                             id = (int)selectedTitleblock.Id.Value,
                             familyName = selectedTitleblock.FamilyName,
                             typeName = selectedTitleblock.Name,
                             usedBy = maxUsage > 0 ? $"{maxUsage} other sheets" : "default (no existing sheets)"
-                        },
-                        sheetSize = new
+                        })
+                        .With("sheetSize", new
                         {
                             widthFeet = Math.Round(sheetWidth, 4),
                             heightFeet = Math.Round(sheetHeight, 4),
                             widthInches = Math.Round(sheetWidth * 12, 2),
                             heightInches = Math.Round(sheetHeight * 12, 2)
-                        },
-                        message = "Sheet created with auto-detected titleblock"
-                    });
+                        })
+                        .WithMessage("Sheet created with auto-detected titleblock")
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -4565,11 +4362,7 @@ namespace RevitMCPBridge
 
                 if (selectedTitleblock == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No titleblock found in project"
-                    });
+                    return ResponseBuilder.Error("No titleblock found in project", "VALIDATION_ERROR").Build();
                 }
 
                 // Create sheets
@@ -4639,18 +4432,17 @@ namespace RevitMCPBridge
                     trans.Commit();
                 }
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = createdSheets.Count > 0,
-                    createdCount = createdSheets.Count,
-                    requestedCount = count,
-                    discipline = discipline,
-                    detectedPattern = numberFormat.Replace("{0}", discipline).Replace("{1:D3}", "###"),
-                    titleblock = selectedTitleblock.FamilyName + ": " + selectedTitleblock.Name,
-                    sheets = createdSheets,
-                    errors = errors.Count > 0 ? errors : null,
-                    message = $"Created {createdSheets.Count} {discipline} sheet(s)"
-                });
+                var result = ResponseBuilder.Success()
+                    .With("createdCount", createdSheets.Count)
+                    .With("requestedCount", count)
+                    .With("discipline", discipline)
+                    .With("detectedPattern", numberFormat.Replace("{0}", discipline).Replace("{1:D3}", "###"))
+                    .With("titleblock", selectedTitleblock.FamilyName + ": " + selectedTitleblock.Name)
+                    .With("sheets", createdSheets)
+                    .WithMessage($"Created {createdSheets.Count} {discipline} sheet(s)");
+                if (errors.Count > 0)
+                    result.With("errors", errors);
+                return result.Build();
             }
             catch (Exception ex)
             {
@@ -4698,19 +4490,13 @@ namespace RevitMCPBridge
 
                 if (createResponse["success"]?.Value<bool>() != true)
                 {
-                    return JsonConvert.SerializeObject(new {
-                        success = false,
-                        error = "Failed to create sheets: " + (createResponse["error"]?.ToString() ?? "Unknown error")
-                    });
+                    return ResponseBuilder.Error("Failed to create sheets: " + (createResponse["error"]?.ToString() ?? "Unknown error"), "OPERATION_FAILED").Build();
                 }
 
                 var createdSheets = createResponse["sheets"] as JArray;
                 if (createdSheets == null || createdSheets.Count == 0)
                 {
-                    return JsonConvert.SerializeObject(new {
-                        success = false,
-                        error = "No sheets were created"
-                    });
+                    return ResponseBuilder.Error("No sheets were created", "VALIDATION_ERROR").Build();
                 }
 
                 // Step 2: Add details to each created sheet
@@ -4753,16 +4539,15 @@ namespace RevitMCPBridge
                 int totalSheetsCreated = createdSheets.Count;
                 int totalDetailsPlaced = results.Sum(r => ((dynamic)r).detailsPlaced);
 
-                return JsonConvert.SerializeObject(new {
-                    success = true,
-                    sheetsCreated = totalSheetsCreated,
-                    totalDetailsPlaced = totalDetailsPlaced,
-                    detailsPerSheet = detailsPerSheet,
-                    discipline = discipline,
-                    results = results,
-                    errors = errors.Count > 0 ? errors : null,
-                    message = $"Created {totalSheetsCreated} {discipline} sheets with {totalDetailsPlaced} total details placed"
-                });
+                return ResponseBuilder.Success()
+                    .With("sheetsCreated", totalSheetsCreated)
+                    .With("totalDetailsPlaced", totalDetailsPlaced)
+                    .With("detailsPerSheet", detailsPerSheet)
+                    .With("discipline", discipline)
+                    .With("results", results)
+                    .With("errors", errors.Count > 0 ? errors : null)
+                    .WithMessage($"Created {totalSheetsCreated} {discipline} sheets with {totalDetailsPlaced} total details placed")
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -4785,20 +4570,12 @@ namespace RevitMCPBridge
 
                 if (parameters["sheetId"] == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "sheetId is required"
-                    });
+                    return ResponseBuilder.Error("sheetId is required", "MISSING_PARAMETER").Build();
                 }
 
                 if (parameters["titleBlockId"] == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "titleBlockId is required"
-                    });
+                    return ResponseBuilder.Error("titleBlockId is required", "MISSING_PARAMETER").Build();
                 }
 
                 var sheetId = new ElementId(int.Parse(parameters["sheetId"].ToString()));
@@ -4807,22 +4584,14 @@ namespace RevitMCPBridge
                 var sheet = doc.GetElement(sheetId) as ViewSheet;
                 if (sheet == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Sheet not found"
-                    });
+                    return ResponseBuilder.Error("Sheet not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 // Verify the new titleblock type exists
                 var newTitleBlockType = doc.GetElement(newTitleBlockId) as FamilySymbol;
                 if (newTitleBlockType == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "TitleBlock type not found with specified ID"
-                    });
+                    return ResponseBuilder.Error("TitleBlock type not found with specified ID", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 // Find the existing titleblock instance on the sheet
@@ -4833,11 +4602,7 @@ namespace RevitMCPBridge
 
                 if (titleblockInstance == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No titleblock found on sheet"
-                    });
+                    return ResponseBuilder.Error("No titleblock found on sheet", "VALIDATION_ERROR").Build();
                 }
 
                 var oldTitleBlockId = titleblockInstance.Symbol.Id;
@@ -4871,25 +4636,23 @@ namespace RevitMCPBridge
                         newHeight = bbox.Max.Y - bbox.Min.Y;
                     }
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        sheetId = (int)sheetId.Value,
-                        sheetNumber = sheet.SheetNumber,
-                        sheetName = sheet.Name,
-                        oldTitleBlockId = (int)oldTitleBlockId.Value,
-                        oldTitleBlockName = oldTitleBlockName,
-                        newTitleBlockId = (int)newTitleBlockId.Value,
-                        newTitleBlockName = newTitleBlockType.FamilyName + ": " + newTitleBlockType.Name,
-                        newSheetSize = new
+                    return ResponseBuilder.Success()
+                        .With("sheetId", (int)sheetId.Value)
+                        .With("sheetNumber", sheet.SheetNumber)
+                        .With("sheetName", sheet.Name)
+                        .With("oldTitleBlockId", (int)oldTitleBlockId.Value)
+                        .With("oldTitleBlockName", oldTitleBlockName)
+                        .With("newTitleBlockId", (int)newTitleBlockId.Value)
+                        .With("newTitleBlockName", newTitleBlockType.FamilyName + ": " + newTitleBlockType.Name)
+                        .With("newSheetSize", new
                         {
                             widthFeet = Math.Round(newWidth, 4),
                             heightFeet = Math.Round(newHeight, 4),
                             widthInches = Math.Round(newWidth * 12, 2),
                             heightInches = Math.Round(newHeight * 12, 2)
-                        },
-                        message = "TitleBlock changed successfully"
-                    });
+                        })
+                        .WithMessage("TitleBlock changed successfully")
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -4995,15 +4758,13 @@ namespace RevitMCPBridge
                     trans.Commit();
                 }
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    sheetsProcessed = sheets.Count,
-                    sheetsUpdated = updatedCount,
-                    totalParameterUpdates = parameterUpdates,
-                    projectData = projectData,
-                    results = results
-                });
+                return ResponseBuilder.Success()
+                    .With("sheetsProcessed", sheets.Count)
+                    .With("sheetsUpdated", updatedCount)
+                    .With("totalParameterUpdates", parameterUpdates)
+                    .With("projectData", projectData)
+                    .With("results", results)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -5107,25 +4868,23 @@ namespace RevitMCPBridge
                     canExportPDF = false;
                 }
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    sheetsFound = sheetsToProcess.Count,
-                    sheetIds = viewIds.Select(id => id.Value).ToList(),
-                    canExportPDF = canExportPDF,
-                    outputFolder = outputFolder ?? "Use Revit's default PDF folder",
-                    exportSettings = new
+                return ResponseBuilder.Success()
+                    .With("sheetsFound", sheetsToProcess.Count)
+                    .With("sheetIds", viewIds.Select(id => id.Value).ToList())
+                    .With("canExportPDF", canExportPDF)
+                    .With("outputFolder", outputFolder ?? "Use Revit's default PDF folder")
+                    .With("exportSettings", new
                     {
                         exportToPDF = exportToPDF,
                         combinePDF = combinePDF,
                         fileNamePattern = fileNamePattern
-                    },
-                    sheets = exportResults,
-                    note = "To execute print: Use Revit's Print dialog or File > Export > PDF. Sheet IDs provided for batch selection.",
-                    apiNote = canExportPDF
+                    })
+                    .With("sheets", exportResults)
+                    .With("note", "To execute print: Use Revit's Print dialog or File > Export > PDF. Sheet IDs provided for batch selection.")
+                    .With("apiNote", canExportPDF
                         ? "PDF export API available in Revit 2022+. Use doc.Export() with PDFExportOptions."
-                        : "PDF export requires manual configuration through Revit UI."
-                });
+                        : "PDF export requires manual configuration through Revit UI.")
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -5155,11 +4914,7 @@ namespace RevitMCPBridge
 
                 if (parameters["sheetId"] == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "sheetId is required"
-                    });
+                    return ResponseBuilder.Error("sheetId is required", "MISSING_PARAMETER").Build();
                 }
 
                 int sheetIdInt = parameters["sheetId"].ToObject<int>();
@@ -5168,11 +4923,7 @@ namespace RevitMCPBridge
 
                 if (sheet == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = $"Sheet with ID {sheetIdInt} not found"
-                    });
+                    return ResponseBuilder.Error($"Sheet with ID {sheetIdInt} not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 string strategy = parameters["strategy"]?.ToString()?.ToLower() ?? "grid";
@@ -5211,11 +4962,7 @@ namespace RevitMCPBridge
 
                 if (viewports.Count == 0)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No viewports found on sheet"
-                    });
+                    return ResponseBuilder.Error("No viewports found on sheet", "VALIDATION_ERROR").Build();
                 }
 
                 // Get viewport bounds
@@ -5354,24 +5101,22 @@ namespace RevitMCPBridge
                     trans.Commit();
                 }
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    sheetId = sheetIdInt,
-                    sheetNumber = sheet.SheetNumber,
-                    sheetName = sheet.Name,
-                    strategy = strategy,
-                    printableArea = new
+                return ResponseBuilder.Success()
+                    .With("sheetId", sheetIdInt)
+                    .With("sheetNumber", sheet.SheetNumber)
+                    .With("sheetName", sheet.Name)
+                    .With("strategy", strategy)
+                    .With("printableArea", new
                     {
                         width = printableWidth,
                         height = printableHeight,
                         margin = margin
-                    },
-                    viewportCount = viewports.Count,
-                    movedCount = movedCount,
-                    results = results,
-                    message = $"Arranged {movedCount} viewports using '{strategy}' strategy"
-                });
+                    })
+                    .With("viewportCount", viewports.Count)
+                    .With("movedCount", movedCount)
+                    .With("results", results)
+                    .WithMessage($"Arranged {movedCount} viewports using '{strategy}' strategy")
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -5400,7 +5145,7 @@ namespace RevitMCPBridge
                     // Get title block for specific sheet
                     var sheet = doc.GetElement(new ElementId(sheetIdInt.Value)) as ViewSheet;
                     if (sheet == null)
-                        return JsonConvert.SerializeObject(new { success = false, error = "Sheet not found" });
+                        return ResponseBuilder.Error("Sheet not found", "ELEMENT_NOT_FOUND").Build();
 
                     var titleBlocks = new FilteredElementCollector(doc, sheet.Id)
                         .OfCategory(BuiltInCategory.OST_TitleBlocks)
@@ -5429,12 +5174,10 @@ namespace RevitMCPBridge
                     }
                 }
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    count = results.Count,
-                    titleBlocks = results
-                });
+                return ResponseBuilder.Success()
+                    .With("count", results.Count)
+                    .With("titleBlocks", results)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -5494,16 +5237,16 @@ namespace RevitMCPBridge
                 var doc = uiApp.ActiveUIDocument.Document;
 
                 if (parameters["titleBlockId"] == null)
-                    return JsonConvert.SerializeObject(new { success = false, error = "titleBlockId is required" });
+                    return ResponseBuilder.Error("titleBlockId is required", "MISSING_PARAMETER").Build();
                 if (parameters["updates"] == null)
-                    return JsonConvert.SerializeObject(new { success = false, error = "updates is required" });
+                    return ResponseBuilder.Error("updates is required", "MISSING_PARAMETER").Build();
 
                 int titleBlockIdInt = parameters["titleBlockId"].ToObject<int>();
                 var updates = parameters["updates"] as JObject;
 
                 var tb = doc.GetElement(new ElementId(titleBlockIdInt)) as FamilyInstance;
                 if (tb == null)
-                    return JsonConvert.SerializeObject(new { success = false, error = "Title block not found" });
+                    return ResponseBuilder.Error("Title block not found", "ELEMENT_NOT_FOUND").Build();
 
                 var updatedParams = new List<string>();
                 var failedParams = new List<object>();
@@ -5554,15 +5297,13 @@ namespace RevitMCPBridge
                     trans.Commit();
                 }
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    titleBlockId = titleBlockIdInt,
-                    updatedCount = updatedParams.Count,
-                    updated = updatedParams,
-                    failedCount = failedParams.Count,
-                    failed = failedParams
-                });
+                return ResponseBuilder.Success()
+                    .With("titleBlockId", titleBlockIdInt)
+                    .With("updatedCount", updatedParams.Count)
+                    .With("updated", updatedParams)
+                    .With("failedCount", failedParams.Count)
+                    .With("failed", failedParams)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -5581,7 +5322,7 @@ namespace RevitMCPBridge
                 var doc = uiApp.ActiveUIDocument.Document;
 
                 if (parameters["updates"] == null)
-                    return JsonConvert.SerializeObject(new { success = false, error = "updates is required" });
+                    return ResponseBuilder.Error("updates is required", "MISSING_PARAMETER").Build();
 
                 var updates = parameters["updates"] as JObject;
                 var sheetIds = parameters["sheetIds"]?.ToObject<int[]>();
@@ -5676,14 +5417,12 @@ namespace RevitMCPBridge
                     trans.Commit();
                 }
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    totalTitleBlocks = results.Count,
-                    successCount = successCount,
-                    errorCount = errorCount,
-                    results = results
-                });
+                return ResponseBuilder.Success()
+                    .With("totalTitleBlocks", results.Count)
+                    .With("successCount", successCount)
+                    .With("errorCount", errorCount)
+                    .With("results", results)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -5709,20 +5448,20 @@ namespace RevitMCPBridge
 
                 // Validate required parameters
                 if (parameters["sheetId"] == null)
-                    return JsonConvert.SerializeObject(new { success = false, error = "sheetId is required" });
+                    return ResponseBuilder.Error("sheetId is required", "MISSING_PARAMETER").Build();
                 if (parameters["viewId"] == null)
-                    return JsonConvert.SerializeObject(new { success = false, error = "viewId is required" });
+                    return ResponseBuilder.Error("viewId is required", "MISSING_PARAMETER").Build();
 
                 var sheetId = new ElementId(int.Parse(parameters["sheetId"].ToString()));
                 var viewId = new ElementId(int.Parse(parameters["viewId"].ToString()));
 
                 var sheet = doc.GetElement(sheetId) as ViewSheet;
                 if (sheet == null)
-                    return JsonConvert.SerializeObject(new { success = false, error = $"Sheet {sheetId.Value} not found" });
+                    return ResponseBuilder.Error($"Sheet {sheetId.Value} not found", "ELEMENT_NOT_FOUND").Build();
 
                 var view = doc.GetElement(viewId) as View;
                 if (view == null)
-                    return JsonConvert.SerializeObject(new { success = false, error = $"View {viewId.Value} not found" });
+                    return ResponseBuilder.Error($"View {viewId.Value} not found", "ELEMENT_NOT_FOUND").Build();
 
                 // Parse location
                 double x = 1.5, y = 1.0;
@@ -5795,21 +5534,15 @@ namespace RevitMCPBridge
                     if (existingVp != null)
                     {
                         var existingSheet = doc.GetElement(existingVp.SheetId) as ViewSheet;
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = false,
-                            error = $"View already placed on sheet {existingSheet?.SheetNumber}",
-                            existingViewportId = existingVp.Id.Value
-                        });
+                        return ResponseBuilder.Error($"View already placed on sheet {existingSheet?.SheetNumber}", "VALIDATION_ERROR")
+                            .With("existingViewportId", existingVp.Id.Value)
+                            .Build();
                     }
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Cannot add view to sheet - Revit validation failed",
-                        viewType = view.ViewType.ToString(),
-                        viewName = view.Name
-                    });
+                    return ResponseBuilder.Error("Cannot add view to sheet - Revit validation failed", "VALIDATION_ERROR")
+                        .With("viewType", view.ViewType.ToString())
+                        .With("viewName", view.Name)
+                        .Build();
                 }
 
                 // STEP 6: Create viewport with multiple strategies
@@ -5897,30 +5630,25 @@ namespace RevitMCPBridge
                         }
                         catch { }
 
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = false,
-                            error = "All placement strategies failed. The view may need manual placement.",
-                            viewName = view.Name,
-                            viewType = view.ViewType.ToString(),
-                            elementCount = elemCount,
-                            suggestion = "Try opening the view in Revit first, then drag it from Project Browser to the sheet"
-                        });
+                        return ResponseBuilder.Error("All placement strategies failed. The view may need manual placement.", "OPERATION_FAILED")
+                            .With("viewName", view.Name)
+                            .With("viewType", view.ViewType.ToString())
+                            .With("elementCount", elemCount)
+                            .With("suggestion", "Try opening the view in Revit first, then drag it from Project Browser to the sheet")
+                            .Build();
                     }
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        viewportId = viewport.Id.Value,
-                        sheetId = sheetId.Value,
-                        viewId = viewport.ViewId.Value,
-                        viewName = doc.GetElement(viewport.ViewId)?.Name ?? view.Name,
-                        sheetNumber = sheet.SheetNumber,
-                        location = new[] { x, y, 0.0 },
-                        placementMethod = successMethod
-                    });
+                    return ResponseBuilder.Success()
+                        .With("viewportId", viewport.Id.Value)
+                        .With("sheetId", sheetId.Value)
+                        .With("viewId", viewport.ViewId.Value)
+                        .With("viewName", doc.GetElement(viewport.ViewId)?.Name ?? view.Name)
+                        .With("sheetNumber", sheet.SheetNumber)
+                        .With("location", new[] { x, y, 0.0 })
+                        .With("placementMethod", successMethod)
+                        .Build();
                 }
             }
             catch (Exception ex)

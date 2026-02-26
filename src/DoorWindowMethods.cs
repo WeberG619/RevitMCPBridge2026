@@ -6,6 +6,7 @@ using Autodesk.Revit.UI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RevitMCPBridge.Helpers;
+using RevitMCPBridge.Validation;
 
 namespace RevitMCPBridge
 {
@@ -34,11 +35,7 @@ namespace RevitMCPBridge
                 var wall = doc.GetElement(wallId) as Wall;
                 if (wall == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall not found"
-                    });
+                    return ResponseBuilder.Error("Wall not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 // Get door type
@@ -59,22 +56,14 @@ namespace RevitMCPBridge
 
                 if (doorType == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No valid door type found"
-                    });
+                    return ResponseBuilder.Error("No valid door type found", "TYPE_NOT_FOUND").Build();
                 }
 
                 // NULL SAFETY: Validate level before using
                 var level = doc.GetElement(wall.LevelId) as Level;
                 if (level == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall level not found. Cannot place door without a valid level."
-                    });
+                    return ResponseBuilder.Error("Wall level not found. Cannot place door without a valid level.", "LEVEL_NOT_FOUND").Build();
                 }
 
                 using (var trans = new Transaction(doc, "Place Door"))
@@ -101,11 +90,7 @@ namespace RevitMCPBridge
                         if (loc == null || loc.Length < 3)
                         {
                             trans.RollBack();
-                            return JsonConvert.SerializeObject(new
-                            {
-                                success = false,
-                                error = "Location must be an array of 3 numbers [x, y, z]"
-                            });
+                            return ResponseBuilder.Error("Location must be an array of 3 numbers [x, y, z]", "VALIDATION_ERROR").Build();
                         }
                         location = new XYZ(loc[0], loc[1], loc[2]);
                     }
@@ -115,11 +100,7 @@ namespace RevitMCPBridge
                         var locationCurve = wall.Location as LocationCurve;
                         if (locationCurve == null || locationCurve.Curve == null)
                         {
-                            return JsonConvert.SerializeObject(new
-                            {
-                                success = false,
-                                error = "Wall does not have a valid location curve. Cannot determine door placement position."
-                            });
+                            return ResponseBuilder.Error("Wall does not have a valid location curve. Cannot determine door placement position.", "INVALID_GEOMETRY").Build();
                         }
                         location = locationCurve.Curve.Evaluate(0.5, true);
                     }
@@ -140,21 +121,15 @@ namespace RevitMCPBridge
 
                     if (commitResult != TransactionStatus.Committed)
                     {
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = false,
-                            error = $"Transaction failed with status: {commitResult}"
-                        });
+                        return ResponseBuilder.Error($"Transaction failed with status: {commitResult}", "TRANSACTION_FAILED").Build();
                     }
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        doorId = (int)doorId,
-                        doorType = doorTypeName,
-                        wallId = (int)wallId.Value,
-                        level = level.Name
-                    });
+                    return ResponseBuilder.Success()
+                        .With("doorId", (int)doorId)
+                        .With("doorType", doorTypeName)
+                        .With("wallId", (int)wallId.Value)
+                        .With("level", level.Name)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -183,11 +158,7 @@ namespace RevitMCPBridge
                 var wall = doc.GetElement(wallId) as Wall;
                 if (wall == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall not found"
-                    });
+                    return ResponseBuilder.Error("Wall not found", "ELEMENT_NOT_FOUND").Build();
                 }
 
                 // Get window type
@@ -208,22 +179,14 @@ namespace RevitMCPBridge
 
                 if (windowType == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No valid window type found"
-                    });
+                    return ResponseBuilder.Error("No valid window type found", "TYPE_NOT_FOUND").Build();
                 }
 
                 // NULL SAFETY: Validate level before using
                 var level = doc.GetElement(wall.LevelId) as Level;
                 if (level == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Wall level not found. Cannot place window without a valid level."
-                    });
+                    return ResponseBuilder.Error("Wall level not found. Cannot place window without a valid level.", "LEVEL_NOT_FOUND").Build();
                 }
 
                 using (var trans = new Transaction(doc, "Place Window"))
@@ -250,11 +213,7 @@ namespace RevitMCPBridge
                         if (loc == null || loc.Length < 3)
                         {
                             trans.RollBack();
-                            return JsonConvert.SerializeObject(new
-                            {
-                                success = false,
-                                error = "Location must be an array of 3 numbers [x, y, z]"
-                            });
+                            return ResponseBuilder.Error("Location must be an array of 3 numbers [x, y, z]", "VALIDATION_ERROR").Build();
                         }
                         location = new XYZ(loc[0], loc[1], loc[2]);
                     }
@@ -265,11 +224,7 @@ namespace RevitMCPBridge
                         if (locationCurve == null || locationCurve.Curve == null)
                         {
                             trans.RollBack();
-                            return JsonConvert.SerializeObject(new
-                            {
-                                success = false,
-                                error = "Wall does not have a valid location curve. Cannot determine window placement position."
-                            });
+                            return ResponseBuilder.Error("Wall does not have a valid location curve. Cannot determine window placement position.", "INVALID_GEOMETRY").Build();
                         }
                         location = locationCurve.Curve.Evaluate(0.5, true);
                     }
@@ -290,21 +245,15 @@ namespace RevitMCPBridge
 
                     if (commitResult != TransactionStatus.Committed)
                     {
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = false,
-                            error = $"Transaction failed with status: {commitResult}"
-                        });
+                        return ResponseBuilder.Error($"Transaction failed with status: {commitResult}", "TRANSACTION_FAILED").Build();
                     }
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        windowId = (int)windowId,
-                        windowType = windowTypeName,
-                        wallId = (int)wallId.Value,
-                        level = level.Name
-                    });
+                    return ResponseBuilder.Success()
+                        .With("windowId", (int)windowId)
+                        .With("windowType", windowTypeName)
+                        .With("wallId", (int)wallId.Value)
+                        .With("level", level.Name)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -321,17 +270,13 @@ namespace RevitMCPBridge
             try
             {
                 var doc = uiApp.ActiveUIDocument.Document;
-                var elementId = new ElementId(int.Parse(parameters["elementId"].ToString()));
-                var element = doc.GetElement(elementId) as FamilyInstance;
 
-                if (element == null)
-                {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Element not found"
-                    });
-                }
+                var v = new ParameterValidator(parameters, "GetDoorWindowInfo");
+                v.Require("elementId").IsType<int>();
+                v.ThrowIfInvalid();
+
+                var elementIdInt = v.GetRequired<int>("elementId");
+                var element = ElementLookup.GetElement<FamilyInstance>(doc, elementIdInt);
 
                 var category = element.Category.Name;
                 var familySymbol = element.Symbol;
@@ -347,23 +292,21 @@ namespace RevitMCPBridge
                 // Get location
                 var location = (element.Location as LocationPoint)?.Point;
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    elementId = (int)element.Id.Value,
-                    category = category,
-                    familyName = familySymbol.Family.Name,
-                    typeName = familySymbol.Name,
-                    typeId = (int)familySymbol.Id.Value,
-                    hostId = host != null ? (int)host.Id.Value : -1,
-                    level = level?.Name,
-                    levelId = (int)element.LevelId.Value,
-                    width = width,
-                    height = height,
-                    location = location != null ? new[] { location.X, location.Y, location.Z } : null,
-                    mark = element.get_Parameter(BuiltInParameter.ALL_MODEL_MARK)?.AsString(),
-                    comments = element.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS)?.AsString()
-                });
+                return ResponseBuilder.Success()
+                    .With("elementId", (int)element.Id.Value)
+                    .With("category", category)
+                    .With("familyName", familySymbol.Family.Name)
+                    .With("typeName", familySymbol.Name)
+                    .With("typeId", (int)familySymbol.Id.Value)
+                    .With("hostId", host != null ? (int)host.Id.Value : -1)
+                    .With("level", level?.Name)
+                    .With("levelId", (int)element.LevelId.Value)
+                    .With("width", width)
+                    .With("height", height)
+                    .With("location", location != null ? new[] { location.X, location.Y, location.Z } : null)
+                    .With("mark", element.get_Parameter(BuiltInParameter.ALL_MODEL_MARK)?.AsString())
+                    .With("comments", element.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS)?.AsString())
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -379,17 +322,14 @@ namespace RevitMCPBridge
             try
             {
                 var doc = uiApp.ActiveUIDocument.Document;
-                var elementId = new ElementId(int.Parse(parameters["elementId"].ToString()));
-                var element = doc.GetElement(elementId) as FamilyInstance;
 
-                if (element == null)
-                {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Element not found"
-                    });
-                }
+                var v = new ParameterValidator(parameters, "ModifyDoorWindowProperties");
+                v.Require("elementId").IsType<int>();
+                v.ThrowIfInvalid();
+
+                var elementIdInt = v.GetRequired<int>("elementId");
+                var element = ElementLookup.GetElement<FamilyInstance>(doc, elementIdInt);
+                var elementId = element.Id;
 
                 using (var trans = new Transaction(doc, "Modify Door/Window Properties"))
                 {
@@ -451,12 +391,10 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        elementId = (int)element.Id.Value,
-                        modified = modified
-                    });
+                    return ResponseBuilder.Success()
+                        .With("elementId", (int)element.Id.Value)
+                        .With("modified", modified)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -473,24 +411,17 @@ namespace RevitMCPBridge
             try
             {
                 var doc = uiApp.ActiveUIDocument.Document;
-                var elementId = new ElementId(int.Parse(parameters["elementId"].ToString()));
-                var flipHand = parameters["flipHand"] != null
-                    ? bool.Parse(parameters["flipHand"].ToString())
-                    : true;
-                var flipFacing = parameters["flipFacing"] != null
-                    ? bool.Parse(parameters["flipFacing"].ToString())
-                    : false;
 
-                var element = doc.GetElement(elementId) as FamilyInstance;
+                var v = new ParameterValidator(parameters, "FlipDoorWindow");
+                v.Require("elementId").IsType<int>();
+                v.ThrowIfInvalid();
 
-                if (element == null)
-                {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Element not found"
-                    });
-                }
+                var elementIdInt = v.GetRequired<int>("elementId");
+                var flipHand = v.GetOptional<bool>("flipHand", true);
+                var flipFacing = v.GetOptional<bool>("flipFacing", false);
+
+                var element = ElementLookup.GetElement<FamilyInstance>(doc, elementIdInt);
+                var elementId = element.Id;
 
                 using (var trans = new Transaction(doc, "Flip Door/Window"))
                 {
@@ -511,13 +442,11 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        elementId = (int)elementId.Value,
-                        flippedHand = flipHand,
-                        flippedFacing = flipFacing
-                    });
+                    return ResponseBuilder.Success()
+                        .With("elementId", (int)elementId.Value)
+                        .With("flippedHand", flipHand)
+                        .With("flippedFacing", flipFacing)
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -533,46 +462,19 @@ namespace RevitMCPBridge
         {
             try
             {
-                // Validate UIApplication and document
                 if (uiApp?.ActiveUIDocument?.Document == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No active document open in Revit"
-                    });
+                    return ResponseBuilder.Error("No active document open in Revit", "NO_ACTIVE_DOCUMENT").Build();
                 }
                 var doc = uiApp.ActiveUIDocument.Document;
 
-                // Validate viewId parameter
-                if (parameters["viewId"] == null)
-                {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "viewId parameter is required"
-                    });
-                }
+                var v = new ParameterValidator(parameters, "GetDoorsInView");
+                v.Require("viewId").IsType<int>();
+                v.ThrowIfInvalid();
 
-                if (!int.TryParse(parameters["viewId"].ToString(), out int viewIdInt))
-                {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "viewId must be a valid integer"
-                    });
-                }
-
-                var viewId = new ElementId(viewIdInt);
-                var view = doc.GetElement(viewId) as View;
-                if (view == null)
-                {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = $"View with ID {viewIdInt} not found"
-                    });
-                }
+                var viewIdInt = v.GetRequired<int>("viewId");
+                var view = ElementLookup.GetView(doc, viewIdInt);
+                var viewId = view.Id;
 
                 var doors = new FilteredElementCollector(doc, viewId)
                     .OfClass(typeof(FamilyInstance))
@@ -591,12 +493,10 @@ namespace RevitMCPBridge
                     })
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    doorCount = doors.Count,
-                    doors = doors
-                });
+                return ResponseBuilder.Success()
+                    .With("doorCount", doors.Count)
+                    .With("doors", doors)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -611,46 +511,19 @@ namespace RevitMCPBridge
         {
             try
             {
-                // Validate UIApplication and document
                 if (uiApp?.ActiveUIDocument?.Document == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No active document open in Revit"
-                    });
+                    return ResponseBuilder.Error("No active document open in Revit", "NO_ACTIVE_DOCUMENT").Build();
                 }
                 var doc = uiApp.ActiveUIDocument.Document;
 
-                // Validate viewId parameter
-                if (parameters["viewId"] == null)
-                {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "viewId parameter is required"
-                    });
-                }
+                var v = new ParameterValidator(parameters, "GetWindowsInView");
+                v.Require("viewId").IsType<int>();
+                v.ThrowIfInvalid();
 
-                if (!int.TryParse(parameters["viewId"].ToString(), out int viewIdInt))
-                {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "viewId must be a valid integer"
-                    });
-                }
-
-                var viewId = new ElementId(viewIdInt);
-                var view = doc.GetElement(viewId) as View;
-                if (view == null)
-                {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = $"View with ID {viewIdInt} not found"
-                    });
-                }
+                var viewIdInt = v.GetRequired<int>("viewId");
+                var view = ElementLookup.GetView(doc, viewIdInt);
+                var viewId = view.Id;
 
                 var windows = new FilteredElementCollector(doc, viewId)
                     .OfClass(typeof(FamilyInstance))
@@ -670,12 +543,10 @@ namespace RevitMCPBridge
                     })
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    windowCount = windows.Count,
-                    windows = windows
-                });
+                return ResponseBuilder.Success()
+                    .With("windowCount", windows.Count)
+                    .With("windows", windows)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -707,12 +578,10 @@ namespace RevitMCPBridge
                     })
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    doorTypeCount = doorTypes.Count,
-                    doorTypes = doorTypes
-                });
+                return ResponseBuilder.Success()
+                    .With("doorTypeCount", doorTypes.Count)
+                    .With("doorTypes", doorTypes)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -744,12 +613,10 @@ namespace RevitMCPBridge
                     })
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    windowTypeCount = windowTypes.Count,
-                    windowTypes = windowTypes
-                });
+                return ResponseBuilder.Success()
+                    .With("windowTypeCount", windowTypes.Count)
+                    .With("windowTypes", windowTypes)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -778,12 +645,10 @@ namespace RevitMCPBridge
 
                     trans.Commit();
 
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        elementId = (int)elementId.Value,
-                        message = "Element deleted successfully"
-                    });
+                    return ResponseBuilder.Success()
+                        .WithElementId((int)elementId.Value)
+                        .WithMessage("Element deleted successfully")
+                        .Build();
                 }
             }
             catch (Exception ex)
@@ -820,12 +685,10 @@ namespace RevitMCPBridge
                     .OrderBy(d => d.mark)
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    doorCount = doors.Count,
-                    doors = doors
-                });
+                return ResponseBuilder.Success()
+                    .With("doorCount", doors.Count)
+                    .With("doors", doors)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -860,12 +723,10 @@ namespace RevitMCPBridge
                     .OrderBy(w => w.mark)
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    windowCount = windows.Count,
-                    windows = windows
-                });
+                return ResponseBuilder.Success()
+                    .With("windowCount", windows.Count)
+                    .With("windows", windows)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -881,14 +742,9 @@ namespace RevitMCPBridge
         {
             try
             {
-                // Validate UIApplication and document
                 if (uiApp?.ActiveUIDocument?.Document == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No active document open in Revit"
-                    });
+                    return ResponseBuilder.Error("No active document open in Revit", "NO_ACTIVE_DOCUMENT").Build();
                 }
                 var doc = uiApp.ActiveUIDocument.Document;
 
@@ -922,12 +778,10 @@ namespace RevitMCPBridge
                     })
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    doorCount = doors.Count,
-                    doors = doors
-                });
+                return ResponseBuilder.Success()
+                    .With("doorCount", doors.Count)
+                    .With("doors", doors)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -943,14 +797,9 @@ namespace RevitMCPBridge
         {
             try
             {
-                // Validate UIApplication and document
                 if (uiApp?.ActiveUIDocument?.Document == null)
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No active document open in Revit"
-                    });
+                    return ResponseBuilder.Error("No active document open in Revit", "NO_ACTIVE_DOCUMENT").Build();
                 }
                 var doc = uiApp.ActiveUIDocument.Document;
 
@@ -983,12 +832,10 @@ namespace RevitMCPBridge
                     })
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    windowCount = windows.Count,
-                    windows = windows
-                });
+                return ResponseBuilder.Success()
+                    .With("windowCount", windows.Count)
+                    .With("windows", windows)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -1026,12 +873,10 @@ namespace RevitMCPBridge
                     })
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    furnitureCount = furniture.Count,
-                    furniture = furniture
-                });
+                return ResponseBuilder.Success()
+                    .With("furnitureCount", furniture.Count)
+                    .With("furniture", furniture)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -1069,12 +914,10 @@ namespace RevitMCPBridge
                     })
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    fixtureCount = fixtures.Count,
-                    plumbingFixtures = fixtures
-                });
+                return ResponseBuilder.Success()
+                    .With("fixtureCount", fixtures.Count)
+                    .With("plumbingFixtures", fixtures)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -1111,12 +954,10 @@ namespace RevitMCPBridge
                     })
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    fixtureCount = fixtures.Count,
-                    lightingFixtures = fixtures
-                });
+                return ResponseBuilder.Success()
+                    .With("fixtureCount", fixtures.Count)
+                    .With("lightingFixtures", fixtures)
+                    .Build();
             }
             catch (Exception ex)
             {
@@ -1153,12 +994,10 @@ namespace RevitMCPBridge
                     })
                     .ToList();
 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = true,
-                    fixtureCount = fixtures.Count,
-                    electricalFixtures = fixtures
-                });
+                return ResponseBuilder.Success()
+                    .With("fixtureCount", fixtures.Count)
+                    .With("electricalFixtures", fixtures)
+                    .Build();
             }
             catch (Exception ex)
             {
