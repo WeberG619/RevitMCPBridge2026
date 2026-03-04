@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
@@ -321,19 +323,36 @@ namespace RevitMCPBridge
                         });
                     }
 
-                    // Create tag
-                    var tagMode = TagMode.TM_ADDBY_CATEGORY;
+                    // Create tag — use specific tag type if provided, otherwise default by category
                     var tagOrientation = TagOrientation.Horizontal;
+                    var tagTypeIdParam = parameters?["tagTypeId"];
 
-                    var tag = IndependentTag.Create(
-                        doc,
-                        view.Id,
-                        new Reference(element),
-                        addLeader,
-                        tagMode,
-                        tagOrientation,
-                        location
-                    );
+                    IndependentTag tag;
+                    if (tagTypeIdParam != null)
+                    {
+                        var tagTypeElemId = new ElementId(int.Parse(tagTypeIdParam.ToString()));
+                        tag = IndependentTag.Create(
+                            doc,
+                            tagTypeElemId,
+                            view.Id,
+                            new Reference(element),
+                            addLeader,
+                            tagOrientation,
+                            location
+                        );
+                    }
+                    else
+                    {
+                        tag = IndependentTag.Create(
+                            doc,
+                            view.Id,
+                            new Reference(element),
+                            addLeader,
+                            TagMode.TM_ADDBY_CATEGORY,
+                            tagOrientation,
+                            location
+                        );
+                    }
 
                     trans.Commit();
 
@@ -344,7 +363,8 @@ namespace RevitMCPBridge
                         success = true,
                         tagId = tag.Id.Value,
                         elementId = elementId.Value,
-                        viewId = viewId.Value
+                        viewId = viewId.Value,
+                        tagTypeId = tagTypeIdParam != null ? (int?)int.Parse(tagTypeIdParam.ToString()) : null
                     });
                 }
             }
@@ -694,6 +714,456 @@ namespace RevitMCPBridge
             {
                 Log.Error(ex, "Error getting tag info");
                 return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+        /// <summary>
+        /// Get all loaded tag family types in the model, grouped by taggable category
+        /// </summary>
+        [MCPMethod("getTagTypes", Category = "Tagging", Description = "Get all loaded tag family types grouped by taggable category")]
+        public static string GetTagTypes(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+
+                // Tag categories to search
+                var tagCategories = new Dictionary<string, BuiltInCategory>
+                {
+                    { "ElectricalFixtureTags", BuiltInCategory.OST_ElectricalFixtureTags },
+                    { "LightingFixtureTags", BuiltInCategory.OST_LightingFixtureTags },
+                    { "LightingDeviceTags", BuiltInCategory.OST_LightingDeviceTags },
+                    { "DoorTags", BuiltInCategory.OST_DoorTags },
+                    { "WindowTags", BuiltInCategory.OST_WindowTags },
+                    { "RoomTags", BuiltInCategory.OST_RoomTags },
+                    { "WallTags", BuiltInCategory.OST_WallTags },
+                    { "MEPEquipmentTags", BuiltInCategory.OST_MechanicalEquipmentTags },
+                    { "PlumbingFixtureTags", BuiltInCategory.OST_PlumbingFixtureTags },
+                    { "FireAlarmDeviceTags", BuiltInCategory.OST_FireAlarmDeviceTags },
+                    { "DataDeviceTags", BuiltInCategory.OST_DataDeviceTags },
+                    { "CommunicationDeviceTags", BuiltInCategory.OST_CommunicationDeviceTags },
+                    { "ElectricalEquipmentTags", BuiltInCategory.OST_ElectricalEquipmentTags },
+                };
+
+                // Optional filter by category name
+                var filterCategory = parameters?["category"]?.ToString();
+
+                var tagTypes = new List<object>();
+
+                foreach (var kvp in tagCategories)
+                {
+                    if (filterCategory != null && !kvp.Key.Contains(filterCategory))
+                        continue;
+
+                    var types = new FilteredElementCollector(doc)
+                        .OfCategory(kvp.Value)
+                        .OfClass(typeof(FamilySymbol))
+                        .Cast<FamilySymbol>()
+                        .ToList();
+
+                    foreach (var type in types)
+                    {
+                        tagTypes.Add(new
+                        {
+                            typeId = (int)type.Id.Value,
+                            familyName = type.Family?.Name,
+                            typeName = type.Name,
+                            category = kvp.Key
+                        });
+                    }
+                }
+
+                Log.Information($"Found {tagTypes.Count} tag types");
+
+                return JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    tagTypeCount = tagTypes.Count,
+                    tagTypes = tagTypes
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error getting tag types");
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
+        /// <summary>
+        /// Batch delete text notes in a view, optionally filtered by regex pattern
+        /// </summary>
+        [MCPMethod("batchDeleteTextNotes", Category = "Tagging", Description = "Delete text notes in a view with optional regex pattern filter")]
+        public static string BatchDeleteTextNotes(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+
+                var viewId = new ElementId(int.Parse(parameters["viewId"].ToString()));
+                var pattern = parameters?["pattern"]?.ToString();
+
+                var view = doc.GetElement(viewId) as View;
+                if (view == null)
+                {
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        error = "View not found"
+                    });
+                }
+
+                // Collect all text notes in the view
+                var textNotes = new FilteredElementCollector(doc, viewId)
+                    .OfClass(typeof(TextNote))
+                    .Cast<TextNote>()
+                    .ToList();
+
+                Regex regex = null;
+                if (!string.IsNullOrEmpty(pattern))
+                {
+                    regex = new Regex(pattern);
+                }
+
+                var toDelete = new List<ElementId>();
+                var deletedTexts = new List<object>();
+
+                foreach (var note in textNotes)
+                {
+                    var text = note.Text?.Trim();
+                    if (regex != null)
+                    {
+                        if (text != null && regex.IsMatch(text))
+                        {
+                            toDelete.Add(note.Id);
+                            deletedTexts.Add(new { id = (int)note.Id.Value, text = text });
+                        }
+                    }
+                    else
+                    {
+                        toDelete.Add(note.Id);
+                        deletedTexts.Add(new { id = (int)note.Id.Value, text = text });
+                    }
+                }
+
+                if (toDelete.Count == 0)
+                {
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = true,
+                        deletedCount = 0,
+                        totalTextNotes = textNotes.Count,
+                        message = "No text notes matched the filter"
+                    });
+                }
+
+                using (var trans = new Transaction(doc, "Batch Delete Text Notes"))
+                {
+                    trans.Start();
+                    var failureOptions = trans.GetFailureHandlingOptions();
+                    failureOptions.SetFailuresPreprocessor(new WarningSwallower());
+                    trans.SetFailureHandlingOptions(failureOptions);
+
+                    doc.Delete(toDelete);
+
+                    trans.Commit();
+                }
+
+                Log.Information($"Deleted {toDelete.Count} text notes from view {viewId.Value}");
+
+                return JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    deletedCount = toDelete.Count,
+                    totalTextNotes = textNotes.Count,
+                    viewId = (int)viewId.Value,
+                    deletedNotes = deletedTexts
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error batch deleting text notes");
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
+        /// <summary>
+        /// Create a tag family from a Revit template for a given category.
+        /// Useful for creating circuit tags for categories that don't have one (e.g., MechanicalEquipment, ElectricalEquipment).
+        /// </summary>
+        [MCPMethod("createTagFamilyFromTemplate", Category = "Tagging", Description = "Create a tag family from template for a given category")]
+        public static string CreateTagFamilyFromTemplate(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+                var app = uiApp.Application;
+
+                var categoryName = parameters["category"]?.ToString();
+                if (string.IsNullOrEmpty(categoryName))
+                {
+                    return JsonConvert.SerializeObject(new { success = false, error = "category is required (e.g., 'MechanicalEquipment', 'ElectricalEquipment')" });
+                }
+
+                var familyName = parameters["familyName"]?.ToString() ?? $"{categoryName} Circuit Tag";
+                var labelParam = parameters["labelParameter"]?.ToString() ?? "Circuit Number";
+
+                // Map category to template file name
+                var templateMapping = new Dictionary<string, string>
+                {
+                    { "MechanicalEquipment", "Multi-Category Tag" },
+                    { "ElectricalEquipment", "Electrical Equipment Tag" },
+                    { "PlumbingFixtures", "Multi-Category Tag" },
+                    { "ElectricalFixtures", "Electrical Device Tag" },
+                    { "LightingFixtures", "Multi-Category Tag" },
+                    { "LightingDevices", "Multi-Category Tag" },
+                    { "Generic", "Generic Tag" },
+                    { "MultiCategory", "Multi-Category Tag" },
+                };
+
+                if (!templateMapping.ContainsKey(categoryName))
+                {
+                    return JsonConvert.SerializeObject(new { success = false, error = $"Unsupported category: {categoryName}. Supported: {string.Join(", ", templateMapping.Keys)}" });
+                }
+
+                var templateBaseName = templateMapping[categoryName];
+
+                // Find template file
+                var templatePath = FindTagTemplate(app, templateBaseName);
+                if (templatePath == null)
+                {
+                    return JsonConvert.SerializeObject(new { success = false, error = $"Template not found: {templateBaseName}.rft. Searched in: {app.FamilyTemplatePath}" });
+                }
+
+                // Check if family already exists
+                var existingFamily = new FilteredElementCollector(doc)
+                    .OfClass(typeof(Family))
+                    .Cast<Family>()
+                    .FirstOrDefault(f => f.Name == familyName);
+
+                if (existingFamily != null)
+                {
+                    // Family already exists, return its types
+                    var existingTypes = new List<object>();
+                    foreach (var typeId in existingFamily.GetFamilySymbolIds())
+                    {
+                        var symbol = doc.GetElement(typeId) as FamilySymbol;
+                        existingTypes.Add(new { typeId = (int)typeId.Value, typeName = symbol?.Name });
+                    }
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = true,
+                        familyName,
+                        alreadyExists = true,
+                        types = existingTypes,
+                        message = $"Family '{familyName}' already loaded"
+                    });
+                }
+
+                // Create family document from template
+                Document familyDoc = app.NewFamilyDocument(templatePath);
+
+                var diagnostics = new List<string>();
+                var familyParams = new List<object>();
+
+                // Set up the family
+                using (var trans = new Transaction(familyDoc, "Setup Circuit Tag"))
+                {
+                    trans.Start();
+                    var failureOptions = trans.GetFailureHandlingOptions();
+                    failureOptions.SetFailuresPreprocessor(new WarningSwallower());
+                    trans.SetFailureHandlingOptions(failureOptions);
+
+                    var fm = familyDoc.FamilyManager;
+                    diagnostics.Add($"Family document created from template");
+
+                    // List all family parameters
+                    FamilyParameter targetParam = null;
+                    foreach (FamilyParameter fp in fm.Parameters)
+                    {
+                        bool isTarget = fp.Definition.Name == labelParam;
+                        familyParams.Add(new
+                        {
+                            name = fp.Definition.Name,
+                            isInstance = fp.IsInstance,
+                            isShared = fp.IsShared,
+                            storageType = fp.StorageType.ToString(),
+                            isTarget = isTarget
+                        });
+
+                        if (isTarget)
+                            targetParam = fp;
+                    }
+
+                    // Explore family document elements for diagnostics
+                    var allElements = new FilteredElementCollector(familyDoc)
+                        .WhereElementIsNotElementType()
+                        .ToList();
+
+                    var elementSummary = new List<object>();
+                    foreach (var elem in allElements)
+                    {
+                        elementSummary.Add(new
+                        {
+                            id = (int)elem.Id.Value,
+                            type = elem.GetType().Name,
+                            category = elem.Category?.Name,
+                            name = elem.Name
+                        });
+                    }
+                    diagnostics.Add($"Family has {allElements.Count} elements: {string.Join(", ", allElements.Select(e => e.GetType().Name).Distinct())}");
+
+                    // Try to find TextNote elements (label placeholders)
+                    var textNotes = allElements.OfType<TextNote>().ToList();
+                    diagnostics.Add($"Found {textNotes.Count} TextNote label(s)");
+
+                    foreach (var tn in textNotes)
+                    {
+                        try
+                        {
+                            var ft = tn.GetFormattedText();
+                            diagnostics.Add($"Label text: '{ft.GetPlainText()}'");
+                        }
+                        catch (Exception ex)
+                        {
+                            diagnostics.Add($"Could not read label: {ex.Message}");
+                        }
+                    }
+
+                    if (targetParam != null)
+                    {
+                        diagnostics.Add($"Target parameter '{labelParam}' found in family");
+                    }
+                    else
+                    {
+                        diagnostics.Add($"Target parameter '{labelParam}' NOT found. Available: {string.Join(", ", familyParams.Cast<dynamic>().Select(p => (string)p.name))}");
+                        diagnostics.Add("After loading, edit family in Family Editor: change label to show 'Circuit Number'");
+                    }
+
+                    trans.Commit();
+                }
+
+                // Save family to temp file with desired name, then load into project
+                var tempDir = Path.Combine(Path.GetTempPath(), "RevitMCPTags");
+                if (!Directory.Exists(tempDir))
+                    Directory.CreateDirectory(tempDir);
+                var tempFamilyPath = Path.Combine(tempDir, familyName + ".rfa");
+                familyDoc.SaveAs(tempFamilyPath);
+                familyDoc.Close(false);
+                diagnostics.Add($"Saved family to: {tempFamilyPath}");
+
+                Family loadedFamily = null;
+                using (var trans = new Transaction(doc, "Load Circuit Tag Family"))
+                {
+                    trans.Start();
+                    var failureOptions = trans.GetFailureHandlingOptions();
+                    failureOptions.SetFailuresPreprocessor(new WarningSwallower());
+                    trans.SetFailureHandlingOptions(failureOptions);
+
+                    doc.LoadFamily(tempFamilyPath, new TagFamilyLoadOptions(), out loadedFamily);
+                    trans.Commit();
+                }
+
+                if (loadedFamily == null)
+                {
+                    return JsonConvert.SerializeObject(new { success = false, error = "Failed to load family into project", diagnostics });
+                }
+
+                // Get and activate type IDs
+                var types = new List<object>();
+                using (var trans = new Transaction(doc, "Activate Tag Types"))
+                {
+                    trans.Start();
+                    foreach (var typeId in loadedFamily.GetFamilySymbolIds())
+                    {
+                        var symbol = doc.GetElement(typeId) as FamilySymbol;
+                        if (symbol != null)
+                        {
+                            if (!symbol.IsActive) symbol.Activate();
+                            types.Add(new { typeId = (int)typeId.Value, typeName = symbol.Name });
+                        }
+                    }
+                    trans.Commit();
+                }
+
+                Log.Information($"Created tag family: {familyName} with {types.Count} type(s)");
+
+                return JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    familyName,
+                    templateUsed = templatePath,
+                    types,
+                    availableParameters = familyParams,
+                    diagnostics
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error creating tag family from template");
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
+        private static string FindTagTemplate(Autodesk.Revit.ApplicationServices.Application app, string templateBaseName)
+        {
+            var searchPaths = new List<string>();
+            var templateDir = app.FamilyTemplatePath;
+
+            if (!string.IsNullOrEmpty(templateDir))
+            {
+                searchPaths.Add(Path.Combine(templateDir, "Annotations", templateBaseName + ".rft"));
+                searchPaths.Add(Path.Combine(templateDir, "English-Imperial", "Annotations", templateBaseName + ".rft"));
+                searchPaths.Add(Path.Combine(templateDir, "English", "Annotations", templateBaseName + ".rft"));
+                searchPaths.Add(Path.Combine(templateDir, templateBaseName + ".rft"));
+            }
+
+            // Common Revit 2026 paths
+            var commonPaths = new[]
+            {
+                @"C:\ProgramData\Autodesk\RVT 2026\Family Templates\English-Imperial\Annotations",
+                @"C:\ProgramData\Autodesk\RVT 2026\Family Templates\English\Annotations",
+                @"C:\ProgramData\Autodesk\RVT 2026\Family Templates\English_I\Annotations",
+                @"C:\ProgramData\Autodesk\RVT 2026\Family Templates\Annotations",
+            };
+
+            foreach (var dir in commonPaths)
+            {
+                searchPaths.Add(Path.Combine(dir, templateBaseName + ".rft"));
+            }
+
+            foreach (var path in searchPaths)
+            {
+                if (File.Exists(path))
+                    return path;
+            }
+
+            // Recursive search as fallback
+            try
+            {
+                if (!string.IsNullOrEmpty(templateDir) && Directory.Exists(templateDir))
+                {
+                    var files = Directory.GetFiles(templateDir, templateBaseName + ".rft", SearchOption.AllDirectories);
+                    if (files.Length > 0)
+                        return files[0];
+                }
+            }
+            catch { }
+
+            return null;
+        }
+
+        private class TagFamilyLoadOptions : IFamilyLoadOptions
+        {
+            public bool OnFamilyFound(bool familyInUse, out bool overwriteParameterValues)
+            {
+                overwriteParameterValues = true;
+                return true;
+            }
+
+            public bool OnSharedFamilyFound(Family sharedFamily, bool familyInUse, out FamilySource source, out bool overwriteParameterValues)
+            {
+                source = FamilySource.Family;
+                overwriteParameterValues = true;
+                return true;
             }
         }
     }

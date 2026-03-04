@@ -737,6 +737,13 @@ namespace RevitMCPBridge
 
                     var taggedCount = 0;
                     var tagIds = new List<int>();
+                    var addLeader = parameters?["addLeader"]?.ToObject<bool>() ?? false;
+                    var tagTypeIdParam = parameters?["tagTypeId"];
+                    ElementId tagTypeElemId = null;
+                    if (tagTypeIdParam != null)
+                    {
+                        tagTypeElemId = new ElementId(int.Parse(tagTypeIdParam.ToString()));
+                    }
 
                     // Get category
                     BuiltInCategory builtInCat;
@@ -754,17 +761,41 @@ namespace RevitMCPBridge
                                 var location = (element.Location as LocationPoint)?.Point
                                     ?? ((element.Location as LocationCurve)?.Curve.Evaluate(0.5, true));
 
+                                if (location == null)
+                                {
+                                    // Fallback to bounding box center
+                                    var bbox = element.get_BoundingBox(view);
+                                    if (bbox != null)
+                                        location = (bbox.Min + bbox.Max) / 2;
+                                }
+
                                 if (location != null)
                                 {
                                     var reference = new Reference(element);
-                                    var tag = IndependentTag.Create(
-                                        doc,
-                                        viewId,
-                                        reference,
-                                        false,
-                                        TagMode.TM_ADDBY_CATEGORY,
-                                        TagOrientation.Horizontal,
-                                        location);
+                                    IndependentTag tag;
+
+                                    if (tagTypeElemId != null)
+                                    {
+                                        tag = IndependentTag.Create(
+                                            doc,
+                                            tagTypeElemId,
+                                            viewId,
+                                            reference,
+                                            addLeader,
+                                            TagOrientation.Horizontal,
+                                            location);
+                                    }
+                                    else
+                                    {
+                                        tag = IndependentTag.Create(
+                                            doc,
+                                            viewId,
+                                            reference,
+                                            addLeader,
+                                            TagMode.TM_ADDBY_CATEGORY,
+                                            TagOrientation.Horizontal,
+                                            location);
+                                    }
 
                                     tagIds.Add((int)tag.Id.Value);
                                     taggedCount++;

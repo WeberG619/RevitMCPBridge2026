@@ -1105,6 +1105,14 @@ namespace RevitMCPBridge
                     case "getTagInfo":
                         return await ExecuteInRevitContext(uiApp => TaggingMethods.GetTagInfo(uiApp, parameters));
 
+                    case "getTagTypes":
+                        return await ExecuteInRevitContext(uiApp => TaggingMethods.GetTagTypes(uiApp, parameters));
+
+                    case "batchDeleteTextNotes":
+                        return await ExecuteInRevitContext(uiApp => TaggingMethods.BatchDeleteTextNotes(uiApp, parameters));
+                    case "createTagFamilyFromTemplate":
+                        return await ExecuteInRevitContext(uiApp => TaggingMethods.CreateTagFamilyFromTemplate(uiApp, parameters));
+
                     // Dimensioning Methods (6 total)
                     case "createLinearDimension":
                         return await ExecuteInRevitContext(uiApp => DimensioningMethods.CreateLinearDimension(uiApp, parameters));
