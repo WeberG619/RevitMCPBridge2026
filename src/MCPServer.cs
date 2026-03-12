@@ -3183,6 +3183,10 @@ namespace RevitMCPBridge
                         return await ExecuteInRevitContext(uiApp => LinkMethods.DeleteRevitLink(uiApp, parameters));
                     case "getCADLinks":
                         return await ExecuteInRevitContext(uiApp => LinkMethods.GetCADLinks(uiApp, parameters));
+                    case "importPDF":
+                        return await ExecuteInRevitContext(uiApp => LinkMethods.ImportPDF(uiApp, parameters));
+                    case "linkPDF":
+                        return await ExecuteInRevitContext(uiApp => LinkMethods.LinkPDF(uiApp, parameters));
                     case "importCAD":
                         return await ExecuteInRevitContext(uiApp => LinkMethods.ImportCAD(uiApp, parameters));
                     case "deleteCADLink":

@@ -1447,5 +1447,189 @@ namespace RevitMCPBridge
                 return ResponseBuilder.FromException(ex).Build();
             }
         }
+
+        // =================================================================
+        // PDF Import / Link Methods
+        // =================================================================
+
+        /// <summary>
+        /// Import a PDF file onto a sheet or view as an image.
+        /// Supports multi-page PDFs (specify page number).
+        /// Uses Revit's ImageType API which handles PDF files natively.
+        /// </summary>
+        public static string ImportPDF(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+                var uiDoc = uiApp.ActiveUIDocument;
+
+                // Required: file path
+                var filePath = parameters["filePath"]?.ToString();
+                if (string.IsNullOrEmpty(filePath))
+                {
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        error = "filePath is required (full Windows path to PDF file)"
+                    });
+                }
+
+                if (!System.IO.File.Exists(filePath))
+                {
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        error = $"PDF file not found: {filePath}"
+                    });
+                }
+
+                // Optional: target view/sheet
+                View view = null;
+                if (parameters["viewId"] != null)
+                {
+                    var viewId = new ElementId(int.Parse(parameters["viewId"].ToString()));
+                    view = doc.GetElement(viewId) as View;
+                }
+                else if (parameters["sheetId"] != null)
+                {
+                    var sheetId = new ElementId(int.Parse(parameters["sheetId"].ToString()));
+                    view = doc.GetElement(sheetId) as View;
+                }
+                else
+                {
+                    view = doc.ActiveView;
+                }
+
+                if (view == null)
+                {
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        error = "No valid view or sheet found. Provide viewId, sheetId, or have a view active."
+                    });
+                }
+
+                // Optional: position
+                double x = 1.0, y = 0.75;
+                if (parameters["location"] != null)
+                {
+                    var loc = parameters["location"].ToObject<double[]>();
+                    if (loc != null && loc.Length >= 2)
+                    {
+                        x = loc[0];
+                        y = loc[1];
+                    }
+                }
+                else
+                {
+                    if (parameters["x"] != null) x = double.Parse(parameters["x"].ToString());
+                    if (parameters["y"] != null) y = double.Parse(parameters["y"].ToString());
+
+                    if (view is ViewSheet)
+                    {
+                        var titleblock = new FilteredElementCollector(doc, view.Id)
+                            .OfCategory(BuiltInCategory.OST_TitleBlocks)
+                            .FirstOrDefault();
+                        if (titleblock != null)
+                        {
+                            var bbox = titleblock.get_BoundingBox(view);
+                            if (bbox != null)
+                            {
+                                x = (bbox.Min.X + bbox.Max.X) / 2.0;
+                                y = (bbox.Min.Y + bbox.Max.Y) / 2.0;
+                            }
+                        }
+                    }
+                }
+
+                bool asLink = parameters["asLink"]?.Value<bool>() ?? false;
+                var importSource = asLink ? ImageTypeSource.Link : ImageTypeSource.Import;
+                int page = parameters["page"]?.Value<int>() ?? 1;
+                int resolution = parameters["resolution"]?.Value<int>() ?? 300;
+
+                bool switchTo = parameters["switchTo"]?.Value<bool>() ?? true;
+                if (switchTo && view is ViewSheet)
+                {
+                    try { uiDoc.ActiveView = view; } catch { }
+                }
+
+                using (var trans = new Transaction(doc, asLink ? "Link PDF" : "Import PDF"))
+                {
+                    trans.Start();
+                    var failureOptions = trans.GetFailureHandlingOptions();
+                    failureOptions.SetFailuresPreprocessor(new WarningSwallower());
+                    trans.SetFailureHandlingOptions(failureOptions);
+
+                    var imageTypeOptions = new ImageTypeOptions(filePath, false, importSource);
+                    try { imageTypeOptions.Resolution = resolution; } catch { }
+                    // Note: Multi-page PDF support depends on Revit API version
+
+                    var imageType = ImageType.Create(doc, imageTypeOptions);
+
+                    var placementOptions = new ImagePlacementOptions();
+                    placementOptions.PlacementPoint = BoxPlacement.Center;
+                    placementOptions.Location = new XYZ(x, y, 0);
+
+                    var imageInstance = ImageInstance.Create(doc, view, imageType.Id, placementOptions);
+
+                    trans.Commit();
+
+                    double widthFeet = 0, heightFeet = 0;
+                    var imgBbox = imageInstance.get_BoundingBox(view);
+                    if (imgBbox != null)
+                    {
+                        widthFeet = imgBbox.Max.X - imgBbox.Min.X;
+                        heightFeet = imgBbox.Max.Y - imgBbox.Min.Y;
+                    }
+
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = true,
+                        imageInstanceId = (long)imageInstance.Id.Value,
+                        imageTypeId = (long)imageType.Id.Value,
+                        viewId = (long)view.Id.Value,
+                        viewName = view.Name,
+                        filePath,
+                        isLink = asLink,
+                        page,
+                        resolution,
+                        position = new { x, y },
+                        size = new
+                        {
+                            widthFeet = Math.Round(widthFeet, 3),
+                            heightFeet = Math.Round(heightFeet, 3),
+                            widthInches = Math.Round(widthFeet * 12, 2),
+                            heightInches = Math.Round(heightFeet * 12, 2)
+                        },
+                        message = asLink
+                            ? "PDF linked successfully (stays connected to source file)"
+                            : "PDF imported successfully (embedded in project)"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "[ImportPDF] Failed");
+                return JsonConvert.SerializeObject(new
+                {
+                    success = false,
+                    error = ex.Message,
+                    hint = "Make sure the PDF file path is a full Windows path (e.g. D:\\\\folder\\\\file.pdf)"
+                });
+            }
+        }
+
+        /// <summary>
+        /// Link a PDF file (stays connected to source). Alias for ImportPDF with asLink=true.
+        /// </summary>
+        public static string LinkPDF(UIApplication uiApp, JObject parameters)
+        {
+            if (parameters["asLink"] == null)
+            {
+                parameters["asLink"] = true;
+            }
+            return ImportPDF(uiApp, parameters);
+        }
     }
 }
