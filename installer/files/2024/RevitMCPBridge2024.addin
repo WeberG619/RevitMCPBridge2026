@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>MCP Bridge 2024</Name>
+    <Assembly>RevitMCPBridge2024.dll</Assembly>
+    <FullClassName>RevitMCPBridge.RevitMCPBridgeApp</FullClassName>
+    <ClientId>8B8B6F55-9C7A-4F5E-8D8A-1B2C3D4E5F63</ClientId>
+    <VendorId>BIMOpsStudio</VendorId>
+    <VendorDescription>BIM Ops Studio - https://github.com/WeberG619/RevitMCPBridge2026</VendorDescription>
+    <Description>MCP Bridge for Revit 2024 - Enables AI integration with Revit API through Model Context Protocol (437 methods)</Description>
+  </AddIn>
+</RevitAddIns>
