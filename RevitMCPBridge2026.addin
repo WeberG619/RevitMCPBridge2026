@@ -2,7 +2,7 @@
 <RevitAddIns>
   <AddIn Type="Application">
     <Name>MCP Bridge 2026</Name>
-    <Assembly>C:\Users\rick\AppData\Roaming\Autodesk\Revit\Addins\2026\RevitMCPBridge2026.dll</Assembly>
+    <Assembly>C:\Users\echra\AppData\Roaming\Autodesk\Revit\Addins\2026\RevitMCPBridge2026.dll</Assembly>
     <FullClassName>RevitMCPBridge.RevitMCPBridgeApp</FullClassName>
     <ClientId>8B8B6F55-9C7A-4F5E-8D8A-1B2C3D4E5F61</ClientId>
     <VendorId>ADSK</VendorId>
