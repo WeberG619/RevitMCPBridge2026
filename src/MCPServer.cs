@@ -2219,6 +2219,9 @@ namespace RevitMCPBridge
                     case "placeViewOnSheet":
                         return await ExecuteInRevitContext(uiApp => SheetMethods.PlaceViewOnSheet(uiApp, parameters));
 
+                    case "placeScheduleOnSheet":
+                        return await ExecuteInRevitContext(uiApp => SheetMethods.PlaceScheduleOnSheet(uiApp, parameters));
+
                     case "getAllSheets2":
                         return await ExecuteInRevitContext(uiApp => SheetMethods.GetAllSheets(uiApp, parameters));
 
