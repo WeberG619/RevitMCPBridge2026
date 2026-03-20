@@ -16,7 +16,7 @@ namespace RevitMCPBridge
     {
         private static MCPServer _mcpServer;
         private static UIApplication _uiApplication;
-        private static string _tabName = "MCP Bridge";
+        private static string _tabName = "bimmonkey.ai";
         private static MCPRequestHandler _requestHandler;
         private static ExternalEvent _externalEvent;
 
@@ -147,8 +147,6 @@ namespace RevitMCPBridge
                 
                 // Create panels
                 CreateServerPanel(application);
-                CreateToolsPanel(application);
-                CreateSettingsPanel(application);
                 
                 // Auto-start MCP server
                 try
@@ -224,8 +222,21 @@ namespace RevitMCPBridge
             var statusButton = panel.AddItem(statusButtonData) as PushButton;
             statusButton.LargeImage = CreateButtonIcon("status", 32);
             statusButton.Image = CreateButtonIcon("status", 16);
+
+            // FAQ button
+            panel.AddSeparator();
+            var faqButtonData = new PushButtonData(
+                "BimMonkeyFAQ",
+                "FAQ",
+                Assembly.GetExecutingAssembly().Location,
+                "RevitMCPBridge.Commands.BimMonkeyFaqCommand")
+            {
+                ToolTip = "bimmonkey.ai help & FAQ",
+                LongDescription = "Opens the bimmonkey.ai quick-start guide and frequently asked questions."
+            };
+            panel.AddItem(faqButtonData);
         }
-        
+
         private void CreateToolsPanel(UIControlledApplication application)
         {
             var panel = application.CreateRibbonPanel(_tabName, "MCP Tools");
