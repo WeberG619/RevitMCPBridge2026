@@ -175,53 +175,20 @@ namespace RevitMCPBridge
         private void CreateServerPanel(UIControlledApplication application)
         {
             var panel = application.CreateRibbonPanel(_tabName, "Server Control");
-            
-            // Start Server button
-            var startButtonData = new PushButtonData(
-                "StartMCPServer",
-                "Start\nServer",
+
+            // Claude button
+            var claudeButtonData = new PushButtonData(
+                "OpenClaude",
+                "Claude",
                 Assembly.GetExecutingAssembly().Location,
-                "RevitMCPBridge.Commands.StartServerCommand")
+                "RevitMCPBridge.Commands.OpenClaudeCommand")
             {
-                ToolTip = "Start the MCP Bridge server",
-                LongDescription = "Starts the Model Context Protocol server to enable AI integration with Revit",
-                AvailabilityClassName = "RevitMCPBridge.Commands.ServerStoppedAvailability"
+                ToolTip = "Open Claude Code",
+                LongDescription = "Opens Claude Code in your BIM Monkey folder."
             };
-            
-            var startButton = panel.AddItem(startButtonData) as PushButton;
-            startButton.LargeImage = CreateButtonIcon("start", 32);
-            startButton.Image = CreateButtonIcon("start", 16);
-            
-            // Stop Server button
-            var stopButtonData = new PushButtonData(
-                "StopMCPServer",
-                "Stop\nServer",
-                Assembly.GetExecutingAssembly().Location,
-                "RevitMCPBridge.Commands.StopServerCommand")
-            {
-                ToolTip = "Stop the MCP Bridge server",
-                LongDescription = "Stops the Model Context Protocol server",
-                AvailabilityClassName = "RevitMCPBridge.Commands.ServerRunningAvailability"
-            };
-            
-            var stopButton = panel.AddItem(stopButtonData) as PushButton;
-            stopButton.LargeImage = CreateButtonIcon("stop", 32);
-            stopButton.Image = CreateButtonIcon("stop", 16);
-            
-            // Server Status button
-            var statusButtonData = new PushButtonData(
-                "MCPServerStatus",
-                "Server\nStatus",
-                Assembly.GetExecutingAssembly().Location,
-                "RevitMCPBridge.Commands.ServerStatusCommand")
-            {
-                ToolTip = "Check MCP server status",
-                LongDescription = "Shows the current status of the MCP Bridge server and connection details"
-            };
-            
-            var statusButton = panel.AddItem(statusButtonData) as PushButton;
-            statusButton.LargeImage = CreateButtonIcon("status", 32);
-            statusButton.Image = CreateButtonIcon("status", 16);
+            var claudeButton = panel.AddItem(claudeButtonData) as PushButton;
+            claudeButton.LargeImage = CreateButtonIcon("claude", 32);
+            claudeButton.Image = CreateButtonIcon("claude", 16);
 
             // Platform button
             var platformButtonData = new PushButtonData(
@@ -237,6 +204,51 @@ namespace RevitMCPBridge
             platformButton.LargeImage = CreateButtonIcon("ai", 32);
             platformButton.Image = CreateButtonIcon("ai", 16);
 
+            panel.AddSeparator();
+
+            // Start Server button
+            var startButtonData = new PushButtonData(
+                "StartMCPServer",
+                "Start\nServer",
+                Assembly.GetExecutingAssembly().Location,
+                "RevitMCPBridge.Commands.StartServerCommand")
+            {
+                ToolTip = "Start the BIM Monkey server",
+                LongDescription = "Starts the BIM Monkey server to enable AI integration with Revit.",
+                AvailabilityClassName = "RevitMCPBridge.Commands.ServerStoppedAvailability"
+            };
+            var startButton = panel.AddItem(startButtonData) as PushButton;
+            startButton.LargeImage = CreateButtonIcon("start", 32);
+            startButton.Image = CreateButtonIcon("start", 16);
+
+            // Stop Server button
+            var stopButtonData = new PushButtonData(
+                "StopMCPServer",
+                "Stop\nServer",
+                Assembly.GetExecutingAssembly().Location,
+                "RevitMCPBridge.Commands.StopServerCommand")
+            {
+                ToolTip = "Stop the BIM Monkey server",
+                LongDescription = "Stops the BIM Monkey server.",
+                AvailabilityClassName = "RevitMCPBridge.Commands.ServerRunningAvailability"
+            };
+            var stopButton = panel.AddItem(stopButtonData) as PushButton;
+            stopButton.LargeImage = CreateButtonIcon("stop", 32);
+            stopButton.Image = CreateButtonIcon("stop", 16);
+
+            // Server Status button
+            var statusButtonData = new PushButtonData(
+                "MCPServerStatus",
+                "Server\nStatus",
+                Assembly.GetExecutingAssembly().Location,
+                "RevitMCPBridge.Commands.ServerStatusCommand")
+            {
+                ToolTip = "Check BIM Monkey server status",
+                LongDescription = "Shows the current status of the BIM Monkey server and connection details."
+            };
+            var statusButton = panel.AddItem(statusButtonData) as PushButton;
+            statusButton.LargeImage = CreateButtonIcon("status", 32);
+            statusButton.Image = CreateButtonIcon("status", 16);
         }
 
         private void CreateToolsPanel(UIControlledApplication application)
@@ -417,6 +429,9 @@ namespace RevitMCPBridge
                 {
                     switch (iconType)
                     {
+                        case "claude":
+                            DrawClaudeIcon(dc, size);
+                            break;
                         case "start":
                             DrawStartIcon(dc, size);
                             break;
@@ -470,6 +485,24 @@ namespace RevitMCPBridge
             }
         }
         
+        private void DrawClaudeIcon(DrawingContext dc, int size)
+        {
+            // Claude Code icon: dark rounded square with coral/orange ">" mark
+            var margin = size * 0.08;
+            var rect = new Rect(margin, margin, size - 2 * margin, size - 2 * margin);
+            var bg = new SolidColorBrush(Color.FromRgb(30, 30, 30));
+            dc.DrawRoundedRectangle(bg, null, rect, size * 0.15, size * 0.15);
+
+            // Coral ">" chevron — Claude Code terminal prompt style
+            var coral = new SolidColorBrush(Color.FromRgb(214, 103, 76));
+            var pen = new Pen(coral, size * 0.115) { StartLineCap = PenLineCap.Round, EndLineCap = PenLineCap.Round, LineJoin = PenLineJoin.Round };
+            var cx = size * 0.48;
+            var cy = size * 0.5;
+            var arm = size * 0.19;
+            dc.DrawLine(pen, new Point(cx - arm * 0.5, cy - arm), new Point(cx + arm * 0.5, cy));
+            dc.DrawLine(pen, new Point(cx - arm * 0.5, cy + arm), new Point(cx + arm * 0.5, cy));
+        }
+
         private void DrawStartIcon(DrawingContext dc, int size)
         {
             // Green play button
