@@ -192,7 +192,7 @@ namespace RevitMCPBridge
             // Platform button
             var platformButtonData = new PushButtonData(
                 "BimMonkeyPlatform",
-                "Platform",
+                "Web\nPlatform",
                 Assembly.GetExecutingAssembly().Location,
                 "RevitMCPBridge.Commands.OpenPlatformCommand")
             {
