@@ -179,7 +179,7 @@ namespace RevitMCPBridge
             // Claude button
             var claudeButtonData = new PushButtonData(
                 "OpenClaude",
-                "Claude",
+                "Claude\nCode",
                 Assembly.GetExecutingAssembly().Location,
                 "RevitMCPBridge.Commands.OpenClaudeCommand")
             {
