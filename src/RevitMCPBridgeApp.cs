@@ -174,9 +174,9 @@ namespace RevitMCPBridge
         
         private void CreateServerPanel(UIControlledApplication application)
         {
-            var panel = application.CreateRibbonPanel(_tabName, "Server Control");
+            // ── AI Enablement ─────────────────────────────────────────────
+            var aiPanel = application.CreateRibbonPanel(_tabName, "AI Enablement");
 
-            // Claude button
             var claudeButtonData = new PushButtonData(
                 "OpenClaude",
                 "Claude\nCode",
@@ -185,11 +185,10 @@ namespace RevitMCPBridge
             {
                 ToolTip = "Open Claude Code in BIM Monkey folder"
             };
-            var claudeButton = panel.AddItem(claudeButtonData) as PushButton;
+            var claudeButton = aiPanel.AddItem(claudeButtonData) as PushButton;
             claudeButton.LargeImage = CreateButtonIcon("claude", 32);
             claudeButton.Image = CreateButtonIcon("claude", 16);
 
-            // Platform button
             var platformButtonData = new PushButtonData(
                 "BimMonkeyPlatform",
                 "Web\nPlatform",
@@ -198,13 +197,13 @@ namespace RevitMCPBridge
             {
                 ToolTip = "Open BIM Monkey dashboard"
             };
-            var platformButton = panel.AddItem(platformButtonData) as PushButton;
+            var platformButton = aiPanel.AddItem(platformButtonData) as PushButton;
             platformButton.LargeImage = CreateButtonIcon("monkey", 32);
             platformButton.Image = CreateButtonIcon("monkey", 16);
 
-            panel.AddSeparator();
+            // ── Server Control ────────────────────────────────────────────
+            var serverPanel = application.CreateRibbonPanel(_tabName, "Server Control");
 
-            // Start Server button
             var startButtonData = new PushButtonData(
                 "StartMCPServer",
                 "Start\nServer",
@@ -214,11 +213,10 @@ namespace RevitMCPBridge
                 ToolTip = "Start BIM Monkey server",
                 AvailabilityClassName = "RevitMCPBridge.Commands.ServerStoppedAvailability"
             };
-            var startButton = panel.AddItem(startButtonData) as PushButton;
+            var startButton = serverPanel.AddItem(startButtonData) as PushButton;
             startButton.LargeImage = CreateButtonIcon("start", 32);
             startButton.Image = CreateButtonIcon("start", 16);
 
-            // Stop Server button
             var stopButtonData = new PushButtonData(
                 "StopMCPServer",
                 "Stop\nServer",
@@ -228,11 +226,10 @@ namespace RevitMCPBridge
                 ToolTip = "Stop BIM Monkey server",
                 AvailabilityClassName = "RevitMCPBridge.Commands.ServerRunningAvailability"
             };
-            var stopButton = panel.AddItem(stopButtonData) as PushButton;
+            var stopButton = serverPanel.AddItem(stopButtonData) as PushButton;
             stopButton.LargeImage = CreateButtonIcon("stop", 32);
             stopButton.Image = CreateButtonIcon("stop", 16);
 
-            // Server Status button
             var statusButtonData = new PushButtonData(
                 "MCPServerStatus",
                 "Server\nStatus",
@@ -241,9 +238,53 @@ namespace RevitMCPBridge
             {
                 ToolTip = "Check BIM Monkey server status"
             };
-            var statusButton = panel.AddItem(statusButtonData) as PushButton;
+            var statusButton = serverPanel.AddItem(statusButtonData) as PushButton;
             statusButton.LargeImage = CreateButtonIcon("status", 32);
             statusButton.Image = CreateButtonIcon("status", 16);
+
+            // ── Standards ─────────────────────────────────────────────────
+            var standardsPanel = application.CreateRibbonPanel(_tabName, "Standards");
+
+            var standardsButtonData = new PushButtonData(
+                "Standards",
+                "Library\nStats",
+                Assembly.GetExecutingAssembly().Location,
+                "RevitMCPBridge.Commands.StandardsCommand")
+            {
+                ToolTip = "View your BIM Monkey training library statistics"
+            };
+            var standardsButton = standardsPanel.AddItem(standardsButtonData) as PushButton;
+            standardsButton.LargeImage = CreateButtonIcon("standards", 32);
+            standardsButton.Image = CreateButtonIcon("standards", 16);
+
+            // ── Easy Buttons ──────────────────────────────────────────────
+            var easyPanel = application.CreateRibbonPanel(_tabName, "Easy Buttons");
+
+            var startGenButtonData = new PushButtonData(
+                "StartGeneration",
+                "Start\nGeneration",
+                Assembly.GetExecutingAssembly().Location,
+                "RevitMCPBridge.Commands.StartGenerationCommand")
+            {
+                ToolTip = "Start generating Construction Documents",
+                AvailabilityClassName = "RevitMCPBridge.Commands.GenerationNotRunningAvailability"
+            };
+            var startGenButton = easyPanel.AddItem(startGenButtonData) as PushButton;
+            startGenButton.LargeImage = CreateButtonIcon("startgen", 32);
+            startGenButton.Image = CreateButtonIcon("startgen", 16);
+
+            var stopGenButtonData = new PushButtonData(
+                "StopGeneration",
+                "Stop\nGeneration",
+                Assembly.GetExecutingAssembly().Location,
+                "RevitMCPBridge.Commands.StopGenerationCommand")
+            {
+                ToolTip = "Stop the running generation",
+                AvailabilityClassName = "RevitMCPBridge.Commands.GenerationRunningAvailability"
+            };
+            var stopGenButton = easyPanel.AddItem(stopGenButtonData) as PushButton;
+            stopGenButton.LargeImage = CreateButtonIcon("stopgen", 32);
+            stopGenButton.Image = CreateButtonIcon("stopgen", 16);
         }
 
         private void CreateToolsPanel(UIControlledApplication application)
@@ -468,6 +509,15 @@ namespace RevitMCPBridge
                             break;
                         case "smart":
                             DrawSmartIcon(dc, size);
+                            break;
+                        case "startgen":
+                            DrawStartGenIcon(dc, size);
+                            break;
+                        case "stopgen":
+                            DrawStopGenIcon(dc, size);
+                            break;
+                        case "standards":
+                            DrawStandardsIcon(dc, size);
                             break;
                     }
                 }
@@ -1040,6 +1090,68 @@ namespace RevitMCPBridge
             dc.DrawLine(rayPen,
                 new Point(center + rayDistance * 0.7, center - rayDistance * 0.5),
                 new Point(center + (rayDistance + rayLength) * 0.7, center - (rayDistance + rayLength) * 0.5));
+        }
+
+        private void DrawStandardsIcon(DrawingContext dc, int size)
+        {
+            // Bar chart — three ascending bars in dark grey
+            var dark = new SolidColorBrush(Color.FromRgb(50, 50, 50));
+            var mid  = new SolidColorBrush(Color.FromRgb(120, 120, 120));
+            var light = new SolidColorBrush(Color.FromRgb(190, 190, 190));
+            double margin = size * 0.12;
+            double bottom = size - margin;
+            double barW = (size - 2 * margin) / 4.0;
+            double gap = barW * 0.3;
+            double bw = barW - gap;
+
+            // Bar 1 — short
+            double h1 = size * 0.3;
+            dc.DrawRectangle(light, null, new Rect(margin, bottom - h1, bw, h1));
+            // Bar 2 — medium
+            double h2 = size * 0.52;
+            dc.DrawRectangle(mid, null, new Rect(margin + barW, bottom - h2, bw, h2));
+            // Bar 3 — tall
+            double h3 = size * 0.72;
+            dc.DrawRectangle(dark, null, new Rect(margin + barW * 2, bottom - h3, bw, h3));
+
+            // Baseline
+            dc.DrawLine(new Pen(dark, Math.Max(1, size * 0.04)),
+                new Point(margin * 0.6, bottom),
+                new Point(size - margin * 0.6, bottom));
+        }
+
+        private void DrawStartGenIcon(DrawingContext dc, int size)
+        {
+            // Solid green circle with white "GO" text
+            var center = size / 2.0;
+            var radius = size * 0.42;
+            var green = new SolidColorBrush(Color.FromRgb(67, 160, 71));
+            var darkGreen = new SolidColorBrush(Color.FromRgb(46, 125, 50));
+            dc.DrawEllipse(green, new Pen(darkGreen, Math.Max(1, size * 0.04)), new Point(center, center), radius, radius);
+
+            var text = new FormattedText(
+                "GO",
+                System.Globalization.CultureInfo.CurrentCulture,
+                System.Windows.FlowDirection.LeftToRight,
+                new Typeface(new FontFamily("Arial"), System.Windows.FontStyles.Normal, System.Windows.FontWeights.Bold, System.Windows.FontStretches.Normal),
+                size * 0.32,
+                new SolidColorBrush(Colors.White),
+                96);
+            dc.DrawText(text, new Point(center - text.Width / 2, center - text.Height / 2));
+        }
+
+        private void DrawStopGenIcon(DrawingContext dc, int size)
+        {
+            // Solid red circle with white stop square
+            var center = size / 2.0;
+            var radius = size * 0.42;
+            var red = new SolidColorBrush(Color.FromRgb(229, 57, 53));
+            var darkRed = new SolidColorBrush(Color.FromRgb(183, 28, 28));
+            dc.DrawEllipse(red, new Pen(darkRed, Math.Max(1, size * 0.04)), new Point(center, center), radius, radius);
+
+            var sq = size * 0.22;
+            dc.DrawRectangle(new SolidColorBrush(Colors.White), null,
+                new Rect(center - sq, center - sq, sq * 2, sq * 2));
         }
 
         // Dialog handling event
