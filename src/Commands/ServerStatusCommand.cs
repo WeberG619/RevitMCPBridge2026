@@ -30,14 +30,11 @@ namespace RevitMCPBridge.Commands
                 else
                 {
                     status.AppendLine($"Status: {(server.IsRunning ? "Running" : "Stopped")}");
-                    status.AppendLine($"Pipe Name: {server.PipeName}");
 
                     if (server.IsRunning)
                     {
                         status.AppendLine();
-                        status.AppendLine("Connection Information:");
-                        status.AppendLine($"- Named Pipe: \\\\.\\pipe\\{server.PipeName}");
-                        status.AppendLine("- Transport: Named Pipes (Windows)");
+                        status.AppendLine("The BIM Monkey server is running and ready.");
                     }
                     else
                     {

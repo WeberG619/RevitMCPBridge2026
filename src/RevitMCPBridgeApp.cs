@@ -183,8 +183,7 @@ namespace RevitMCPBridge
                 Assembly.GetExecutingAssembly().Location,
                 "RevitMCPBridge.Commands.OpenClaudeCommand")
             {
-                ToolTip = "Open Claude Code",
-                LongDescription = "Opens Claude Code in your BIM Monkey folder."
+                ToolTip = "Open Claude Code in BIM Monkey folder"
             };
             var claudeButton = panel.AddItem(claudeButtonData) as PushButton;
             claudeButton.LargeImage = CreateButtonIcon("claude", 32);
@@ -197,8 +196,7 @@ namespace RevitMCPBridge
                 Assembly.GetExecutingAssembly().Location,
                 "RevitMCPBridge.Commands.OpenPlatformCommand")
             {
-                ToolTip = "Open BIM Monkey dashboard",
-                LongDescription = "Opens app.bimmonkey.ai in your browser."
+                ToolTip = "Open BIM Monkey dashboard"
             };
             var platformButton = panel.AddItem(platformButtonData) as PushButton;
             platformButton.LargeImage = CreateButtonIcon("ai", 32);
@@ -213,8 +211,7 @@ namespace RevitMCPBridge
                 Assembly.GetExecutingAssembly().Location,
                 "RevitMCPBridge.Commands.StartServerCommand")
             {
-                ToolTip = "Start the BIM Monkey server",
-                LongDescription = "Starts the BIM Monkey server to enable AI integration with Revit.",
+                ToolTip = "Start BIM Monkey server",
                 AvailabilityClassName = "RevitMCPBridge.Commands.ServerStoppedAvailability"
             };
             var startButton = panel.AddItem(startButtonData) as PushButton;
@@ -228,8 +225,7 @@ namespace RevitMCPBridge
                 Assembly.GetExecutingAssembly().Location,
                 "RevitMCPBridge.Commands.StopServerCommand")
             {
-                ToolTip = "Stop the BIM Monkey server",
-                LongDescription = "Stops the BIM Monkey server.",
+                ToolTip = "Stop BIM Monkey server",
                 AvailabilityClassName = "RevitMCPBridge.Commands.ServerRunningAvailability"
             };
             var stopButton = panel.AddItem(stopButtonData) as PushButton;
@@ -243,8 +239,7 @@ namespace RevitMCPBridge
                 Assembly.GetExecutingAssembly().Location,
                 "RevitMCPBridge.Commands.ServerStatusCommand")
             {
-                ToolTip = "Check BIM Monkey server status",
-                LongDescription = "Shows the current status of the BIM Monkey server and connection details."
+                ToolTip = "Check BIM Monkey server status"
             };
             var statusButton = panel.AddItem(statusButtonData) as PushButton;
             statusButton.LargeImage = CreateButtonIcon("status", 32);
