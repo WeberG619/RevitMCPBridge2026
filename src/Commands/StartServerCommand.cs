@@ -24,13 +24,13 @@ namespace RevitMCPBridge.Commands
                 
                 if (server.IsRunning)
                 {
-                    TaskDialog.Show("", "Server is already running.");
+                    TaskDialog.Show("BIM Monkey", "Server is already running.");
                     return Result.Succeeded;
                 }
 
                 server.Start();
 
-                var dialog = new TaskDialog("");
+                var dialog = new TaskDialog("BIM Monkey");
                 dialog.MainContent = "BIM Monkey server started. You can now run Claude Code.";
                 dialog.MainIcon = TaskDialogIcon.TaskDialogIconInformation;
                 dialog.Show();
