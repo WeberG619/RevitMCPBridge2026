@@ -199,8 +199,8 @@ namespace RevitMCPBridge
                 ToolTip = "Open BIM Monkey dashboard"
             };
             var platformButton = panel.AddItem(platformButtonData) as PushButton;
-            platformButton.LargeImage = CreateButtonIcon("ai", 32);
-            platformButton.Image = CreateButtonIcon("ai", 16);
+            platformButton.LargeImage = CreateButtonIcon("monkey", 32);
+            platformButton.Image = CreateButtonIcon("monkey", 16);
 
             panel.AddSeparator();
 
@@ -460,6 +460,9 @@ namespace RevitMCPBridge
                         case "ai":
                             DrawAiIcon(dc, size);
                             break;
+                        case "monkey":
+                            DrawMonkeyIcon(dc, size);
+                            break;
                         case "library":
                             DrawLibraryIcon(dc, size);
                             break;
@@ -480,6 +483,30 @@ namespace RevitMCPBridge
             }
         }
         
+        private void DrawMonkeyIcon(DrawingContext dc, int size)
+        {
+            // Monkey face: white fill, dark outline — matches bimmonkey-mark.svg
+            double s = size / 80.0;
+            var white = new SolidColorBrush(Colors.White);
+            var dark = new SolidColorBrush(Color.FromRgb(17, 17, 17));
+            var pen = new Pen(dark, Math.Max(1.0, 1.5 * s));
+            var penThin = new Pen(dark, Math.Max(0.8, 1.2 * s));
+
+            // Ears (behind body — draw first)
+            dc.DrawEllipse(white, pen, new Point(20 * s, 36 * s), 6 * s, 8 * s);
+            dc.DrawEllipse(white, pen, new Point(60 * s, 36 * s), 6 * s, 8 * s);
+            // Body
+            dc.DrawEllipse(white, pen, new Point(40 * s, 38 * s), 20 * s, 22 * s);
+            // Muzzle
+            dc.DrawEllipse(white, penThin, new Point(40 * s, 48 * s), 10 * s, 7 * s);
+            // Eyes
+            dc.DrawEllipse(dark, null, new Point(34 * s, 34 * s), 2.8 * s, 2.8 * s);
+            dc.DrawEllipse(dark, null, new Point(46 * s, 34 * s), 2.8 * s, 2.8 * s);
+            // Nostrils
+            dc.DrawEllipse(dark, null, new Point(37 * s, 48 * s), 1.2 * s, 1.2 * s);
+            dc.DrawEllipse(dark, null, new Point(43 * s, 48 * s), 1.2 * s, 1.2 * s);
+        }
+
         private void DrawClaudeIcon(DrawingContext dc, int size)
         {
             // Claude Code icon: dark rounded square with coral/orange ">" mark
