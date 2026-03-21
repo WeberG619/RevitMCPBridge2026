@@ -493,8 +493,8 @@ namespace RevitMCPBridge
             var penThin = new Pen(dark, Math.Max(0.8, 1.2 * s));
 
             // Ears (behind body — draw first)
-            dc.DrawEllipse(white, pen, new Point(20 * s, 36 * s), 6 * s, 8 * s);
-            dc.DrawEllipse(white, pen, new Point(60 * s, 36 * s), 6 * s, 8 * s);
+            dc.DrawEllipse(white, pen, new Point(20 * s, 26 * s), 6 * s, 8 * s);
+            dc.DrawEllipse(white, pen, new Point(60 * s, 26 * s), 6 * s, 8 * s);
             // Body
             dc.DrawEllipse(white, pen, new Point(40 * s, 38 * s), 20 * s, 22 * s);
             // Muzzle
