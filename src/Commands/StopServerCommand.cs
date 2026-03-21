@@ -18,13 +18,13 @@ namespace RevitMCPBridge.Commands
                 
                 if (server == null || !server.IsRunning)
                 {
-                    TaskDialog.Show("BIM Monkey", "Server is not running.");
+                    TaskDialog.Show("", "Server is not running.");
                     return Result.Succeeded;
                 }
 
                 server.Stop();
 
-                TaskDialog.Show("BIM Monkey", "BIM Monkey server stopped.");
+                TaskDialog.Show("", "BIM Monkey server stopped.");
                 Log.Information("MCP Server stopped via UI command");
                 
                 return Result.Succeeded;
