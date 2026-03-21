@@ -237,20 +237,6 @@ namespace RevitMCPBridge
             platformButton.LargeImage = CreateButtonIcon("ai", 32);
             platformButton.Image = CreateButtonIcon("ai", 16);
 
-            // FAQ button
-            panel.AddSeparator();
-            var faqButtonData = new PushButtonData(
-                "BimMonkeyFAQ",
-                "FAQ",
-                Assembly.GetExecutingAssembly().Location,
-                "RevitMCPBridge.Commands.BimMonkeyFaqCommand")
-            {
-                ToolTip = "BIM Monkey help & FAQ",
-                LongDescription = "Opens the BIM Monkey quick-start guide and frequently asked questions."
-            };
-            var faqButton = panel.AddItem(faqButtonData) as PushButton;
-            faqButton.LargeImage = CreateButtonIcon("logs", 32);
-            faqButton.Image = CreateButtonIcon("logs", 16);
         }
 
         private void CreateToolsPanel(UIControlledApplication application)
