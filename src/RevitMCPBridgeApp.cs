@@ -70,10 +70,51 @@ namespace RevitMCPBridge
         {
             try
             {
-                // Store UI application reference and initialize ChangeTracker
+                // Initialize logger - wrapped in try/catch so Serilog version issues don't kill the add-in
+                try
+                {
+                    var logPath = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                        "Autodesk", "Revit", "Addins", "2026", "Logs",
+                        $"mcp_{DateTime.Now:yyyyMMdd}.log");
+
+                    Directory.CreateDirectory(Path.GetDirectoryName(logPath));
+
+                    Log.Logger = new LoggerConfiguration()
+                        .MinimumLevel.Debug()
+                        .WriteTo.File(logPath,
+                            rollingInterval: RollingInterval.Day,
+                            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                        .CreateLogger();
+                }
+                catch
+                {
+                    // Serilog failed (version mismatch) - use silent logger so add-in still loads
+                    Log.Logger = new LoggerConfiguration().CreateLogger();
+                }
+
+                Log.Information("Starting MCP Bridge for Revit 2026");
+
+                // Initialize MCP request handler (but NOT ExternalEvent yet - must wait for ApplicationInitialized)
+                _requestHandler = new MCPRequestHandler();
+                Log.Information("MCP Request Handler created");
+
+                // Store UI application reference and initialize ExternalEvent + ChangeTracker
+                // ExternalEvent.Create() must be called after application is fully initialized (Revit 2026 requirement)
                 application.ControlledApplication.ApplicationInitialized += (sender, args) =>
                 {
                     _uiApplication = new UIApplication(sender as Autodesk.Revit.ApplicationServices.Application);
+
+                    // Create ExternalEvent here where it's safe
+                    try
+                    {
+                        _externalEvent = ExternalEvent.Create(_requestHandler);
+                        Log.Information("ExternalEvent created successfully in ApplicationInitialized");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Failed to create ExternalEvent in ApplicationInitialized");
+                    }
 
                     // Initialize the ChangeTracker for real-time change detection
                     try
@@ -85,29 +126,19 @@ namespace RevitMCPBridge
                     {
                         Log.Error(ex, "Failed to initialize ChangeTracker");
                     }
-                };
-                
-                // Initialize logger
-                var logPath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "Autodesk", "Revit", "Addins", "2026", "Logs",
-                    $"mcp_{DateTime.Now:yyyyMMdd}.log");
-                
-                Directory.CreateDirectory(Path.GetDirectoryName(logPath));
-                
-                Log.Logger = new LoggerConfiguration()
-                    .MinimumLevel.Debug()
-                    .WriteTo.File(logPath, 
-                        rollingInterval: RollingInterval.Day,
-                        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
-                    .CreateLogger();
-                
-                Log.Information("Starting MCP Bridge for Revit 2026");
 
-                // Initialize MCP request handler and external event
-                _requestHandler = new MCPRequestHandler();
-                _externalEvent = ExternalEvent.Create(_requestHandler);
-                Log.Information("MCP Request Handler and ExternalEvent initialized");
+                    // Auto-start MCP server after application is ready
+                    try
+                    {
+                        _mcpServer = new MCPServer();
+                        _mcpServer.Start();
+                        Log.Information("MCP Server started automatically on Revit startup");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Failed to auto-start MCP server");
+                    }
+                };
 
                 // Subscribe to dialog events for automatic handling
                 application.DialogBoxShowing += OnDialogBoxShowing;
@@ -123,26 +154,12 @@ namespace RevitMCPBridge
                 {
                     Log.Warning($"Ribbon tab already exists: {ex.Message}");
                 }
-                
+
                 // Create panels
                 CreateServerPanel(application);
                 CreateToolsPanel(application);
                 CreateSettingsPanel(application);
-                
-                // Auto-start MCP server
-                try
-                {
-                    _mcpServer = new MCPServer();
-                    _mcpServer.Start();
-                    Log.Information("MCP Server started automatically on Revit startup");
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, "Failed to auto-start MCP server");
-                    // Don't fail the whole add-in if server fails to start
-                    // User can still manually start it via button
-                }
-                
+
                 return Result.Succeeded;
             }
             catch (Exception ex)
