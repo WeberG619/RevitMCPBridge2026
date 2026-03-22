@@ -924,13 +924,29 @@ namespace RevitMCPBridge
 
                 var sheets = ElementLookup.GetAllSheets(doc)
                     .Where(s => !s.IsPlaceholder)
-                    .Select(s => new
+                    .Select(s =>
                     {
-                        sheetId = (int)s.Id.Value,
-                        sheetNumber = s.SheetNumber,
-                        sheetName = s.Name,
-                        isPlaceholder = s.IsPlaceholder,
-                        viewportCount = s.GetAllViewports()?.Count ?? 0
+                        // Sheet printable bounds (in inches) from the sheet outline.
+                        // Claude uses these to calculate whether a view fits before placing.
+                        double widthIn = 0, heightIn = 0;
+                        try
+                        {
+                            var outline = s.Outline;
+                            widthIn  = Math.Round((outline.Max.U - outline.Min.U) * 12, 1);
+                            heightIn = Math.Round((outline.Max.V - outline.Min.V) * 12, 1);
+                        }
+                        catch { /* non-fatal — bounds stay 0 if outline unavailable */ }
+
+                        return new
+                        {
+                            sheetId = (int)s.Id.Value,
+                            sheetNumber = s.SheetNumber,
+                            sheetName = s.Name,
+                            isPlaceholder = s.IsPlaceholder,
+                            viewportCount = s.GetAllViewports()?.Count ?? 0,
+                            widthInches = widthIn,
+                            heightInches = heightIn
+                        };
                     })
                     .OrderBy(s => s.sheetNumber)
                     .ToList();

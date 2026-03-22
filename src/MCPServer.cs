@@ -2062,6 +2062,9 @@ namespace RevitMCPBridge
                     case "duplicateView":
                         return await ExecuteInRevitContext(uiApp => ViewMethods.DuplicateView(uiApp, parameters));
 
+                    case "canPlaceView":
+                        return await ExecuteInRevitContext(uiApp => ViewMethods.CanPlaceView(uiApp, parameters));
+
                     case "applyViewTemplate":
                         return await ExecuteInRevitContext(uiApp => ViewMethods.ApplyViewTemplate(uiApp, parameters));
 

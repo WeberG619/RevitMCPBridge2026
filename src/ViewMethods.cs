@@ -431,6 +431,72 @@ namespace RevitMCPBridge
         }
 
         /// <summary>
+        /// Check whether a view can be placed on a sheet before attempting placement.
+        /// Returns canPlace, reason, isAlreadyOnSheet, elementCount, and viewType.
+        /// </summary>
+        [MCPMethod("canPlaceView", Category = "View", Description = "Preflight check — returns whether a view is ready to place on a sheet")]
+        public static string CanPlaceView(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+                var viewIdInt = int.Parse(parameters["viewId"].ToString());
+                var viewId = new ElementId(viewIdInt);
+
+                var view = doc.GetElement(viewId) as View;
+                if (view == null)
+                    return ResponseBuilder.Error("View not found", "ELEMENT_NOT_FOUND").Build();
+
+                // Types that can be placed on sheets
+                var placeableTypes = new HashSet<ViewType>
+                {
+                    ViewType.FloorPlan, ViewType.CeilingPlan, ViewType.Elevation,
+                    ViewType.Section, ViewType.Detail, ViewType.DraftingView,
+                    ViewType.Legend, ViewType.EngineeringPlan, ViewType.AreaPlan
+                };
+
+                bool isTemplate = view.IsTemplate;
+                bool isPlaceableType = placeableTypes.Contains(view.ViewType);
+
+                // Check if already on a sheet
+                bool isAlreadyOnSheet = new FilteredElementCollector(doc)
+                    .OfClass(typeof(Viewport))
+                    .Cast<Viewport>()
+                    .Any(vp => vp.ViewId == viewId);
+
+                // Check element count (empty views can't be placed)
+                var elementCount = new FilteredElementCollector(doc, viewId)
+                    .WhereElementIsNotElementType()
+                    .GetElementCount();
+
+                bool hasContent = elementCount > 1;
+
+                bool canPlace = isPlaceableType && !isTemplate && !isAlreadyOnSheet && hasContent;
+
+                string reason = !isPlaceableType    ? $"{view.ViewType} cannot be placed on sheets" :
+                                isTemplate          ? "view is a template" :
+                                isAlreadyOnSheet    ? "view is already placed on a sheet — call duplicateView first" :
+                                !hasContent         ? "view has no content (elementCount ≤ 1)" :
+                                                      "ok";
+
+                return ResponseBuilder.Success()
+                    .With("canPlace", canPlace)
+                    .With("reason", reason)
+                    .With("viewId", viewIdInt)
+                    .With("viewName", view.Name)
+                    .With("viewType", view.ViewType.ToString())
+                    .With("isAlreadyOnSheet", isAlreadyOnSheet)
+                    .With("isTemplate", isTemplate)
+                    .With("elementCount", elementCount)
+                    .Build();
+            }
+            catch (Exception ex)
+            {
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
+        /// <summary>
         /// Apply a view template
         /// </summary>
         [MCPMethod("applyViewTemplate", Category = "View", Description = "Apply a view template to a view")]
