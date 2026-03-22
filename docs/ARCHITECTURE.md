@@ -362,16 +362,23 @@ Claude **must never improvise a CD plan**. Every generation follows this exact s
                 getSheets, getViews, getWallTypes — combine into one JSON object
 
 2. Get plan:    bim_monkey_generate(modelJson)
-                → POSTs to /api/generate on Railway backend
+                → build_model_summary() reshapes + prunes raw Revit responses
+                  into the compact format the backend expects
+                → POSTs lean model summary (~20KB) to /api/generate on Railway
                 → Backend does RAG lookup against firm's approved_examples
                 → Backend injects previous run notes as direct instructions
                 → Returns { generationId, plan }
                 → STOP and report if this fails — do not proceed
 
 3. Execute:     revit_execute() for each sheet, view, schedule, detail in plan
-                Log failures and skip — do not abort entire run
+                - Schedule views: use placeScheduleOnSheet (not placeViewOnSheet)
+                - Views marked requiresDuplicate:true: call duplicateView (newName param) first
+                - Log all failures, continue — do not abort entire run
 
-4. Mark done:   bim_monkey_mark_executed(generationId)
+4. Report:      bim_monkey_report_issues(generationId, issues)
+                → Posts all issues encountered to dashboard System Report
+
+5. Mark done:   bim_monkey_mark_executed(generationId)
                 → Logs run in dashboard so notes/feedback loop works
 ```
 
@@ -382,6 +389,12 @@ and in the tool docstrings in `revit_mcp_wrapper.py`.
 
 ```
 POST /api/generate
+  │
+  │  ← receives lean model summary (~20KB) built by build_model_summary()
+  │    Keys: projectName, projectInfo, buildingType, levels[], rooms[],
+  │          existingSheets[], wallTypes[], existingViews[], existingDraftingViews[]
+  │    (NOT raw Revit response objects — those are never sent to the backend)
+  │
   ├── fetchApprovedExamples(buildingType, firmId)
   │     → queries approved_examples table (firm's private library only)
   │     → RAG: retrieved examples injected as reference context
@@ -393,10 +406,25 @@ POST /api/generate
   │
   ├── fetchCrossReferenceRules() + fetchLayoutTemplates()
   │
+  ├── existingViews → structured EXISTING VIEWS block (id|viewType|name per line)
+  │     used for view-to-sheet mapping in the sheets prompt
+  │
+  ├── existingSheets → sheet collision detection + numbering style detection
+  │
   └── Two-phase Claude API call (cached system prompt):
-        Phase 1 → sheets JSON
+        Phase 1 → sheets JSON (viewPlacements include isSchedule:true and requiresDuplicate:true flags)
         Phase 2 → detail plan JSON
         → returns { success, generationId, plan }
+```
+
+### Dashboard System Report (`/api/generation/:id/system-report`)
+
+```
+POST /api/generation/:id/system-report
+  ← called by bim_monkey_report_issues() MCP tool after execution
+  ← body: { issues: [{type, message, item?, recommendation?}] }
+  → stores in generations.system_notes JSONB column
+  → shown in run detail view as "System Report" section (yellow, above sheets)
 ```
 
 ### Community Pool — Deprecated
@@ -404,6 +432,19 @@ POST /api/generate
 Community pool was removed. All `approved_examples` rows are now firm-private
 (`in_community_pool = false` hardcoded). The Settings toggle, Team stats section,
 and all community pool language have been removed from the frontend and ToS.
+
+### Wrapper Bug Fixes Applied (March 2026 — Sprint N)
+
+The following CD-generation bugs were fixed based on post-run analysis of the BAINES REMODEL output:
+
+| Area | Problem | Fix |
+|------|---------|-----|
+| `bim_monkey_generate` payload | Raw Revit response objects sent to backend — `existingViews`, `existingSheets`, `levels` extracted as empty arrays; backend viewsBlock and sheet collision detection silently broken | Replaced ad-hoc slimming with `build_model_summary()` which reshapes nested responses into flat arrays the backend expects |
+| Payload size | 157 views × full metadata = ~200KB; 500-view models would hit ~500KB and timeout | `build_model_summary()` prunes to `{id,name,viewType}` per view — 500-view model now ~20KB |
+| Schedule placement | Backend CD plan contained no signal; executor Claude called `placeViewOnSheet` for Schedule views (always fails in Revit) | sheetsPrompt now instructs AI to mark Schedule viewPlacements with `"isSchedule": true` |
+| View duplication | No signal when same view needed on multiple sheets; executor called `placeViewOnSheet` twice → Revit error | sheetsPrompt now marks second+ occurrences with `"requiresDuplicate": true` |
+| `duplicateView` param | Executor passed `name` parameter; plugin reads `newName` — view was renamed silently | CLAUDE.md execution rules updated: `newName` not `name` |
+| Auto system notes | No post-run issue reporting; errors only visible in Claude's local transcript | New `bim_monkey_report_issues` MCP tool + `POST /api/generation/:id/system-report` endpoint + dashboard System Report section |
 
 ### Plugin Bug Fixes Applied (March 2026 — v0.1.202603220758)
 
