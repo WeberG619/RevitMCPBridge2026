@@ -7,7 +7,17 @@
 │                        Claude Code / AI Client                       │
 │                    (Natural Language Interface)                      │
 └─────────────────────────────────────┬───────────────────────────────┘
-                                      │ MCP Protocol
+                                      │ MCP stdio (JSON-RPC)
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                      revit_mcp_wrapper.py                            │
+│              (Python MCP server — bridges stdio ↔ pipe)             │
+│  • Launched automatically by Claude Code via .mcp.json              │
+│  • All logging goes to STDERR — stdout must stay clean for MCP      │
+│  • Source lives in woodstudioai/scripts/ (not RevitMCPBridge2026)   │
+│  • Installed to Documents\BIM Monkey\wrapper\ on end-user machines  │
+└─────────────────────────────────────┬───────────────────────────────┘
+                                      │ Windows Named Pipe
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         Named Pipe Server                            │
@@ -241,3 +251,124 @@ RevitMCPBridge2026/
 2. Wire into IntelligenceMethods.cs
 3. Register endpoints in MCPServer.cs
 4. Add MCP method catalog entry
+
+---
+
+## Build & Deploy Architecture
+
+### Repo Split — Critical to Understand
+
+| Repo | Owner | Contains |
+|------|-------|----------|
+| `WeberG619/RevitMCPBridge2026` | Dev only | C# plugin source, DLL |
+| `showme2thebike/woodstudioai` | Product repo | Installer, wrapper, React frontend, API backend |
+
+**The wrapper (`revit_mcp_wrapper.py`) lives in `woodstudioai/scripts/`** — NOT here.
+It is installer glue, not plugin code. It was moved there so the entire
+deployable product lives in one repo the product account controls.
+
+### Frontend / Website Architecture
+
+The `woodstudioai` repo contains three web surfaces:
+
+| Folder | Purpose | Deployed |
+|--------|---------|---------|
+| `frontend/` | React SPA (Vite) — all public-facing pages | Yes — Netlify builds from here |
+| `landing/` | Legacy static HTML files | **NOT deployed** — disconnected |
+| `api/` | Express.js backend | Railway (`bimmonkey-production.up.railway.app`) |
+
+**Critical:** `landing/*.html` files are **not deployed** to bimmonkey.ai.
+Netlify builds from `frontend/` only (`netlify.toml` `base = "frontend"`).
+All marketing pages (`/how-it-works`, `/install`, `/tos`, etc.) are React
+components in `frontend/src/pages/`. Edit those files — not the `landing/` HTML.
+
+The `landing/` folder should be treated as archived/reference only. Any content
+changes must be made in the corresponding React page component:
+
+| URL | Component |
+|-----|-----------|
+| `/` | `frontend/src/pages/Landing.jsx` |
+| `/how-it-works` | `frontend/src/pages/HowItWorks.jsx` |
+| `/install` | `frontend/src/pages/Install.jsx` |
+| `/tos` | `frontend/src/pages/Tos.jsx` |
+
+**Netlify deploy config** (`netlify.toml`):
+- Build base: `frontend/`
+- Build command: `npm install && npm run build`
+- Publish dir: `dist/`
+- Catch-all redirect: `/* → /index.html` (SPA routing)
+
+**API auth header:** The backend uses `Authorization: Bearer <key>`, not `X-API-Key`.
+Correct endpoint to validate a key: `GET /api/auth/verify` with `Authorization: Bearer bm_...`.
+
+### Dev Build Flow (developer machine only)
+
+```
+1. Edit C# source in RevitMCPBridge2026/
+2. Edit installer/wrapper in woodstudioai/scripts/ if needed
+3. Run the build script — ONE command handles everything:
+
+   cd C:\Users\echra\CascadeProjects\wood-studio-ai-git
+   .\scripts\build_plugin_zip.ps1
+
+   → dotnet publish → bin/Release/publish/RevitMCPBridge2026.dll  (correct output path)
+   → ISCC           → dist/BimMonkeySetup.exe
+
+4. gh release create → upload BimMonkeySetup.exe to GitHub
+5. git push (woodstudioai)
+```
+
+⚠️  NEVER run MSBuild manually then ISCC separately.
+MSBuild outputs to bin/Release/ but the installer reads from bin/Release/publish/.
+dotnet publish (used by the script) outputs to the right place.
+Running them out of order silently packages the old DLL.
+
+### End User Install Flow
+
+```
+1. Download BimMonkeySetup.exe
+2. Run it — wizard installs:
+   %APPDATA%\Autodesk\Revit\Addins\2026\RevitMCPBridge2026.dll
+   %APPDATA%\Autodesk\Revit\Addins\2026\RevitMCPBridge2026.addin
+   Documents\BIM Monkey\wrapper\revit_mcp_wrapper.py
+   Documents\BIM Monkey\.mcp.json          ← auto-written with API key + python path
+   Documents\BIM Monkey\CLAUDE.md          ← auto-written with API key
+   Documents\BIM Monkey\README.md
+3. Open Revit → BIM Monkey tab → Start Server
+4. Open terminal in Documents\BIM Monkey → type "claude"
+5. Claude Code reads .mcp.json, auto-starts the wrapper, tools appear
+```
+
+### The MCP Connection Chain (end-user runtime)
+
+```
+claude (Claude Code)
+  └─ reads .mcp.json
+  └─ spawns: python wrapper\revit_mcp_wrapper.py
+               │  (stdio JSON-RPC)
+               └─ connects to \\.\pipe\RevitMCPBridge2026
+                               │  (Windows named pipe)
+                               └─ Revit add-in (RevitMCPBridge2026.dll)
+                                               │
+                                               └─ Revit 2026 API
+```
+
+### Critical Lessons Learned
+
+**Logging must go to stderr.**
+FastMCP logs INFO lines to stdout by default. Claude Code reads stdout
+expecting clean JSON-RPC. Any non-JSON line on stdout silently breaks
+the handshake — tools never appear, no error shown. Fix:
+```python
+logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
+```
+
+**`.mcp.json` must be written by the installer.**
+Claude Code only auto-starts MCP servers declared in `.mcp.json` in the
+project directory. Without it, users get no tools and no error. The
+installer writes it post-install with the user's API key and the correct
+absolute path to the wrapper.
+
+**Dev machine ≠ end-user machine in one way only.**
+Developer runs: build DLL → build installer → run installer.
+End user runs: run installer. From the installer step onward, identical.
