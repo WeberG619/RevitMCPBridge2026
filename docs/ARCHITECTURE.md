@@ -353,6 +353,78 @@ claude (Claude Code)
                                                └─ Revit 2026 API
 ```
 
+## Generation Protocol (How Claude Creates CD Sets)
+
+Claude **must never improvise a CD plan**. Every generation follows this exact sequence:
+
+```
+1. Read model:  revit_execute("getDocumentInfo"), getLevels, getRooms,
+                getSheets, getViews, getWallTypes — combine into one JSON object
+
+2. Get plan:    bim_monkey_generate(modelJson)
+                → POSTs to /api/generate on Railway backend
+                → Backend does RAG lookup against firm's approved_examples
+                → Backend injects previous run notes as direct instructions
+                → Returns { generationId, plan }
+                → STOP and report if this fails — do not proceed
+
+3. Execute:     revit_execute() for each sheet, view, schedule, detail in plan
+                Log failures and skip — do not abort entire run
+
+4. Mark done:   bim_monkey_mark_executed(generationId)
+                → Logs run in dashboard so notes/feedback loop works
+```
+
+This is enforced in `CLAUDE.md` (the project instructions file Claude reads on startup)
+and in the tool docstrings in `revit_mcp_wrapper.py`.
+
+### Backend Generation Pipeline (`/api/generate`)
+
+```
+POST /api/generate
+  ├── fetchApprovedExamples(buildingType, firmId)
+  │     → queries approved_examples table (firm's private library only)
+  │     → RAG: retrieved examples injected as reference context
+  │
+  ├── fetchPreviousRunNotes(firmId, projectName)
+  │     → queries last 5 generations with notes for same project
+  │     → injected as "FEEDBACK FROM PREVIOUS RUNS (apply to this generation):"
+  │     → these are INSTRUCTIONS to the AI, not just background context
+  │
+  ├── fetchCrossReferenceRules() + fetchLayoutTemplates()
+  │
+  └── Two-phase Claude API call (cached system prompt):
+        Phase 1 → sheets JSON
+        Phase 2 → detail plan JSON
+        → returns { success, generationId, plan }
+```
+
+### Community Pool — Deprecated
+
+Community pool was removed. All `approved_examples` rows are now firm-private
+(`in_community_pool = false` hardcoded). The Settings toggle, Team stats section,
+and all community pool language have been removed from the frontend and ToS.
+
+### Plugin Bug Fixes Applied (March 2026 — v0.1.202603220758)
+
+The following field-session bugs were fixed based on a BAINES REMODEL CD run:
+
+| Method | Problem | Fix |
+|--------|---------|-----|
+| `batchExecute` | Called `ExecuteMethodDirect` which requires `_currentUiApp` to be set externally — always returned "No UIApplication context" | Changed to call `ExecuteMethod(uiApp, ...)` directly using the `uiApp` already in scope |
+| `createFilledRegionFromPoints` | Hard-failed if `typeId` not supplied; no fallback | Added `typeName` lookup by name (case-insensitive); returns list of available types on failure |
+| `getTextNotes` | No filtering — dumped entire document (300k+ chars, exceeded token limit) | Added `viewId` filter, `fields` selector, `maxResults`/`offset` pagination; returns `totalCount` + `hasMore` |
+| `drawLayerStack` | Only supported `left-to-right` / `right-to-left`; no vertical | Added `top-to-bottom` / `bottom-to-top` directions; layers stack along Y axis, `height` param becomes horizontal span width |
+| `placeViewOnSheetSmart` | Always defaulted to sheet center when no `targetZone` — caused viewport stacking | Added 9-zone auto-detection (TL/TC/TR/ML/MC/MR/BL/BC/BR); finds first unoccupied zone |
+| `createTextNoteWithLeader` | Ignored `position:{x,y}` / `leaderEnd:{x,y}` object params | Added nested object support as alternative to flat `textX`/`textY`/`leaderX`/`leaderY` |
+| `moveTextNote` | `.Coord` setter is unreliable in Revit — move was a no-op | Replaced with `ElementTransformUtils.MoveElement` using delta; reports actual post-move position |
+| `moveViewport` | Only accepted `newLocation:{x,y}` — flat `x`/`y` and `location:{x,y}` silently ignored | Added fallback to parse `location` token or flat `x`/`y` params |
+
+**Server startup change (same session):** Server no longer auto-starts on add-in load.
+The Start Server ribbon button is now clickable immediately on Revit open. This prevents
+the button appearing greyed-out and avoids false "server already running" state when the
+named pipe isn't actually ready.
+
 ### Critical Lessons Learned
 
 **Logging must go to stderr.**

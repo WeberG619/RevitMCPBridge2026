@@ -148,19 +148,7 @@ namespace RevitMCPBridge
                 // Create panels
                 CreateServerPanel(application);
                 
-                // Auto-start MCP server
-                try
-                {
-                    _mcpServer = new MCPServer();
-                    _mcpServer.Start();
-                    Log.Information("MCP Server started automatically on Revit startup");
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, "Failed to auto-start MCP server");
-                    // Don't fail the whole add-in if server fails to start
-                    // User can still manually start it via button
-                }
+                // Server starts manually via Start Server button — not auto-started
                 
                 return Result.Succeeded;
             }
@@ -242,23 +230,8 @@ namespace RevitMCPBridge
             statusButton.LargeImage = CreateButtonIcon("status", 32);
             statusButton.Image = CreateButtonIcon("status", 16);
 
-            // ── Standards ─────────────────────────────────────────────────
-            var standardsPanel = application.CreateRibbonPanel(_tabName, "Standards");
-
-            var standardsButtonData = new PushButtonData(
-                "Standards",
-                "Library\nStats",
-                Assembly.GetExecutingAssembly().Location,
-                "RevitMCPBridge.Commands.StandardsCommand")
-            {
-                ToolTip = "View your BIM Monkey training library statistics"
-            };
-            var standardsButton = standardsPanel.AddItem(standardsButtonData) as PushButton;
-            standardsButton.LargeImage = CreateButtonIcon("standards", 32);
-            standardsButton.Image = CreateButtonIcon("standards", 16);
-
-            // ── Easy Buttons ──────────────────────────────────────────────
-            var easyPanel = application.CreateRibbonPanel(_tabName, "Easy Buttons");
+            // ── Generation Control ─────────────────────────────────────────
+            var easyPanel = application.CreateRibbonPanel(_tabName, "Generation");
 
             var startGenButtonData = new PushButtonData(
                 "StartGeneration",
@@ -285,6 +258,21 @@ namespace RevitMCPBridge
             var stopGenButton = easyPanel.AddItem(stopGenButtonData) as PushButton;
             stopGenButton.LargeImage = CreateButtonIcon("stopgen", 32);
             stopGenButton.Image = CreateButtonIcon("stopgen", 16);
+
+            // ── Library Stats ──────────────────────────────────────────────
+            var standardsPanel = application.CreateRibbonPanel(_tabName, "Standards");
+
+            var standardsButtonData = new PushButtonData(
+                "Standards",
+                "Library\nStats",
+                Assembly.GetExecutingAssembly().Location,
+                "RevitMCPBridge.Commands.StandardsCommand")
+            {
+                ToolTip = "View your BIM Monkey training library statistics"
+            };
+            var standardsButton = standardsPanel.AddItem(standardsButtonData) as PushButton;
+            standardsButton.LargeImage = CreateButtonIcon("standards", 32);
+            standardsButton.Image = CreateButtonIcon("standards", 16);
         }
 
         private void CreateToolsPanel(UIControlledApplication application)

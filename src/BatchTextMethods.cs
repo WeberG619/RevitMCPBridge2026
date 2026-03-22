@@ -185,37 +185,64 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all text notes in current document
         /// </summary>
-        [MCPMethod("getTextNotes", Category = "BatchText", Description = "Get all text notes in the current document")]
+        [MCPMethod("getTextNotes", Category = "BatchText", Description = "Get text notes in the current document. Filter by viewId. Use maxResults/offset for pagination.")]
         public static string GetTextNotes(UIApplication uiApp, JObject parameters)
         {
             try
             {
                 var doc = uiApp.ActiveUIDocument.Document;
 
-                var collector = new FilteredElementCollector(doc)
-                    .OfClass(typeof(TextNote));
+                int? viewIdFilter = parameters?["viewId"]?.ToObject<int>();
+                int maxResults = parameters?["maxResults"]?.ToObject<int>() ?? 200;
+                int offset = parameters?["offset"]?.ToObject<int>() ?? 0;
+                var fieldsParam = parameters?["fields"] as JArray;
+                bool allFields = fieldsParam == null || fieldsParam.Count == 0;
+                var requestedFields = allFields ? null : new HashSet<string>(fieldsParam.Select(f => f.ToString()), StringComparer.OrdinalIgnoreCase);
+
+                FilteredElementCollector collector;
+                if (viewIdFilter.HasValue)
+                {
+                    var viewId = new ElementId(viewIdFilter.Value);
+                    collector = new FilteredElementCollector(doc, viewId).OfClass(typeof(TextNote));
+                }
+                else
+                {
+                    collector = new FilteredElementCollector(doc).OfClass(typeof(TextNote));
+                }
+
+                var allNotes = collector.Cast<TextNote>().ToList();
+                int totalCount = allNotes.Count;
+                var paged = allNotes.Skip(offset).Take(maxResults);
+
+                bool wantId = allFields || requestedFields.Contains("id");
+                bool wantText = allFields || requestedFields.Contains("text");
+                bool wantTypeId = allFields || requestedFields.Contains("typeId");
+                bool wantTypeName = allFields || requestedFields.Contains("typeName");
+                bool wantViewId = allFields || requestedFields.Contains("viewId");
+                bool wantCoord = allFields || requestedFields.Contains("coord");
 
                 var textNotes = new List<object>();
-
-                foreach (TextNote tn in collector)
+                foreach (TextNote tn in paged)
                 {
-                    var textType = doc.GetElement(tn.GetTypeId()) as TextNoteType;
-
-                    textNotes.Add(new
-                    {
-                        id = tn.Id.Value,
-                        text = tn.Text,
-                        typeId = tn.GetTypeId().Value,
-                        typeName = textType?.Name ?? "Unknown",
-                        viewId = tn.OwnerViewId.Value
-                    });
+                    TextNoteType textType = (wantTypeName || wantTypeId) ? doc.GetElement(tn.GetTypeId()) as TextNoteType : null;
+                    var entry = new Dictionary<string, object>();
+                    if (wantId) entry["id"] = tn.Id.Value;
+                    if (wantText) entry["text"] = tn.Text;
+                    if (wantTypeId) entry["typeId"] = tn.GetTypeId().Value;
+                    if (wantTypeName) entry["typeName"] = textType?.Name ?? "Unknown";
+                    if (wantViewId) entry["viewId"] = tn.OwnerViewId.Value;
+                    if (wantCoord) entry["coord"] = new { x = Math.Round(tn.Coord.X, 4), y = Math.Round(tn.Coord.Y, 4) };
+                    textNotes.Add(entry);
                 }
 
                 return JsonConvert.SerializeObject(new
                 {
                     success = true,
-                    count = textNotes.Count,
-                    textNotes = textNotes
+                    totalCount,
+                    offset,
+                    returned = textNotes.Count,
+                    hasMore = (offset + textNotes.Count) < totalCount,
+                    textNotes
                 });
             }
             catch (Exception ex)

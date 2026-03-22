@@ -361,7 +361,7 @@ namespace RevitMCPBridge
                                 continue;
                             }
 
-                            var result = MCPServer.ExecuteMethodDirect(methodName, methodParams);
+                            var result = MCPServer.ExecuteMethod(uiApp, methodName, methodParams);
                             var parsed = JsonConvert.DeserializeObject<dynamic>(result);
 
                             results.Add(new

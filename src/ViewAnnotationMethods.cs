@@ -566,12 +566,34 @@ namespace RevitMCPBridge
                 var doc = uiApp.ActiveUIDocument.Document;
                 var viewIdParam = parameters?["viewId"];
                 var text = parameters?["text"]?.ToString();
-                var textX = parameters?["textX"]?.ToObject<double>() ?? 0;
-                var textY = parameters?["textY"]?.ToObject<double>() ?? 0;
-                var textZ = parameters?["textZ"]?.ToObject<double>() ?? 0;
-                var leaderX = parameters?["leaderX"]?.ToObject<double>() ?? 0;
-                var leaderY = parameters?["leaderY"]?.ToObject<double>() ?? 0;
-                var leaderZ = parameters?["leaderZ"]?.ToObject<double>() ?? 0;
+                // Accept flat textX/textY OR position:{x,y} object
+                double textX = 0, textY = 0, textZ = 0;
+                if (parameters?["position"] is JObject posObj)
+                {
+                    textX = posObj["x"]?.ToObject<double>() ?? 0;
+                    textY = posObj["y"]?.ToObject<double>() ?? 0;
+                    textZ = posObj["z"]?.ToObject<double>() ?? 0;
+                }
+                else
+                {
+                    textX = parameters?["textX"]?.ToObject<double>() ?? 0;
+                    textY = parameters?["textY"]?.ToObject<double>() ?? 0;
+                    textZ = parameters?["textZ"]?.ToObject<double>() ?? 0;
+                }
+                // Accept flat leaderX/leaderY OR leaderEnd:{x,y} object
+                double leaderX = 0, leaderY = 0, leaderZ = 0;
+                if (parameters?["leaderEnd"] is JObject leObj)
+                {
+                    leaderX = leObj["x"]?.ToObject<double>() ?? 0;
+                    leaderY = leObj["y"]?.ToObject<double>() ?? 0;
+                    leaderZ = leObj["z"]?.ToObject<double>() ?? 0;
+                }
+                else
+                {
+                    leaderX = parameters?["leaderX"]?.ToObject<double>() ?? 0;
+                    leaderY = parameters?["leaderY"]?.ToObject<double>() ?? 0;
+                    leaderZ = parameters?["leaderZ"]?.ToObject<double>() ?? 0;
+                }
                 var typeIdParam = parameters?["typeId"];
                 var expandCrop = parameters?["expandCrop"]?.ToObject<bool>() ?? true;
                 var useViewCoords = parameters?["useViewCoords"]?.ToObject<bool>() ?? false;
@@ -760,11 +782,15 @@ namespace RevitMCPBridge
                     var oldCoord = textNote.Coord;
                     var newX = x ?? oldCoord.X;
                     var newY = y ?? oldCoord.Y;
-                    var newCoord = new XYZ(newX, newY, oldCoord.Z);
 
-                    textNote.Coord = newCoord;
+                    // Use ElementTransformUtils.MoveElement — the .Coord setter is unreliable
+                    var delta = new XYZ(newX - oldCoord.X, newY - oldCoord.Y, 0);
+                    ElementTransformUtils.MoveElement(doc, elementId, delta);
 
                     trans.Commit();
+
+                    // Read actual post-move position
+                    var actualCoord = (doc.GetElement(elementId) as TextNote)?.Coord ?? new XYZ(newX, newY, 0);
 
                     return JsonConvert.SerializeObject(new
                     {
@@ -772,8 +798,8 @@ namespace RevitMCPBridge
                         result = new
                         {
                             elementId = elementId.Value,
-                            oldPosition = new { x = oldCoord.X, y = oldCoord.Y },
-                            newPosition = new { x = newX, y = newY }
+                            oldPosition = new { x = Math.Round(oldCoord.X, 4), y = Math.Round(oldCoord.Y, 4) },
+                            newPosition = new { x = Math.Round(actualCoord.X, 4), y = Math.Round(actualCoord.Y, 4) }
                         }
                     });
                 }
@@ -2639,12 +2665,14 @@ namespace RevitMCPBridge
                     });
                 }
 
-                if (typeIdParam == null)
+                var typeNameParam = parameters?["typeName"]?.ToString();
+
+                if (typeIdParam == null && string.IsNullOrEmpty(typeNameParam))
                 {
                     return JsonConvert.SerializeObject(new
                     {
                         success = false,
-                        error = "typeId parameter is required"
+                        error = "typeId or typeName parameter is required"
                     });
                 }
 
@@ -2669,7 +2697,34 @@ namespace RevitMCPBridge
                     });
                 }
 
-                var typeId = new ElementId(typeIdParam.ToObject<int>());
+                ElementId typeId;
+                if (typeIdParam != null)
+                {
+                    typeId = new ElementId(typeIdParam.ToObject<int>());
+                }
+                else
+                {
+                    var frt = new FilteredElementCollector(doc)
+                        .OfClass(typeof(FilledRegionType))
+                        .Cast<FilledRegionType>()
+                        .FirstOrDefault(t => t.Name.Equals(typeNameParam, StringComparison.OrdinalIgnoreCase));
+                    if (frt == null)
+                    {
+                        var available = new FilteredElementCollector(doc)
+                            .OfClass(typeof(FilledRegionType))
+                            .Cast<FilledRegionType>()
+                            .Select(t => t.Name)
+                            .Take(20)
+                            .ToList();
+                        return JsonConvert.SerializeObject(new
+                        {
+                            success = false,
+                            error = $"FilledRegionType '{typeNameParam}' not found",
+                            availableTypes = available
+                        });
+                    }
+                    typeId = frt.Id;
+                }
 
                 // Parse points
                 var points = new List<XYZ>();

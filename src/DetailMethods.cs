@@ -6895,11 +6895,12 @@ namespace RevitMCPBridge2026
                 // Origin and dimensions
                 double originX = parameters["originX"]?.ToObject<double>() ?? 0;
                 double originY = parameters["originY"]?.ToObject<double>() ?? 0;
-                double height = parameters["height"]?.ToObject<double>() ?? 8.0; // default 8 feet
-                string direction = parameters["direction"]?.ToString() ?? "left-to-right"; // or right-to-left
+                double height = parameters["height"]?.ToObject<double>() ?? 8.0; // default 8 feet (or width for vertical)
+                string direction = parameters["direction"]?.ToString() ?? "left-to-right"; // left-to-right, right-to-left, top-to-bottom, bottom-to-top
                 bool addLabels = parameters["addLabels"]?.ToObject<bool>() ?? true;
                 double labelOffset = parameters["labelOffset"]?.ToObject<double>() ?? 0.5; // feet from stack
                 bool addDimensions = parameters["addDimensions"]?.ToObject<bool>() ?? true;
+                bool isVertical = direction == "top-to-bottom" || direction == "bottom-to-top";
 
                 // Cache lookups
                 var lineStyleCache = new Dictionary<string, GraphicsStyle>(StringComparer.OrdinalIgnoreCase);
@@ -6922,7 +6923,8 @@ namespace RevitMCPBridge2026
 
                 var createdElements = new List<object>();
                 double currentX = originX;
-                int dirMultiplier = direction == "right-to-left" ? -1 : 1;
+                double currentY = originY;
+                int dirMultiplier = (direction == "right-to-left" || direction == "bottom-to-top") ? -1 : 1;
                 var layerPositions = new List<object>(); // Track for dimension output
 
                 using (var trans = new Transaction(doc, "MCP Draw Layer Stack"))
@@ -6946,135 +6948,184 @@ namespace RevitMCPBridge2026
 
                         if (thickness <= 0 && !isOverlay)
                         {
-                            // Zero-thickness layers (membranes) - draw a single dashed line
+                            // Zero-thickness layers (membranes) - draw a single line
                             string membraneStyle = layer["linePattern"]?.ToString();
                             GraphicsStyle dashStyle = null;
                             if (!string.IsNullOrEmpty(membraneStyle))
-                            {
                                 lineStyleCache.TryGetValue(membraneStyle, out dashStyle);
-                            }
 
-                            var membraneLine = Line.CreateBound(
-                                new XYZ(currentX, originY, 0),
-                                new XYZ(currentX, originY + height, 0));
-                            var membraneCurve = doc.Create.NewDetailCurve(view, membraneLine);
+                            DetailCurve membraneCurve;
+                            if (isVertical)
+                            {
+                                var membraneLine = Line.CreateBound(new XYZ(originX, currentY, 0), new XYZ(originX + height, currentY, 0));
+                                membraneCurve = doc.Create.NewDetailCurve(view, membraneLine);
+                            }
+                            else
+                            {
+                                var membraneLine = Line.CreateBound(new XYZ(currentX, originY, 0), new XYZ(currentX, originY + height, 0));
+                                membraneCurve = doc.Create.NewDetailCurve(view, membraneLine);
+                            }
                             if (dashStyle != null) membraneCurve.LineStyle = dashStyle;
 
                             createdElements.Add(new { type = "membrane", name = layerName, id = (long)membraneCurve.Id.Value });
                             continue;
                         }
 
-                        double layerStartX = isOverlay ? (currentX - thickness * dirMultiplier) : currentX;
-                        double layerEndX = isOverlay ? currentX : currentX + thickness * dirMultiplier;
-
-                        // Ensure start < end for geometry
-                        double leftX = Math.Min(layerStartX, layerEndX);
-                        double rightX = Math.Max(layerStartX, layerEndX);
-
-                        // Draw boundary lines (left and right edges)
                         GraphicsStyle edgeStyle = null;
                         lineStyleCache.TryGetValue(lineWeight, out edgeStyle);
 
-                        if (!isOverlay)
+                        long? regionId = null;
+                        long? textId = null;
+
+                        if (isVertical)
                         {
+                            // Vertical stacking: layers advance along Y axis, span width = height param
+                            double layerStartY = isOverlay ? (currentY - thickness * dirMultiplier) : currentY;
+                            double layerEndY = isOverlay ? currentY : currentY + thickness * dirMultiplier;
+                            double bottomY = Math.Min(layerStartY, layerEndY);
+                            double topY = Math.Max(layerStartY, layerEndY);
+                            double spanWidth = height; // reuse 'height' as horizontal span width
+
+                            if (!isOverlay)
+                            {
+                                // Top edge
+                                var topLine = Line.CreateBound(new XYZ(originX, topY, 0), new XYZ(originX + spanWidth, topY, 0));
+                                var topCurve = doc.Create.NewDetailCurve(view, topLine);
+                                if (edgeStyle != null) topCurve.LineStyle = edgeStyle;
+
+                                // Bottom edge
+                                var bottomLine = Line.CreateBound(new XYZ(originX, bottomY, 0), new XYZ(originX + spanWidth, bottomY, 0));
+                                var bottomCurve = doc.Create.NewDetailCurve(view, bottomLine);
+                                if (edgeStyle != null) bottomCurve.LineStyle = edgeStyle;
+                            }
+
                             // Left edge
-                            var leftLine = Line.CreateBound(new XYZ(leftX, originY, 0), new XYZ(leftX, originY + height, 0));
-                            var leftCurve = doc.Create.NewDetailCurve(view, leftLine);
-                            if (edgeStyle != null) leftCurve.LineStyle = edgeStyle;
+                            var leftLine2 = Line.CreateBound(new XYZ(originX, bottomY, 0), new XYZ(originX, topY, 0));
+                            var leftCurve2 = doc.Create.NewDetailCurve(view, leftLine2);
+                            if (edgeStyle != null) leftCurve2.LineStyle = edgeStyle;
 
                             // Right edge
-                            var rightLine = Line.CreateBound(new XYZ(rightX, originY, 0), new XYZ(rightX, originY + height, 0));
-                            var rightCurve = doc.Create.NewDetailCurve(view, rightLine);
-                            if (edgeStyle != null) rightCurve.LineStyle = edgeStyle;
-                        }
+                            var rightLine2 = Line.CreateBound(new XYZ(originX + spanWidth, bottomY, 0), new XYZ(originX + spanWidth, topY, 0));
+                            var rightCurve2 = doc.Create.NewDetailCurve(view, rightLine2);
+                            if (edgeStyle != null) rightCurve2.LineStyle = edgeStyle;
 
-                        // Top line
-                        var topLine = Line.CreateBound(new XYZ(leftX, originY + height, 0), new XYZ(rightX, originY + height, 0));
-                        var topCurve = doc.Create.NewDetailCurve(view, topLine);
-                        if (edgeStyle != null) topCurve.LineStyle = edgeStyle;
-
-                        // Bottom line
-                        var bottomLine = Line.CreateBound(new XYZ(leftX, originY, 0), new XYZ(rightX, originY, 0));
-                        var bottomCurve = doc.Create.NewDetailCurve(view, bottomLine);
-                        if (edgeStyle != null) bottomCurve.LineStyle = edgeStyle;
-
-                        // Create filled region if hatch pattern specified
-                        long? regionId = null;
-                        if (!string.IsNullOrEmpty(hatch))
-                        {
-                            FilledRegionType frt = null;
-                            filledRegionTypeCache.TryGetValue(hatch, out frt);
-
-                            if (frt != null)
+                            if (!string.IsNullOrEmpty(hatch))
                             {
-                                var curveLoop = new CurveLoop();
-                                curveLoop.Append(Line.CreateBound(new XYZ(leftX, originY, 0), new XYZ(rightX, originY, 0)));
-                                curveLoop.Append(Line.CreateBound(new XYZ(rightX, originY, 0), new XYZ(rightX, originY + height, 0)));
-                                curveLoop.Append(Line.CreateBound(new XYZ(rightX, originY + height, 0), new XYZ(leftX, originY + height, 0)));
-                                curveLoop.Append(Line.CreateBound(new XYZ(leftX, originY + height, 0), new XYZ(leftX, originY, 0)));
-
-                                var region = FilledRegion.Create(doc, frt.Id, view.Id, new List<CurveLoop> { curveLoop });
-                                regionId = (long)region.Id.Value;
+                                FilledRegionType frt = null;
+                                filledRegionTypeCache.TryGetValue(hatch, out frt);
+                                if (frt != null)
+                                {
+                                    var curveLoop = new CurveLoop();
+                                    curveLoop.Append(Line.CreateBound(new XYZ(originX, bottomY, 0), new XYZ(originX + spanWidth, bottomY, 0)));
+                                    curveLoop.Append(Line.CreateBound(new XYZ(originX + spanWidth, bottomY, 0), new XYZ(originX + spanWidth, topY, 0)));
+                                    curveLoop.Append(Line.CreateBound(new XYZ(originX + spanWidth, topY, 0), new XYZ(originX, topY, 0)));
+                                    curveLoop.Append(Line.CreateBound(new XYZ(originX, topY, 0), new XYZ(originX, bottomY, 0)));
+                                    var region = FilledRegion.Create(doc, frt.Id, view.Id, new List<CurveLoop> { curveLoop });
+                                    regionId = (long)region.Id.Value;
+                                }
                             }
-                        }
 
-                        // Add label
-                        long? textId = null;
-                        if (addLabels && !isOverlay)
-                        {
-                            // Stagger labels vertically - distribute evenly across the height
-                            double labelX = dirMultiplier > 0 ? Math.Max(originX, currentX) + labelOffset + 1.0 : Math.Min(originX, currentX) - labelOffset - 1.0;
-                            double labelSpacing = height / (layers.Count + 1);
-                            double labelY = originY + height - (labelSpacing * (labelIndex + 1));
-                            labelIndex++;
-
-                            string thicknessStr = FormatFractionalInches(thickness * 12);
-                            string labelText = $"{layerName} ({thicknessStr})";
-                            var textNote = TextNote.Create(doc, view.Id, new XYZ(labelX, labelY, 0), labelText, defaultTextTypeId);
-                            textId = (long)textNote.Id.Value;
-
-                            // Draw leader line from text to layer midpoint
-                            double layerMidX = (leftX + rightX) / 2;
-                            double layerMidY = originY + height / 2;
-                            var leaderStart = new XYZ(labelX - 0.05, labelY, 0);
-                            var leaderEnd = new XYZ(layerMidX, layerMidY, 0);
-                            if (!leaderStart.IsAlmostEqualTo(leaderEnd))
+                            if (addLabels && !isOverlay)
                             {
-                                var leaderLine = doc.Create.NewDetailCurve(view, Line.CreateBound(leaderStart, leaderEnd));
-                                GraphicsStyle thinStyle = null;
-                                lineStyleCache.TryGetValue("Thin Lines", out thinStyle);
-                                if (thinStyle != null) leaderLine.LineStyle = thinStyle;
+                                double labelSpacing = spanWidth / (layers.Count + 1);
+                                double labelX = originX + labelSpacing * (labelIndex + 1);
+                                double labelY2 = dirMultiplier > 0 ? topY + labelOffset : bottomY - labelOffset;
+                                labelIndex++;
+                                string thicknessStr = FormatFractionalInches(thickness * 12);
+                                string labelText = $"{layerName} ({thicknessStr})";
+                                var textNote = TextNote.Create(doc, view.Id, new XYZ(labelX, labelY2, 0), labelText, defaultTextTypeId);
+                                textId = (long)textNote.Id.Value;
                             }
+
+                            layerPositions.Add(new { name = layerName, bottomY, topY, thickness, thicknessInches = Math.Round(thickness * 12, 3) });
+                            createdElements.Add(new { type = isOverlay ? "overlay" : "layer", name = layerName, regionId, textId, bottomY, topY, thickness });
+
+                            if (!isOverlay)
+                                currentY += thickness * dirMultiplier;
                         }
-
-                        layerPositions.Add(new
+                        else
                         {
-                            name = layerName,
-                            leftX,
-                            rightX,
-                            thickness,
-                            thicknessInches = Math.Round(thickness * 12, 3)
-                        });
+                            // Horizontal stacking (original behavior)
+                            double layerStartX = isOverlay ? (currentX - thickness * dirMultiplier) : currentX;
+                            double layerEndX = isOverlay ? currentX : currentX + thickness * dirMultiplier;
+                            double leftX = Math.Min(layerStartX, layerEndX);
+                            double rightX = Math.Max(layerStartX, layerEndX);
 
-                        createdElements.Add(new
-                        {
-                            type = isOverlay ? "overlay" : "layer",
-                            name = layerName,
-                            regionId,
-                            textId,
-                            leftX,
-                            rightX,
-                            thickness
-                        });
+                            if (!isOverlay)
+                            {
+                                // Left edge
+                                var leftLine = Line.CreateBound(new XYZ(leftX, originY, 0), new XYZ(leftX, originY + height, 0));
+                                var leftCurve = doc.Create.NewDetailCurve(view, leftLine);
+                                if (edgeStyle != null) leftCurve.LineStyle = edgeStyle;
 
-                        if (!isOverlay)
-                            currentX += thickness * dirMultiplier;
+                                // Right edge
+                                var rightLine = Line.CreateBound(new XYZ(rightX, originY, 0), new XYZ(rightX, originY + height, 0));
+                                var rightCurve = doc.Create.NewDetailCurve(view, rightLine);
+                                if (edgeStyle != null) rightCurve.LineStyle = edgeStyle;
+                            }
+
+                            // Top line
+                            var topLine2 = Line.CreateBound(new XYZ(leftX, originY + height, 0), new XYZ(rightX, originY + height, 0));
+                            var topCurve2 = doc.Create.NewDetailCurve(view, topLine2);
+                            if (edgeStyle != null) topCurve2.LineStyle = edgeStyle;
+
+                            // Bottom line
+                            var bottomLine2 = Line.CreateBound(new XYZ(leftX, originY, 0), new XYZ(rightX, originY, 0));
+                            var bottomCurve2 = doc.Create.NewDetailCurve(view, bottomLine2);
+                            if (edgeStyle != null) bottomCurve2.LineStyle = edgeStyle;
+
+                            if (!string.IsNullOrEmpty(hatch))
+                            {
+                                FilledRegionType frt = null;
+                                filledRegionTypeCache.TryGetValue(hatch, out frt);
+                                if (frt != null)
+                                {
+                                    var curveLoop = new CurveLoop();
+                                    curveLoop.Append(Line.CreateBound(new XYZ(leftX, originY, 0), new XYZ(rightX, originY, 0)));
+                                    curveLoop.Append(Line.CreateBound(new XYZ(rightX, originY, 0), new XYZ(rightX, originY + height, 0)));
+                                    curveLoop.Append(Line.CreateBound(new XYZ(rightX, originY + height, 0), new XYZ(leftX, originY + height, 0)));
+                                    curveLoop.Append(Line.CreateBound(new XYZ(leftX, originY + height, 0), new XYZ(leftX, originY, 0)));
+                                    var region = FilledRegion.Create(doc, frt.Id, view.Id, new List<CurveLoop> { curveLoop });
+                                    regionId = (long)region.Id.Value;
+                                }
+                            }
+
+                            if (addLabels && !isOverlay)
+                            {
+                                double labelX = dirMultiplier > 0 ? Math.Max(originX, currentX) + labelOffset + 1.0 : Math.Min(originX, currentX) - labelOffset - 1.0;
+                                double labelSpacing = height / (layers.Count + 1);
+                                double labelY = originY + height - (labelSpacing * (labelIndex + 1));
+                                labelIndex++;
+                                string thicknessStr = FormatFractionalInches(thickness * 12);
+                                string labelText = $"{layerName} ({thicknessStr})";
+                                var textNote = TextNote.Create(doc, view.Id, new XYZ(labelX, labelY, 0), labelText, defaultTextTypeId);
+                                textId = (long)textNote.Id.Value;
+
+                                double layerMidX = (leftX + rightX) / 2;
+                                double layerMidY = originY + height / 2;
+                                var leaderStart = new XYZ(labelX - 0.05, labelY, 0);
+                                var leaderEnd = new XYZ(layerMidX, layerMidY, 0);
+                                if (!leaderStart.IsAlmostEqualTo(leaderEnd))
+                                {
+                                    var leaderLine = doc.Create.NewDetailCurve(view, Line.CreateBound(leaderStart, leaderEnd));
+                                    GraphicsStyle thinStyle = null;
+                                    lineStyleCache.TryGetValue("Thin Lines", out thinStyle);
+                                    if (thinStyle != null) leaderLine.LineStyle = thinStyle;
+                                }
+                            }
+
+                            layerPositions.Add(new { name = layerName, leftX, rightX, thickness, thicknessInches = Math.Round(thickness * 12, 3) });
+                            createdElements.Add(new { type = isOverlay ? "overlay" : "layer", name = layerName, regionId, textId, leftX, rightX, thickness });
+
+                            if (!isOverlay)
+                                currentX += thickness * dirMultiplier;
+                        }
                     }
 
                     trans.Commit();
                 }
 
-                double totalThickness = Math.Abs(currentX - originX);
+                double totalThickness = isVertical ? Math.Abs(currentY - originY) : Math.Abs(currentX - originX);
 
                 return Newtonsoft.Json.JsonConvert.SerializeObject(new
                 {
@@ -7083,13 +7134,9 @@ namespace RevitMCPBridge2026
                     layerCount = layers.Count,
                     totalThicknessFeet = Math.Round(totalThickness, 4),
                     totalThicknessInches = Math.Round(totalThickness * 12, 3),
-                    stackBounds = new
-                    {
-                        left = Math.Min(originX, currentX),
-                        right = Math.Max(originX, currentX),
-                        bottom = originY,
-                        top = originY + height
-                    },
+                    stackBounds = isVertical
+                        ? new { left = originX, right = originX + height, bottom = Math.Min(originY, currentY), top = Math.Max(originY, currentY) }
+                        : new { left = Math.Min(originX, currentX), right = Math.Max(originX, currentX), bottom = originY, top = originY + height },
                     layerPositions,
                     createdElements
                 });

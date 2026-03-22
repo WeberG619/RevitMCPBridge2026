@@ -880,6 +880,17 @@ namespace RevitMCPBridge
                     var instance = ScheduleSheetInstance.Create(doc, sheetId, schedId, point);
                     trans.Commit();
 
+                    // Mark sheet as AI-generated
+                    if (!sheet.Name.EndsWith(" *"))
+                    {
+                        using (var markTrans = new Transaction(doc, "Mark Sheet as Generated"))
+                        {
+                            markTrans.Start();
+                            sheet.Name = sheet.Name + " *";
+                            markTrans.Commit();
+                        }
+                    }
+
                     return ResponseBuilder.Success()
                         .With("instanceId",    (int)instance.Id.Value)
                         .With("sheetId",       (int)sheetId.Value)
@@ -1089,21 +1100,31 @@ namespace RevitMCPBridge
 
                 var viewportId = new ElementId(int.Parse(parameters["viewportId"].ToString()));
 
-                // Accept both array [x,y,z] and object {x,y,z} formats
+                // Accept: flat x/y, newLocation:{x,y}, newLocation:[x,y], or location:{x,y}
                 double locX = 0, locY = 0;
-                var locToken = parameters["newLocation"];
-                if (locToken == null)
-                    return ResponseBuilder.Error("newLocation is required", "MISSING_PARAMETER").Build();
-                if (locToken.Type == JTokenType.Array)
+                var locToken = parameters["newLocation"] ?? parameters["location"];
+                if (locToken != null)
                 {
-                    var arr = locToken.ToObject<double[]>();
-                    locX = arr.Length > 0 ? arr[0] : 0;
-                    locY = arr.Length > 1 ? arr[1] : 0;
+                    if (locToken.Type == JTokenType.Array)
+                    {
+                        var arr = locToken.ToObject<double[]>();
+                        locX = arr.Length > 0 ? arr[0] : 0;
+                        locY = arr.Length > 1 ? arr[1] : 0;
+                    }
+                    else
+                    {
+                        locX = locToken["x"]?.Value<double>() ?? 0;
+                        locY = locToken["y"]?.Value<double>() ?? 0;
+                    }
+                }
+                else if (parameters["x"] != null || parameters["y"] != null)
+                {
+                    locX = parameters["x"]?.Value<double>() ?? 0;
+                    locY = parameters["y"]?.Value<double>() ?? 0;
                 }
                 else
                 {
-                    locX = locToken["x"]?.Value<double>() ?? 0;
-                    locY = locToken["y"]?.Value<double>() ?? 0;
+                    return ResponseBuilder.Error("Location required: pass x/y, newLocation:{x,y}, or location:{x,y}", "MISSING_PARAMETER").Build();
                 }
 
                 var viewport = doc.GetElement(viewportId) as Viewport;
@@ -2516,10 +2537,53 @@ namespace RevitMCPBridge
                 }
                 else
                 {
-                    // Default to printable area center
-                    targetX = (printMinX + printMaxX) / 2.0;
-                    targetY = (printMinY + printMaxY) / 2.0;
-                    targetDescription = "Sheet center (default)";
+                    // Auto-select: find first zone not already occupied by existing viewports
+                    var existingViewports = new FilteredElementCollector(doc, sheetId)
+                        .OfClass(typeof(Viewport))
+                        .Cast<Viewport>()
+                        .ToList();
+
+                    // 9-zone grid ordered top-left → right → down (TL, TC, TR, ML, MC, MR, BL, BC, BR)
+                    var zones = new[] {
+                        new { col = 0, row = 2, name = "7-TL" }, new { col = 1, row = 2, name = "8-TC" }, new { col = 2, row = 2, name = "9-TR" },
+                        new { col = 0, row = 1, name = "4-ML" }, new { col = 1, row = 1, name = "5-MC" }, new { col = 2, row = 1, name = "6-MR" },
+                        new { col = 0, row = 0, name = "1-BL" }, new { col = 1, row = 0, name = "2-BC" }, new { col = 2, row = 0, name = "3-BR" },
+                    };
+                    double zoneWidth  = printWidth  / 3.0;
+                    double zoneHeight = printHeight / 3.0;
+
+                    bool placed = false;
+                    foreach (var zone in zones)
+                    {
+                        double zCenterX = printMinX + zone.col * zoneWidth  + zoneWidth  / 2.0;
+                        double zCenterY = printMinY + zone.row * zoneHeight + zoneHeight / 2.0;
+
+                        // Check if any existing viewport center falls within this zone
+                        bool occupied = existingViewports.Any(vp => {
+                            var c = vp.GetBoxCenter();
+                            return c.X >= printMinX + zone.col * zoneWidth &&
+                                   c.X <  printMinX + (zone.col + 1) * zoneWidth &&
+                                   c.Y >= printMinY + zone.row * zoneHeight &&
+                                   c.Y <  printMinY + (zone.row + 1) * zoneHeight;
+                        });
+
+                        if (!occupied)
+                        {
+                            targetX = zCenterX;
+                            targetY = zCenterY;
+                            targetDescription = $"Auto zone {zone.name} (first unoccupied)";
+                            placed = true;
+                            break;
+                        }
+                    }
+
+                    if (!placed)
+                    {
+                        // All zones occupied — fall back to center with warning
+                        targetX = (printMinX + printMaxX) / 2.0;
+                        targetY = (printMinY + printMaxY) / 2.0;
+                        targetDescription = "Sheet center (all zones occupied — pass targetZone to override)";
+                    }
                 }
 
                 // Calculate where viewport bounds will be when placed at target center
@@ -2659,6 +2723,17 @@ namespace RevitMCPBridge
                     }
 
                     trans.Commit();
+
+                    // Mark sheet as AI-generated
+                    if (!sheet.Name.EndsWith(" *"))
+                    {
+                        using (var markTrans = new Transaction(doc, "Mark Sheet as Generated"))
+                        {
+                            markTrans.Start();
+                            sheet.Name = sheet.Name + " *";
+                            markTrans.Commit();
+                        }
+                    }
 
                     // Get actual placement results after correction
                     var actualOutline = viewport.GetBoxOutline();
