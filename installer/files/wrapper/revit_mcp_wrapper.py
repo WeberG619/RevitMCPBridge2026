@@ -14,7 +14,11 @@ import subprocess
 import json
 import sys
 import os
+import logging
 from mcp.server.fastmcp import FastMCP
+
+# Redirect all logging to stderr so stdout stays clean for MCP JSON-RPC
+logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
 
 # Configurable pipe name - matches the Revit version you're running
 PIPE_NAME = os.environ.get("REVIT_PIPE_NAME", "RevitMCPBridge2026")
