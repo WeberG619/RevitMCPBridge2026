@@ -750,7 +750,7 @@ namespace RevitMCPBridge
             try
             {
                 var doc = uiApp.ActiveUIDocument.Document;
-                var elementIdParam = parameters?["elementId"];
+                var elementIdParam = parameters?["elementId"] ?? parameters?["textNoteId"];
                 var x = parameters?["x"]?.ToObject<double?>();
                 var y = parameters?["y"]?.ToObject<double?>();
 
@@ -5820,6 +5820,96 @@ namespace RevitMCPBridge
                         elements = cutGeometry
                     }
                 });
+            }
+            catch (Exception ex)
+            {
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
+        [MCPMethod("getTagsInView", Category = "ViewAnnotation", Description = "Get all annotation tags in a view with their positions and tagged element IDs")]
+        public static string GetTagsInView(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+                int viewIdInt = parameters?["viewId"]?.ToObject<int>()
+                    ?? throw new ArgumentException("viewId is required");
+                var viewId = new ElementId(viewIdInt);
+                var view = doc.GetElement(viewId) as View;
+                if (view == null)
+                    return ResponseBuilder.Error("getTagsInView", $"View {viewIdInt} not found").Build();
+
+                var tags = new FilteredElementCollector(doc, viewId)
+                    .OfClass(typeof(IndependentTag))
+                    .Cast<IndependentTag>()
+                    .Select(t =>
+                    {
+                        var head = t.TagHeadPosition;
+                        return new
+                        {
+                            tagId       = (int)t.Id.Value,
+                            category    = t.Category?.Name ?? "Unknown",
+                            headX       = Math.Round(head.X, 6),
+                            headY       = Math.Round(head.Y, 6),
+                            tagText     = TryGetTagText(t),
+                            hasLeader   = t.HasLeader,
+                            isOrphaned  = t.IsOrphaned
+                        };
+                    })
+                    .ToList();
+
+                return ResponseBuilder.Success()
+                    .With("viewId",   viewIdInt)
+                    .With("tagCount", tags.Count)
+                    .With("tags",     tags)
+                    .Build();
+            }
+            catch (Exception ex)
+            {
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
+        private static string TryGetTagText(IndependentTag tag)
+        {
+            try { return tag.TagText; }
+            catch { return null; }
+        }
+
+        [MCPMethod("moveTag", Category = "ViewAnnotation", Description = "Move an annotation tag's head position to new coordinates")]
+        public static string MoveTag(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+                int tagIdInt = parameters?["tagId"]?.ToObject<int>()
+                    ?? throw new ArgumentException("tagId is required");
+                double newX = parameters?["x"]?.ToObject<double>()
+                    ?? throw new ArgumentException("x is required");
+                double newY = parameters?["y"]?.ToObject<double>()
+                    ?? throw new ArgumentException("y is required");
+                double newZ = parameters?["z"]?.ToObject<double>() ?? 0;
+
+                var tag = doc.GetElement(new ElementId(tagIdInt)) as IndependentTag;
+                if (tag == null)
+                    return ResponseBuilder.Error("moveTag", $"Tag {tagIdInt} not found or not an IndependentTag").Build();
+
+                var oldHead = tag.TagHeadPosition;
+                var newHead = new XYZ(newX, newY, newZ);
+
+                using (var t = new Transaction(doc, "Move Tag"))
+                {
+                    t.Start();
+                    tag.TagHeadPosition = newHead;
+                    t.Commit();
+                }
+
+                return ResponseBuilder.Success()
+                    .With("tagId",  tagIdInt)
+                    .With("from",   new[] { Math.Round(oldHead.X, 6), Math.Round(oldHead.Y, 6) })
+                    .With("to",     new[] { Math.Round(newHead.X, 6), Math.Round(newHead.Y, 6) })
+                    .Build();
             }
             catch (Exception ex)
             {

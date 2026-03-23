@@ -881,6 +881,9 @@ namespace RevitMCPBridge
                     case "addLeaderToTextNote":
                         return await ExecuteInRevitContext(uiApp => ViewAnnotationMethods.AddLeaderToTextNote(uiApp, parameters));
 
+                    case "moveTag":
+                        return await ExecuteInRevitContext(uiApp => ViewAnnotationMethods.MoveTag(uiApp, parameters));
+
                     case "setTextNoteLeaderEndpoint":
                         return await ExecuteInRevitContext(uiApp => ViewAnnotationMethods.SetTextNoteLeaderEndpoint(uiApp, parameters));
 

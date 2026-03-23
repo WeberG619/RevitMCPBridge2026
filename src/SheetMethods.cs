@@ -855,12 +855,32 @@ namespace RevitMCPBridge
                 var doc = uiApp.ActiveUIDocument.Document;
 
                 var pv = new ParameterValidator(parameters, "placeScheduleOnSheet");
-                pv.Require("sheetId").IsType<int>();
                 pv.Require("scheduleId").IsType<int>();
                 pv.ThrowIfInvalid();
 
-                var sheetId   = new ElementId(pv.GetRequired<int>("sheetId"));
-                var schedId   = new ElementId(pv.GetRequired<int>("scheduleId"));
+                var schedId = new ElementId(pv.GetRequired<int>("scheduleId"));
+
+                // Accept sheetId (int) or sheetNumber (string)
+                ElementId sheetId;
+                if (parameters["sheetId"] != null)
+                {
+                    sheetId = new ElementId(parameters["sheetId"].ToObject<int>());
+                }
+                else if (parameters["sheetNumber"] != null)
+                {
+                    var sheetNum = parameters["sheetNumber"].ToString();
+                    var found = new FilteredElementCollector(doc)
+                        .OfClass(typeof(ViewSheet))
+                        .Cast<ViewSheet>()
+                        .FirstOrDefault(s => s.SheetNumber == sheetNum);
+                    if (found == null)
+                        return ResponseBuilder.Error($"No sheet found with number '{sheetNum}'").Build();
+                    sheetId = found.Id;
+                }
+                else
+                {
+                    return ResponseBuilder.Error("placeScheduleOnSheet requires sheetId (int) or sheetNumber (string)").Build();
+                }
 
                 var sheet    = doc.GetElement(sheetId) as ViewSheet;
                 var schedule = doc.GetElement(schedId) as ViewSchedule;

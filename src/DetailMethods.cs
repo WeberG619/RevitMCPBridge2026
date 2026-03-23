@@ -6951,6 +6951,13 @@ namespace RevitMCPBridge2026
                     {
                         string layerName = layer["name"]?.ToString() ?? "Unknown";
                         double thickness = layer["thickness"]?.ToObject<double>() ?? 0;
+                        // Auto-convert inches → feet if value looks like inches (no wall layer is > 2 ft thick)
+                        bool thicknessAutoConverted = false;
+                        if (thickness > 2.0)
+                        {
+                            thickness /= 12.0;
+                            thicknessAutoConverted = true;
+                        }
                         string hatch = layer["hatch"]?.ToString(); // filled region type name
                         string lineWeight = layer["lineWeight"]?.ToString() ?? "Thin Lines";
                         bool isOverlay = layer["overlay"]?.ToObject<bool>() ?? false; // insulation overlaps framing
@@ -7051,7 +7058,7 @@ namespace RevitMCPBridge2026
                                 textId = (long)textNote.Id.Value;
                             }
 
-                            layerPositions.Add(new { name = layerName, bottomY, topY, thickness, thicknessInches = Math.Round(thickness * 12, 3) });
+                            layerPositions.Add(new { name = layerName, bottomY, topY, thickness, thicknessInches = Math.Round(thickness * 12, 3), unitNote = thicknessAutoConverted ? "auto-converted from inches to feet" : null });
                             createdElements.Add(new { type = isOverlay ? "overlay" : "layer", name = layerName, regionId, textId, bottomY, topY, thickness });
 
                             if (!isOverlay)
@@ -7133,7 +7140,7 @@ namespace RevitMCPBridge2026
                                 }
                             }
 
-                            layerPositions.Add(new { name = layerName, leftX, rightX, thickness, thicknessInches = Math.Round(thickness * 12, 3) });
+                            layerPositions.Add(new { name = layerName, leftX, rightX, thickness, thicknessInches = Math.Round(thickness * 12, 3), unitNote = thicknessAutoConverted ? "auto-converted from inches to feet" : null });
                             createdElements.Add(new { type = isOverlay ? "overlay" : "layer", name = layerName, regionId, textId, leftX, rightX, thickness });
 
                             if (!isOverlay)
