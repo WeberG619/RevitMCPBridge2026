@@ -57,9 +57,8 @@ namespace RevitMCPBridge.Commands
             html.AppendLine(".q{font-weight:600;margin:0.9rem 0 0.2rem;font-size:0.95rem;color:#000;border-left:3px solid #0055cc;padding-left:0.5rem;}");
             html.AppendLine(".a{color:#000;font-weight:300;line-height:1.6;margin:0 0 0.5rem 0;font-size:0.9rem;}");
             html.AppendLine("code{background:#e8e8e8;padding:0.1rem 0.35rem;border-radius:3px;font-size:0.85em;color:#000;}");
-            html.AppendLine(".step{display:table;width:100%;margin:0.4rem 0;font-size:0.9rem;}");
-            html.AppendLine(".step-num{display:table-cell;font-weight:600;white-space:nowrap;padding-right:0.6rem;vertical-align:top;width:1.5rem;color:#000;}");
-            html.AppendLine(".step > div + div{display:table-cell;vertical-align:top;color:#000;}");
+            html.AppendLine(".step{margin:0.4rem 0;font-size:0.9rem;color:#000;padding-left:1.8rem;text-indent:-1.8rem;}");
+            html.AppendLine(".step-num{font-weight:600;display:inline-block;width:1.8rem;}");
             html.AppendLine("a{color:#0066cc;}");
             html.AppendLine("</style></head><body>");
 
@@ -67,11 +66,11 @@ namespace RevitMCPBridge.Commands
             html.AppendLine("<div class='content'>");
 
             html.AppendLine("<h2>Getting Started</h2>");
-            html.AppendLine("<div class='step'><div class='step-num'>1.</div><div>Open Revit and your project file.</div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>2.</div><div>In the <strong>BIM Monkey</strong> ribbon tab, click <strong>Start Server</strong>. The server auto-starts on Revit launch — this is usually already done.</div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>3.</div><div>Open Claude Code in your <strong>BIM Monkey</strong> folder and ask Claude to generate construction documents. Claude connects to Revit via the named pipe <code>\\\\.\\pipe\\RevitMCPBridge2026</code>.</div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>4.</div><div>Generated sheets are marked with <code> *</code> in the Revit Project Browser so you can tell them apart from your existing sheets.</div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>5.</div><div>Log into <a href='https://app.bimmonkey.ai'>app.bimmonkey.ai</a> to review output and upload completed CD sets to your training library.</div></div>");
+            html.AppendLine("<p class='step'><span class='step-num'>1.</span>Open Revit and your project file.</p>");
+            html.AppendLine("<p class='step'><span class='step-num'>2.</span>In the <strong>BIM Monkey</strong> ribbon tab, click <strong>Start Server</strong>. The server auto-starts on Revit launch — this is usually already done.</p>");
+            html.AppendLine("<p class='step'><span class='step-num'>3.</span>Open Claude Code in your <strong>BIM Monkey</strong> folder and ask Claude to generate construction documents. Claude connects to Revit via the named pipe <code>\\\\.\\pipe\\RevitMCPBridge2026</code>.</p>");
+            html.AppendLine("<p class='step'><span class='step-num'>4.</span>Generated sheets are marked with <code> *</code> in the Revit Project Browser so you can tell them apart from your existing sheets.</p>");
+            html.AppendLine("<p class='step'><span class='step-num'>5.</span>Log into <a href='https://app.bimmonkey.ai'>app.bimmonkey.ai</a> to review output and upload completed CD sets to your training library.</p>");
 
             html.AppendLine("<h2>Ribbon Buttons</h2>");
             html.AppendLine("<p class='q'>Start Server</p><p class='a'>Starts the MCP pipe server so Claude can communicate with Revit. Happens automatically when Revit opens.</p>");
@@ -89,31 +88,31 @@ namespace RevitMCPBridge.Commands
 
             html.AppendLine("<p class='q'>Claude says it can't connect to Revit / server isn't responding.</p>");
             html.AppendLine("<p class='a'>The BIM Monkey server needs to be running before Claude can talk to Revit. To restart it:</p>");
-            html.AppendLine("<div class='step'><div class='step-num'>1.</div><div>Go to the <strong>BIM Monkey</strong> tab → <strong>Server Control</strong> panel</div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>2.</div><div>Click <strong>Stop Server</strong>, wait 2 seconds</div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>3.</div><div>Click <strong>Start Server</strong> — the status indicator should turn green</div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>4.</div><div>Return to Claude Code and retry your request</div></div>");
+            html.AppendLine("<p class='step'><span class='step-num'>1.</span>Go to the <strong>BIM Monkey</strong> tab → <strong>Server Control</strong> panel</p>");
+            html.AppendLine("<p class='step'><span class='step-num'>2.</span>Click <strong>Stop Server</strong>, wait 2 seconds</p>");
+            html.AppendLine("<p class='step'><span class='step-num'>3.</span>Click <strong>Start Server</strong> — the status indicator should turn green</p>");
+            html.AppendLine("<p class='step'><span class='step-num'>4.</span>Return to Claude Code and retry your request</p>");
 
             html.AppendLine("<p class='q'>I opened a new Revit file mid-session and Claude is reading the old file.</p>");
             html.AppendLine("<p class='a'>The server stays bound to the document that was open when it started. After switching files, reset the connection:</p>");
-            html.AppendLine("<div class='step'><div class='step-num'>1.</div><div>Open your new Revit project file</div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>2.</div><div>BIM Monkey tab → click <strong>Stop Server</strong> then <strong>Start Server</strong></div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>3.</div><div>Claude will now read from the new active document</div></div>");
+            html.AppendLine("<p class='step'><span class='step-num'>1.</span>Open your new Revit project file</p>");
+            html.AppendLine("<p class='step'><span class='step-num'>2.</span>BIM Monkey tab → click <strong>Stop Server</strong> then <strong>Start Server</strong></p>");
+            html.AppendLine("<p class='step'><span class='step-num'>3.</span>Claude will now read from the new active document</p>");
 
             html.AppendLine("<p class='q'>Claude Code doesn't see the Revit tools (revit_execute not available).</p>");
             html.AppendLine("<p class='a'>Claude Code <strong>must be opened from the BIM Monkey folder</strong> — not from a general terminal or another project. The MCP config that connects to Revit lives in <code>Documents\\BIM Monkey\\</code>.</p>");
-            html.AppendLine("<div class='step'><div class='step-num'>1.</div><div>Close any existing Claude Code session</div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>2.</div><div>In Revit, go to <strong>BIM Monkey tab</strong> and click the <strong>Claude Code</strong> button — this opens Claude Code pointed at the correct folder automatically</div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>3.</div><div>Alternatively, open Claude Code manually and navigate to <code>Documents\\BIM Monkey</code> as the working directory</div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>4.</div><div>Verify the <code>revit-bridge</code> MCP server shows as connected in Claude's tool list</div></div>");
+            html.AppendLine("<p class='step'><span class='step-num'>1.</span>Close any existing Claude Code session</p>");
+            html.AppendLine("<p class='step'><span class='step-num'>2.</span>In Revit, go to <strong>BIM Monkey tab</strong> and click the <strong>Claude Code</strong> button — this opens Claude Code pointed at the correct folder automatically</p>");
+            html.AppendLine("<p class='step'><span class='step-num'>3.</span>Alternatively, open Claude Code manually and navigate to <code>Documents\\BIM Monkey</code> as the working directory</p>");
+            html.AppendLine("<p class='step'><span class='step-num'>4.</span>Verify the <code>revit-bridge</code> MCP server shows as connected in Claude's tool list</p>");
 
             html.AppendLine("<p class='q'>Commands time out.</p><p class='a'>Revit must not have any modal dialogs open. Dismiss any dialogs, click in the drawing area to give Revit focus, then retry.</p>");
 
             html.AppendLine("<p class='q'>Generation runs but produces no sheets / everything fails immediately.</p>");
             html.AppendLine("<p class='a'>Usually means the API key is missing or the BIM Monkey server is unreachable. Check:</p>");
-            html.AppendLine("<div class='step'><div class='step-num'>1.</div><div>Open <code>Documents\\BIM Monkey\\CLAUDE.md</code> and confirm the line <code>BIM_MONKEY_API_KEY=bm_...</code> is present</div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>2.</div><div>Make sure you have an active internet connection</div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>3.</div><div>Restart the server (Stop → Start) and retry</div></div>");
+            html.AppendLine("<p class='step'><span class='step-num'>1.</span>Open <code>Documents\\BIM Monkey\\CLAUDE.md</code> and confirm the line <code>BIM_MONKEY_API_KEY=bm_...</code> is present</p>");
+            html.AppendLine("<p class='step'><span class='step-num'>2.</span>Make sure you have an active internet connection</p>");
+            html.AppendLine("<p class='step'><span class='step-num'>3.</span>Restart the server (Stop → Start) and retry</p>");
 
             html.AppendLine("<p class='q'>Revit shows a warning about duplicate Type Mark values.</p><p class='a'>This is a standard Revit model quality warning — it has nothing to do with BIM Monkey or the plugin. Revit is flagging elements in your model that share a Type Mark parameter. You can safely dismiss it.</p>");
 
@@ -124,9 +123,9 @@ namespace RevitMCPBridge.Commands
 
             html.AppendLine("<p class='q'>The installer was blocked by Windows / antivirus.</p>");
             html.AppendLine("<p class='a'>The installer is not yet code-signed. Windows SmartScreen may block it.</p>");
-            html.AppendLine("<div class='step'><div class='step-num'>1.</div><div>Right-click the downloaded .zip → Properties → check <strong>Unblock</strong></div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>2.</div><div>Extract, right-click <code>BimMonkeySetup.exe</code> → Properties → <strong>Unblock</strong></div></div>");
-            html.AppendLine("<div class='step'><div class='step-num'>3.</div><div>Run installer → click <strong>More Info → Run Anyway</strong> if SmartScreen appears</div></div>");
+            html.AppendLine("<p class='step'><span class='step-num'>1.</span>Right-click the downloaded .zip → Properties → check <strong>Unblock</strong></p>");
+            html.AppendLine("<p class='step'><span class='step-num'>2.</span>Extract, right-click <code>BimMonkeySetup.exe</code> → Properties → <strong>Unblock</strong></p>");
+            html.AppendLine("<p class='step'><span class='step-num'>3.</span>Run installer → click <strong>More Info → Run Anyway</strong> if SmartScreen appears</p>");
 
             html.AppendLine("<h2>Support</h2>");
             html.AppendLine("<p class='a'>Email <a href='mailto:hello@bimmonkey.ai'>hello@bimmonkey.ai</a> or visit <a href='https://app.bimmonkey.ai'>app.bimmonkey.ai</a>.</p>");
