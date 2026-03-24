@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -800,6 +800,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Generates implementation code from an approved tool spec.
         /// </summary>
+        [MCPMethod("generateImplementation", Category = "Capability")]
         public static string GenerateImplementation(UIApplication uiApp, JObject parameters)
         {
             try
@@ -861,6 +862,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Runs all pending tests for regression.
         /// </summary>
+        [MCPMethod("runRegressionTests", Category = "Capability")]
         public static string RunRegressionTests(UIApplication uiApp, JObject parameters)
         {
             try

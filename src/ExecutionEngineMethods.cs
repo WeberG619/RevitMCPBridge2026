@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -22,6 +22,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Execute a single predicted action
         /// </summary>
+        [MCPMethod("executePrediction", Category = "ExecutionEngine")]
         public static string ExecutePrediction(UIApplication uiApp, JObject parameters)
         {
             try
@@ -118,6 +119,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Execute multiple predictions in sequence
         /// </summary>
+        [MCPMethod("executePredictions", Category = "ExecutionEngine")]
         public static string ExecutePredictions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -232,6 +234,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Automatically place a schedule on the most appropriate sheet
         /// </summary>
+        [MCPMethod("autoPlaceSchedule", Category = "ExecutionEngine")]
         public static string AutoPlaceSchedule(UIApplication uiApp, JObject parameters)
         {
             try
@@ -334,6 +337,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Automatically place a view on the most appropriate sheet
         /// </summary>
+        [MCPMethod("autoPlaceView", Category = "ExecutionEngine")]
         public static string AutoPlaceView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -428,6 +432,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Automatically fix all detected gaps that can be auto-resolved
         /// </summary>
+        [MCPMethod("autoFixGaps", Category = "ExecutionEngine")]
         public static string AutoFixGaps(UIApplication uiApp, JObject parameters)
         {
             try

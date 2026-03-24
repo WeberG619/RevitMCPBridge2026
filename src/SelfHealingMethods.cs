@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -41,6 +41,7 @@ namespace RevitMCPBridge
         /// - originalState: (optional) State before operation for rollback
         /// - parameters: (optional) Parameters used in the operation
         /// </summary>
+        [MCPMethod("recordOperation", Category = "SelfHealing")]
         public static string RecordOperation(UIApplication uiApp, JObject parameters)
         {
             try
@@ -88,6 +89,7 @@ namespace RevitMCPBridge
         /// Parameters:
         /// - limit: (optional) Max records to return (default 10)
         /// </summary>
+        [MCPMethod("getOperationHistory", Category = "SelfHealing")]
         public static string GetOperationHistory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -124,6 +126,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Clear operation history
         /// </summary>
+        [MCPMethod("clearOperationHistory", Category = "SelfHealing")]
         public static string ClearOperationHistory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -156,6 +159,7 @@ namespace RevitMCPBridge
         ///   - "unexpected_elements" - Elements that shouldn't exist
         ///   - "location_drift" - Elements not at expected locations
         /// </summary>
+        [MCPMethod("detectAnomalies", Category = "SelfHealing")]
         public static string DetectAnomalies(UIApplication uiApp, JObject parameters)
         {
             try
@@ -286,6 +290,7 @@ namespace RevitMCPBridge
         /// - errorType: Type of error to recover from
         /// - context: Additional context about the error
         /// </summary>
+        [MCPMethod("attemptRecovery", Category = "SelfHealing")]
         public static string AttemptRecovery(UIApplication uiApp, JObject parameters)
         {
             try
@@ -466,6 +471,7 @@ namespace RevitMCPBridge
         /// Parameters:
         /// - operationId: (optional) Specific operation to undo
         /// </summary>
+        [MCPMethod("undoLastOperation", Category = "SelfHealing")]
         public static string UndoLastOperation(UIApplication uiApp, JObject parameters)
         {
             try
@@ -583,6 +589,7 @@ namespace RevitMCPBridge
         /// - elementId: Element to delete
         /// - force: (optional) Delete even if has dependents (default false)
         /// </summary>
+        [MCPMethod("safeDeleteElement", Category = "SelfHealing")]
         public static string SafeDeleteElement(UIApplication uiApp, JObject parameters)
         {
             try
@@ -688,6 +695,7 @@ namespace RevitMCPBridge
         /// - verify: (optional) Verify after modification (default true)
         /// - maxRetries: (optional) Max retry attempts (default 1)
         /// </summary>
+        [MCPMethod("safeModifyElement", Category = "SelfHealing")]
         public static string SafeModifyElement(UIApplication uiApp, JObject parameters)
         {
             try
@@ -838,6 +846,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Perform a health check on the MCP Bridge and Revit connection
         /// </summary>
+        [MCPMethod("healthCheck", Category = "SelfHealing")]
         public static string HealthCheck(UIApplication uiApp, JObject parameters)
         {
             try

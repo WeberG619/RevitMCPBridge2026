@@ -1,4 +1,4 @@
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -312,6 +312,7 @@ namespace RevitMCPBridge
         ///   "patternName": "Full pattern name"
         /// }
         /// </returns>
+        [MCPMethod("detectSheetPattern", Category = "SheetPattern")]
         public static string DetectSheetPattern(UIApplication uiApp, JObject parameters)
         {
             try
@@ -402,6 +403,7 @@ namespace RevitMCPBridge
         ///   "rules": { ...complete pattern specification... }
         /// }
         /// </returns>
+        [MCPMethod("getPatternRules", Category = "SheetPattern")]
         public static string GetPatternRules(UIApplication uiApp, JObject parameters)
         {
             try
@@ -461,6 +463,7 @@ namespace RevitMCPBridge
         ///   "strategy": "sequential_decimal"
         /// }
         /// </returns>
+        [MCPMethod("generateFloorPlanSheets", Category = "SheetPattern")]
         public static string GenerateFloorPlanSheets(UIApplication uiApp, JObject parameters)
         {
             try
@@ -599,6 +602,7 @@ namespace RevitMCPBridge
         ///   ]
         /// }
         /// </returns>
+        [MCPMethod("generateCompleteSheetSet", Category = "SheetPattern")]
         public static string GenerateCompleteSheetSet(UIApplication uiApp, JObject parameters)
         {
             try
@@ -865,6 +869,7 @@ namespace RevitMCPBridge
         ///   "skippedSheets": [...]
         /// }
         /// </returns>
+        [MCPMethod("createSheetsFromPattern", Category = "SheetPattern")]
         public static string CreateSheetsFromPattern(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1003,6 +1008,7 @@ namespace RevitMCPBridge
         ///   "message": "Client profile created/updated"
         /// }
         /// </returns>
+        [MCPMethod("createClientProfile", Category = "SheetPattern")]
         public static string CreateClientProfile(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1097,6 +1103,7 @@ namespace RevitMCPBridge
         ///   "found": true
         /// }
         /// </returns>
+        [MCPMethod("getClientProfile", Category = "SheetPattern")]
         public static string GetClientProfile(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1164,6 +1171,7 @@ namespace RevitMCPBridge
         ///   ]
         /// }
         /// </returns>
+        [MCPMethod("listKnownFirms", Category = "SheetPattern")]
         public static string ListKnownFirms(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1207,6 +1215,7 @@ namespace RevitMCPBridge
         ///   "reasoning": "Three-digit sequential format detected"
         /// }
         /// </returns>
+        [MCPMethod("detectExistingPattern", Category = "SheetPattern")]
         public static string DetectExistingPattern(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1358,6 +1367,7 @@ namespace RevitMCPBridge
         ///   "reasoning": "Next sequential number after A107"
         /// }
         /// </returns>
+        [MCPMethod("suggestNextSheetNumber", Category = "SheetPattern")]
         public static string SuggestNextSheetNumber(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1502,6 +1512,7 @@ namespace RevitMCPBridge
         ///   "warnings": ["Floor-specific numbering converted to sequential"]
         /// }
         /// </returns>
+        [MCPMethod("convertBetweenPatterns", Category = "SheetPattern")]
         public static string ConvertBetweenPatterns(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1634,6 +1645,7 @@ namespace RevitMCPBridge
         /// Gets all guide grids in the document by scanning sheets for assigned guide grids
         /// Note: GuideGrid class is not publicly accessible in Revit 2026, so we use parameter-based approach
         /// </summary>
+        [MCPMethod("getGuideGrids", Category = "SheetPattern")]
         public static string GetGuideGrids(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1698,6 +1710,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Gets guide grid info for a specific sheet
         /// </summary>
+        [MCPMethod("getSheetGuideGrid", Category = "SheetPattern")]
         public static string GetSheetGuideGrid(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1784,6 +1797,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Applies a guide grid to a sheet using the SHEET_GUIDE_GRID parameter
         /// </summary>
+        [MCPMethod("applyGuideGridToSheet", Category = "SheetPattern")]
         public static string ApplyGuideGridToSheet(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1868,6 +1882,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Applies a guide grid to multiple sheets
         /// </summary>
+        [MCPMethod("applyGuideGridToSheets", Category = "SheetPattern")]
         public static string ApplyGuideGridToSheets(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1990,6 +2005,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Removes guide grid from a sheet (sets to none)
         /// </summary>
+        [MCPMethod("removeGuideGridFromSheet", Category = "SheetPattern")]
         public static string RemoveGuideGridFromSheet(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2060,6 +2076,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Deletes a guide grid element from the document
         /// </summary>
+        [MCPMethod("deleteGuideGrid", Category = "SheetPattern")]
         public static string DeleteGuideGrid(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2149,6 +2166,7 @@ namespace RevitMCPBridge
         /// Returns information about the standard 5x4 detail sheet grid layout
         /// Note: Guide grids must be created manually in Revit - this returns specifications only
         /// </summary>
+        [MCPMethod("getStandardDetailGridSpec", Category = "SheetPattern")]
         public static string GetStandardDetailGridSpec(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2219,6 +2237,7 @@ namespace RevitMCPBridge
         /// This encodes the complete grid knowledge for intelligent viewport placement.
         /// Grid Layout: 5 columns x 4 rows = 20 cells, numbered left-to-right, top-to-bottom
         /// </summary>
+        [MCPMethod("getDetailGridCells", Category = "SheetPattern")]
         public static string GetDetailGridCells(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2357,6 +2376,7 @@ namespace RevitMCPBridge
         /// Calculates how many grid cells a view needs based on its dimensions.
         /// Returns cell count and recommended placement strategy.
         /// </summary>
+        [MCPMethod("calculateViewCellRequirements", Category = "SheetPattern")]
         public static string CalculateViewCellRequirements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2471,6 +2491,7 @@ namespace RevitMCPBridge
         /// Gets the next available grid cell on a sheet, accounting for already-placed viewports.
         /// Returns cell number and coordinates for sequential placement.
         /// </summary>
+        [MCPMethod("getNextAvailableGridCell", Category = "SheetPattern")]
         public static string GetNextAvailableGridCell(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2605,6 +2626,7 @@ namespace RevitMCPBridge
         /// Places a view on a sheet at a specific grid cell, with automatic multi-cell handling.
         /// Supports single-cell, 2-cell horizontal, 2-cell vertical, and 4-cell placements.
         /// </summary>
+        [MCPMethod("placeViewOnGridCell", Category = "SheetPattern")]
         public static string PlaceViewOnGridCell(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2770,6 +2792,7 @@ namespace RevitMCPBridge
         /// Places a legend view on the right side of a sheet (standard practice for keynotes, floor plan legends).
         /// Position is determined by existing content and legend height.
         /// </summary>
+        [MCPMethod("placeLegendOnSheetRight", Category = "SheetPattern")]
         public static string PlaceLegendOnSheetRight(UIApplication uiApp, JObject parameters)
         {
             try

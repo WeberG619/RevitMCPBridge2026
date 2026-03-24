@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -40,6 +40,7 @@ namespace RevitMCPBridge
         /// - offset: Skip first N items (for pagination)
         /// - scanType: "all" | "families" | "views" | "legends" | "schedules" (default: "all")
         /// </summary>
+        [MCPMethod("scanProjectContent", Category = "LibrarySync")]
         public static string ScanProjectContent(UIApplication uiApp, JObject parameters)
         {
             try
@@ -299,6 +300,7 @@ namespace RevitMCPBridge
         /// - MATCHING: Items that exist in both
         /// - AVAILABLE: Items in library but not in project (could be loaded)
         /// </summary>
+        [MCPMethod("compareProjectToLibrary", Category = "LibrarySync")]
         public static string CompareProjectToLibrary(UIApplication uiApp, JObject parameters)
         {
             try
@@ -551,6 +553,7 @@ namespace RevitMCPBridge
         /// Extracts new items from the current project to the library.
         /// Can extract to Master library or a firm-specific library.
         /// </summary>
+        [MCPMethod("extractNewToLibrary", Category = "LibrarySync")]
         public static string ExtractNewToLibrary(UIApplication uiApp, JObject parameters)
         {
             try
@@ -863,6 +866,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Creates a new firm profile for storing firm-specific library content.
         /// </summary>
+        [MCPMethod("createFirmProfile", Category = "LibrarySync")]
         public static string CreateFirmProfile(UIApplication uiApp, JObject parameters)
         {
             try
@@ -931,6 +935,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Gets all registered firm profiles.
         /// </summary>
+        [MCPMethod("getFirmProfiles", Category = "LibrarySync")]
         public static string GetFirmProfiles(UIApplication uiApp, JObject parameters)
         {
             try
@@ -977,6 +982,7 @@ namespace RevitMCPBridge
         /// Detects the firm from title blocks on sheets (primary) and project information (fallback).
         /// Title blocks are the authoritative source as they contain the firm name that appears on printed drawings.
         /// </summary>
+        [MCPMethod("detectFirmFromProject", Category = "LibrarySync")]
         public static string DetectFirmFromProject(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1177,6 +1183,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Rebuilds the library index to include all firm libraries.
         /// </summary>
+        [MCPMethod("rebuildLibraryIndex", Category = "LibrarySync")]
         public static string RebuildLibraryIndex(UIApplication uiApp, JObject parameters)
         {
             try

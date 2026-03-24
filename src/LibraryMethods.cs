@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,6 +25,7 @@ namespace RevitMCPBridge
         /// Searches the library index for items matching the query.
         /// Supports filtering by type (drafting_view, family, legend, schedule) and category.
         /// </summary>
+        [MCPMethod("searchLibrary", Category = "Library")]
         public static string SearchLibrary(UIApplication uiApp, JObject parameters)
         {
             try
@@ -127,6 +128,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Gets library statistics and category breakdown
         /// </summary>
+        [MCPMethod("getLibraryStats", Category = "Library")]
         public static string GetLibraryStats(UIApplication uiApp, JObject parameters)
         {
             try
@@ -204,6 +206,7 @@ namespace RevitMCPBridge
         /// Loads a family (.rfa) from the library into the current project.
         /// Returns the loaded family ID and available types.
         /// </summary>
+        [MCPMethod("loadLibraryFamily", Category = "Library")]
         public static string LoadLibraryFamily(UIApplication uiApp, JObject parameters)
         {
             try
@@ -333,6 +336,7 @@ namespace RevitMCPBridge
         /// Inserts a drafting view, legend, or schedule from the library into the current project.
         /// For views: copies the view and its contents.
         /// </summary>
+        [MCPMethod("insertLibraryView", Category = "Library")]
         public static string InsertLibraryView(UIApplication uiApp, JObject parameters)
         {
             try

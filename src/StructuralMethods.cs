@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -2391,6 +2391,7 @@ namespace RevitMCPBridge2026
         /// Create an escalator element between two levels with configurable width and inclination
         /// Auto-generated from approved tool spec via capability system
         /// </summary>
+        [MCPMethod("createEscalator", Category = "Structural")]
         public static string CreateEscalator(UIApplication uiApp, JObject parameters)
         {
             try

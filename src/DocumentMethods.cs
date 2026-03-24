@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -2661,6 +2661,7 @@ namespace RevitMCPBridge
         /// Exports all drafting views to a folder, organized by category based on view names.
         /// Creates subfolders for categories like Roof, Cabinetry, Wall Details, etc.
         /// </summary>
+        [MCPMethod("exportDraftingViewsToFolder", Category = "Document")]
         public static string ExportDraftingViewsToFolder(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2929,6 +2930,7 @@ namespace RevitMCPBridge
         /// Each drafting view becomes a standalone Revit file containing that view and its elements.
         /// Organized by category based on view names.
         /// </summary>
+        [MCPMethod("exportDraftingViewsToRvt", Category = "Document")]
         public static string ExportDraftingViewsToRvt(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3178,6 +3180,7 @@ namespace RevitMCPBridge
         /// Much more stable than individual files - creates only 16 files instead of 700+.
         /// Each .rvt file contains all drafting views for that category.
         /// </summary>
+        [MCPMethod("exportDraftingViewsByCategoryToRvt", Category = "Document")]
         public static string ExportDraftingViewsByCategoryToRvt(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3530,6 +3533,7 @@ namespace RevitMCPBridge
         /// Exports all legend views to individual .rvt files.
         /// Copies the legend VIEW element itself to new documents, preserving the view and its contents.
         /// </summary>
+        [MCPMethod("exportLegendsToRvt", Category = "Document")]
         public static string ExportLegendsToRvt(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3727,6 +3731,7 @@ namespace RevitMCPBridge
         /// Copies the schedule VIEW element itself (with its definition: columns, formatting, filters).
         /// The schedule will be empty but will populate when loaded into a project with matching elements.
         /// </summary>
+        [MCPMethod("exportSchedulesToRvt", Category = "Document")]
         public static string ExportSchedulesToRvt(UIApplication uiApp, JObject parameters)
         {
             try

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -1457,6 +1457,7 @@ namespace RevitMCPBridge
         /// Supports multi-page PDFs (specify page number).
         /// Uses Revit's ImageType API which handles PDF files natively.
         /// </summary>
+        [MCPMethod("importPDF", Category = "Link")]
         public static string ImportPDF(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1623,6 +1624,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Link a PDF file (stays connected to source). Alias for ImportPDF with asLink=true.
         /// </summary>
+        [MCPMethod("linkPDF", Category = "Link")]
         public static string LinkPDF(UIApplication uiApp, JObject parameters)
         {
             if (parameters["asLink"] == null)

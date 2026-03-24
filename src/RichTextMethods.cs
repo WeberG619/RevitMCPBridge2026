@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -97,6 +97,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get or create a TextNoteType with a specific color
         /// </summary>
+        [MCPMethod("getOrCreateColoredTextType", Category = "RichText")]
         public static string GetOrCreateColoredTextType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -202,6 +203,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all colored text types created for rich text
         /// </summary>
+        [MCPMethod("getColoredTextTypes", Category = "RichText")]
         public static string GetColoredTextTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -249,6 +251,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a rich text note with multiple colored spans
         /// </summary>
+        [MCPMethod("createRichTextNote", Category = "RichText")]
         public static string CreateRichTextNote(UIApplication uiApp, JObject parameters)
         {
             try
@@ -429,6 +432,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get rich text note data from a group or text note
         /// </summary>
+        [MCPMethod("getRichTextNoteData", Category = "RichText")]
         public static string GetRichTextNoteData(UIApplication uiApp, JObject parameters)
         {
             try
@@ -491,6 +495,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Update a rich text note with new spans
         /// </summary>
+        [MCPMethod("updateRichTextNote", Category = "RichText")]
         public static string UpdateRichTextNote(UIApplication uiApp, JObject parameters)
         {
             try
@@ -569,6 +574,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Explode rich text note into regular text notes (removes grouping and metadata)
         /// </summary>
+        [MCPMethod("explodeRichTextNote", Category = "RichText")]
         public static string ExplodeRichTextNote(UIApplication uiApp, JObject parameters)
         {
             try
@@ -631,6 +637,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Find all rich text notes in the document
         /// </summary>
+        [MCPMethod("getRichTextNotes", Category = "RichText")]
         public static string GetRichTextNotes(UIApplication uiApp, JObject parameters)
         {
             try

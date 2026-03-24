@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -23,6 +23,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a new level
         /// </summary>
+        [MCPMethod("createLevel", Category = "ProjectSetup")]
         public static string CreateLevel(UIApplication uiApp, JObject parameters)
         {
             try
@@ -93,6 +94,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a level
         /// </summary>
+        [MCPMethod("deleteLevel", Category = "ProjectSetup")]
         public static string DeleteLevel(UIApplication uiApp, JObject parameters)
         {
             try
@@ -130,6 +132,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a new Revit project document
         /// </summary>
+        [MCPMethod("createNewProject", Category = "ProjectSetup")]
         public static string CreateNewProject(UIApplication uiApp, JObject parameters)
         {
             try
@@ -235,6 +238,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get list of available project templates
         /// </summary>
+        [MCPMethod("getProjectTemplates", Category = "ProjectSetup")]
         public static string GetProjectTemplates(UIApplication uiApp, JObject parameters)
         {
             try
@@ -287,6 +291,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a linear grid
         /// </summary>
+        [MCPMethod("createGrid", Category = "ProjectSetup")]
         public static string CreateGrid(UIApplication uiApp, JObject parameters)
         {
             try
@@ -334,6 +339,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create an arc grid
         /// </summary>
+        [MCPMethod("createArcGrid", Category = "ProjectSetup")]
         public static string CreateArcGrid(UIApplication uiApp, JObject parameters)
         {
             try
@@ -382,6 +388,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all grids in the project
         /// </summary>
+        [MCPMethod("getGrids", Category = "ProjectSetup")]
         public static string GetGrids(UIApplication uiApp, JObject parameters)
         {
             try
@@ -415,6 +422,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a grid
         /// </summary>
+        [MCPMethod("deleteGrid", Category = "ProjectSetup")]
         public static string DeleteGrid(UIApplication uiApp, JObject parameters)
         {
             try
@@ -452,6 +460,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a topography surface from points
         /// </summary>
+        [MCPMethod("createTopography", Category = "ProjectSetup")]
         public static string CreateTopography(UIApplication uiApp, JObject parameters)
         {
             try
@@ -512,6 +521,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Add points to existing topography
         /// </summary>
+        [MCPMethod("modifyTopography", Category = "ProjectSetup")]
         public static string ModifyTopography(UIApplication uiApp, JObject parameters)
         {
             try
@@ -569,6 +579,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a building pad on topography
         /// </summary>
+        [MCPMethod("createBuildingPad", Category = "ProjectSetup")]
         public static string CreateBuildingPad(UIApplication uiApp, JObject parameters)
         {
             try
@@ -645,6 +656,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Copy elements with translation
         /// </summary>
+        [MCPMethod("copyElements", Category = "ProjectSetup")]
         public static string CopyElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -685,6 +697,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Move elements by translation
         /// </summary>
+        [MCPMethod("moveElements", Category = "ProjectSetup")]
         public static string MoveElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -723,6 +736,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Rotate elements around an axis
         /// </summary>
+        [MCPMethod("rotateElements", Category = "ProjectSetup")]
         public static string RotateElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -766,6 +780,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Mirror elements across a plane
         /// </summary>
+        [MCPMethod("mirrorElements", Category = "ProjectSetup")]
         public static string MirrorElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -808,6 +823,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a linear array of elements
         /// </summary>
+        [MCPMethod("arrayElements", Category = "ProjectSetup")]
         public static string ArrayElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -856,6 +872,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete multiple elements
         /// </summary>
+        [MCPMethod("deleteElements", Category = "ProjectSetup")]
         public static string DeleteElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -892,6 +909,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Copy elements between documents
         /// </summary>
+        [MCPMethod("copyElementsBetweenDocuments", Category = "ProjectSetup")]
         public static string CopyElementsBetweenDocuments(UIApplication uiApp, JObject parameters)
         {
             try
@@ -998,6 +1016,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Transfer loadable families between documents (cabinets, furniture, fixtures, etc.)
         /// </summary>
+        [MCPMethod("transferFamilyBetweenDocuments", Category = "ProjectSetup")]
         public static string TransferFamilyBetweenDocuments(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1204,6 +1223,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all loadable families in a document by category
         /// </summary>
+        [MCPMethod("getFamiliesByCategory", Category = "ProjectSetup")]
         public static string GetFamiliesByCategory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1255,6 +1275,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a group from elements
         /// </summary>
+        [MCPMethod("createGroup", Category = "ProjectSetup")]
         public static string CreateGroup(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1300,6 +1321,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Place a group instance
         /// </summary>
+        [MCPMethod("placeGroup", Category = "ProjectSetup")]
         public static string PlaceGroup(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1347,6 +1369,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all group types
         /// </summary>
+        [MCPMethod("getGroupTypes", Category = "ProjectSetup")]
         public static string GetGroupTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1380,6 +1403,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Ungroup a group instance
         /// </summary>
+        [MCPMethod("ungroupElements", Category = "ProjectSetup")]
         public static string UngroupElements(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1450,6 +1474,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the Project Base Point location
         /// </summary>
+        [MCPMethod("getProjectBasePoint", Category = "ProjectSetup")]
         public static string GetProjectBasePoint(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1480,6 +1505,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set/Move the Project Base Point location
         /// </summary>
+        [MCPMethod("setProjectBasePoint", Category = "ProjectSetup")]
         public static string SetProjectBasePoint(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1530,6 +1556,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the Survey Point location
         /// </summary>
+        [MCPMethod("getSurveyPoint", Category = "ProjectSetup")]
         public static string GetSurveyPoint(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1558,6 +1585,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set/Move the Survey Point location
         /// </summary>
+        [MCPMethod("setSurveyPoint", Category = "ProjectSetup")]
         public static string SetSurveyPoint(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1612,6 +1640,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a model line (3D line in model space)
         /// </summary>
+        [MCPMethod("createModelLine", Category = "ProjectSetup")]
         public static string CreateModelLine(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1675,6 +1704,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a detail line (2D line in view)
         /// </summary>
+        [MCPMethod("createDetailLine", Category = "ProjectSetup")]
         public static string CreateDetailLine(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1744,6 +1774,7 @@ namespace RevitMCPBridge
         /// This solves the limitation where CopyElementsBetweenDocuments fails for view-specific elements.
         /// Use case: Copying legend/drafting view content after creating matching views.
         /// </summary>
+        [MCPMethod("copyViewContentBetweenDocuments", Category = "ProjectSetup")]
         public static string CopyViewContentBetweenDocuments(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1907,6 +1938,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get sheets from a specific document by name
         /// </summary>
+        [MCPMethod("getSheetsFromDocument", Category = "ProjectSetup")]
         public static string GetSheetsFromDocument(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1975,6 +2007,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get detail lines from a specific view in a specific document
         /// </summary>
+        [MCPMethod("getDetailLinesFromDocument", Category = "ProjectSetup")]
         public static string GetDetailLinesFromDocument(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2079,6 +2112,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get available ModelTextType types in the project
         /// </summary>
+        [MCPMethod("getModelTextTypes", Category = "ProjectSetup")]
         public static string GetModelTextTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2121,6 +2155,7 @@ namespace RevitMCPBridge
         /// modelTextTypeId (int) - specific type ID (optional, uses default if omitted)
         /// horizontalAlign (string) - "left", "center", "right" (default: "center")
         /// </param>
+        [MCPMethod("createModelText", Category = "ProjectSetup")]
         public static string CreateModelText(UIApplication uiApp, JObject parameters)
         {
             try

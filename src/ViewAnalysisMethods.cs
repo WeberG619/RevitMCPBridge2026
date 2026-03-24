@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -19,6 +19,7 @@ namespace RevitMCPBridge
         /// Comprehensive view snapshot - captures everything visible in the current view
         /// Returns detailed information about all elements, their properties, and relationships
         /// </summary>
+        [MCPMethod("getViewSnapshot", Category = "ViewAnalysis")]
         public static string GetViewSnapshot(UIApplication uiApp, JObject parameters)
         {
             try

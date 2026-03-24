@@ -138,6 +138,17 @@ namespace RevitMCPBridge
                     {
                         Log.Error(ex, "Failed to auto-start MCP server");
                     }
+
+                    // Auto-subscribe to Revit events for real-time state awareness
+                    try
+                    {
+                        EventSubscriptionMethods.SubscribeAll(_uiApplication);
+                        Log.Information("Event subscription system activated");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Failed to activate event subscription system");
+                    }
                 };
 
                 // Subscribe to dialog events for automatic handling

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -988,6 +988,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Enables worksharing in a non-workshared document
         /// </summary>
+        [MCPMethod("enableWorksharing", Category = "Workset")]
         public static string EnableWorksharing(UIApplication uiApp, JObject parameters)
         {
             try

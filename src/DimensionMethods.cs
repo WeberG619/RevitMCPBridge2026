@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -17,6 +17,7 @@ namespace RevitMCPBridge
         /// Add two dimensions to a room: one horizontal (width), one vertical (height)
         /// Dimensions are placed INSIDE the room using wall face references
         /// </summary>
+        [MCPMethod("addRoomDimensions", Category = "Dimension")]
         public static string AddRoomDimensions(UIApplication uiApp, JObject parameters)
         {
             try
@@ -275,6 +276,7 @@ namespace RevitMCPBridge
         /// Analyze dimensions in a view to extract the pattern (what they reference)
         /// Use this to capture how a user set up dimensions in a template room
         /// </summary>
+        [MCPMethod("getDimensionPattern", Category = "Dimension")]
         public static string GetDimensionPattern(UIApplication uiApp, JObject parameters)
         {
             try
@@ -439,6 +441,7 @@ namespace RevitMCPBridge
         /// Add dimensions to a room using wall references (centerline or face)
         /// This allows precise control over what the dimensions measure
         /// </summary>
+        [MCPMethod("addRoomDimensionsWithPattern", Category = "Dimension")]
         public static string AddRoomDimensionsWithPattern(UIApplication uiApp, JObject parameters)
         {
             try

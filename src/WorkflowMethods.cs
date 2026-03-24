@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -101,6 +101,7 @@ namespace RevitMCPBridge
         /// Execute a workflow autonomously
         /// This is the main entry point for Claude to run complete deliverables
         /// </summary>
+        [MCPMethod("executeWorkflow", Category = "Workflow")]
         public static string ExecuteWorkflow(UIApplication uiApp, JObject parameters)
         {
             try
@@ -182,6 +183,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get status of a running or completed workflow
         /// </summary>
+        [MCPMethod("getWorkflowStatus", Category = "Workflow")]
         public static string GetWorkflowStatus(UIApplication uiApp, JObject parameters)
         {
             try
@@ -241,6 +243,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// List available workflow templates
         /// </summary>
+        [MCPMethod("listWorkflowTemplates", Category = "Workflow")]
         public static string ListWorkflowTemplates(UIApplication uiApp, JObject parameters)
         {
             try
@@ -280,6 +283,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Pause a running workflow
         /// </summary>
+        [MCPMethod("pauseWorkflow", Category = "Workflow")]
         public static string PauseWorkflow(UIApplication uiApp, JObject parameters)
         {
             try
@@ -315,6 +319,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Resume a paused workflow
         /// </summary>
+        [MCPMethod("resumeWorkflow", Category = "Workflow")]
         public static string ResumeWorkflow(UIApplication uiApp, JObject parameters)
         {
             try

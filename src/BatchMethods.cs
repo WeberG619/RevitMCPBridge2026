@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -33,6 +33,7 @@ namespace RevitMCPBridge
         ///   "continueOnWarning": true (optional, default true)
         /// }
         /// </param>
+        [MCPMethod("executeBatch", Category = "Batch")]
         public static string ExecuteBatch(UIApplication uiApp, JObject parameters)
         {
             try
@@ -452,6 +453,7 @@ namespace RevitMCPBridge
         /// Create multiple walls efficiently in a single transaction.
         /// Optimized for batch wall creation with consistent parameters.
         /// </summary>
+        [MCPMethod("createWallBatch", Category = "Batch")]
         public static string CreateWallBatch(UIApplication uiApp, JObject parameters)
         {
             try
@@ -599,6 +601,7 @@ namespace RevitMCPBridge
         /// Place multiple family instances efficiently in a single transaction.
         /// Optimized for batch placement of doors, windows, fixtures, furniture.
         /// </summary>
+        [MCPMethod("placeElementsBatch", Category = "Batch")]
         public static string PlaceElementsBatch(UIApplication uiApp, JObject parameters)
         {
             try
@@ -786,6 +789,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete multiple elements efficiently in a single transaction.
         /// </summary>
+        [MCPMethod("deleteElementsBatch", Category = "Batch")]
         public static string DeleteElementsBatch(UIApplication uiApp, JObject parameters)
         {
             try
@@ -844,6 +848,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Set parameters on multiple elements efficiently.
         /// </summary>
+        [MCPMethod("setParametersBatch", Category = "Batch")]
         public static string SetParametersBatch(UIApplication uiApp, JObject parameters)
         {
             try

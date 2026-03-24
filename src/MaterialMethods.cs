@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -1565,6 +1565,7 @@ namespace RevitMCPBridge2026
         /// - materialId: The material to apply
         /// - faceIndex: (optional) Specific face index to paint (default paints all faces)
         /// </summary>
+        [MCPMethod("paintElementFace", Category = "Material")]
         public static string PaintElementFace(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1669,6 +1670,7 @@ namespace RevitMCPBridge2026
         /// - materialId: The material to apply
         /// - side: "interior", "exterior", or "both" (default: "both")
         /// </summary>
+        [MCPMethod("paintWall", Category = "Material")]
         public static string PaintWall(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1771,6 +1773,7 @@ namespace RevitMCPBridge2026
         /// - materialId: The material to apply
         /// - side: "interior", "exterior", or "both" (default: "both")
         /// </summary>
+        [MCPMethod("paintWalls", Category = "Material")]
         public static string PaintWalls(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1884,6 +1887,7 @@ namespace RevitMCPBridge2026
         /// - elementId: The element to remove paint from
         /// - faceIndex: (optional) Specific face index, or remove from all faces
         /// </summary>
+        [MCPMethod("removePaint", Category = "Material")]
         public static string RemovePaint(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1952,6 +1956,7 @@ namespace RevitMCPBridge2026
         /// Parameters:
         /// - elementId: The element to check
         /// </summary>
+        [MCPMethod("isPainted", Category = "Material")]
         public static string IsPainted(UIApplication uiApp, JObject parameters)
         {
             try

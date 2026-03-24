@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -190,6 +190,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create an opening in a floor
         /// </summary>
+        [MCPMethod("createFloorOpening", Category = "FloorCeilingRoof")]
         public static string CreateFloorOpening(UIApplication uiApp, JObject parameters)
         {
             try
@@ -608,6 +609,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a roof opening (skylight cutout)
         /// </summary>
+        [MCPMethod("createRoofOpening", Category = "FloorCeilingRoof")]
         public static string CreateRoofOpening(UIApplication uiApp, JObject parameters)
         {
             try
@@ -672,6 +674,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all levels in the project
         /// </summary>
+        [MCPMethod("getLevels", Category = "FloorCeilingRoof")]
         public static string GetLevels(UIApplication uiApp, JObject parameters)
         {
             try
@@ -706,6 +709,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get ALL floors in the entire model
         /// </summary>
+        [MCPMethod("getFloors", Category = "FloorCeilingRoof")]
         public static string GetFloors(UIApplication uiApp, JObject parameters)
         {
             try
@@ -756,6 +760,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get ALL ceilings in the entire model
         /// </summary>
+        [MCPMethod("getCeilings", Category = "FloorCeilingRoof")]
         public static string GetCeilings(UIApplication uiApp, JObject parameters)
         {
             try
@@ -808,6 +813,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get ALL stairs in the entire model
         /// </summary>
+        [MCPMethod("getStairs", Category = "FloorCeilingRoof")]
         public static string GetStairs(UIApplication uiApp, JObject parameters)
         {
             try
@@ -851,6 +857,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get ALL railings in the entire model
         /// </summary>
+        [MCPMethod("getRailings", Category = "FloorCeilingRoof")]
         public static string GetRailings(UIApplication uiApp, JObject parameters)
         {
             try
@@ -890,6 +897,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get ALL roofs in the entire model
         /// </summary>
+        [MCPMethod("getRoofs", Category = "FloorCeilingRoof")]
         public static string GetRoofs(UIApplication uiApp, JObject parameters)
         {
             try
@@ -930,6 +938,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get ALL columns in the entire model (architectural and structural)
         /// </summary>
+        [MCPMethod("getColumns", Category = "FloorCeilingRoof")]
         public static string GetColumns(UIApplication uiApp, JObject parameters)
         {
             try
@@ -984,6 +993,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get ALL curtain walls in the entire model
         /// </summary>
+        [MCPMethod("getCurtainWalls", Category = "FloorCeilingRoof")]
         public static string GetCurtainWalls(UIApplication uiApp, JObject parameters)
         {
             try

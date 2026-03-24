@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -24,6 +24,7 @@ namespace RevitMCPBridge2026
         /// <param name="uiApp">The Revit UI Application</param>
         /// <param name="parameters">JSON parameters containing familyPath, overwrite (optional)</param>
         /// <returns>JSON response with success status and family ID</returns>
+        [MCPMethod("loadFamily", Category = "Family")]
         public static string LoadFamily(UIApplication uiApp, JObject parameters)
         {
             try
@@ -148,6 +149,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Loads multiple families from a directory
         /// </summary>
+        [MCPMethod("loadFamiliesFromDirectory", Category = "Family")]
         public static string LoadFamiliesFromDirectory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -261,6 +263,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Reloads a family that's already in the project
         /// </summary>
+        [MCPMethod("reloadFamily", Category = "Family")]
         public static string ReloadFamily(UIApplication uiApp, JObject parameters)
         {
             try
@@ -358,6 +361,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Delete a family type (prevents deletion if it's the last type in the family)
         /// </summary>
+        [MCPMethod("deleteFamilyType", Category = "Family")]
         public static string DeleteFamilyType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -456,6 +460,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Get instance count for a family or family type
         /// </summary>
+        [MCPMethod("getInstanceCount", Category = "Family")]
         public static string GetInstanceCount(UIApplication uiApp, JObject parameters)
         {
             try
@@ -576,6 +581,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Search for families by name, category, or properties
         /// </summary>
+        [MCPMethod("searchFamilies", Category = "Family")]
         public static string SearchFamilies(UIApplication uiApp, JObject parameters)
         {
             try
@@ -660,6 +666,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all families in the project
         /// </summary>
+        [MCPMethod("getAllFamilies", Category = "Family")]
         public static string GetAllFamilies(UIApplication uiApp, JObject parameters)
         {
             try
@@ -720,6 +727,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets detailed information about a family
         /// </summary>
+        [MCPMethod("getFamilyInfo", Category = "Family")]
         public static string GetFamilyInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -823,6 +831,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all types (symbols) for a family
         /// </summary>
+        [MCPMethod("getFamilyTypes", Category = "Family")]
         public static string GetFamilyTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -924,6 +933,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates a new type (symbol) for a family
         /// </summary>
+        [MCPMethod("createFamilyType", Category = "Family")]
         public static string CreateFamilyType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1018,6 +1028,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies parameters of a family type
         /// </summary>
+        [MCPMethod("modifyFamilyType", Category = "Family")]
         public static string ModifyFamilyType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1149,6 +1160,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Renames a family type
         /// </summary>
+        [MCPMethod("renameFamilyType", Category = "Family")]
         public static string RenameFamilyType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1242,6 +1254,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Places a family instance at a location
         /// </summary>
+        [MCPMethod("placeFamilyInstance", Category = "Family")]
         public static string PlaceFamilyInstance(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1354,6 +1367,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all instances of a family or family type
         /// </summary>
+        [MCPMethod("getFamilyInstances", Category = "Family")]
         public static string GetFamilyInstances(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1497,6 +1511,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets information about a family instance
         /// </summary>
+        [MCPMethod("getFamilyInstanceInfo", Category = "Family")]
         public static string GetFamilyInstanceInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1587,6 +1602,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Modifies properties of a family instance
         /// </summary>
+        [MCPMethod("modifyFamilyInstance", Category = "Family")]
         public static string ModifyFamilyInstance(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1693,6 +1709,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Changes the type of a family instance
         /// </summary>
+        [MCPMethod("changeFamilyInstanceType", Category = "Family")]
         public static string ChangeFamilyInstanceType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1785,6 +1802,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Deletes a family instance
         /// </summary>
+        [MCPMethod("deleteFamilyInstance", Category = "Family")]
         public static string DeleteFamilyInstance(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1866,6 +1884,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all parameters for a family or family type
         /// </summary>
+        [MCPMethod("getFamilyParameters", Category = "Family")]
         public static string GetFamilyParameters(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1953,6 +1972,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Sets parameter values for a family type or instance
         /// </summary>
+        [MCPMethod("setFamilyParameter", Category = "Family")]
         public static string SetFamilyParameter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2124,6 +2144,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets the category of a family
         /// </summary>
+        [MCPMethod("getFamilyCategory", Category = "Family")]
         public static string GetFamilyCategory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2207,6 +2228,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all families in a specific category
         /// </summary>
+        [MCPMethod("getFamiliesByCategory", Category = "Family")]
         public static string GetFamiliesByCategory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2309,6 +2331,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Creates an in-place family element
         /// </summary>
+        [MCPMethod("createInPlaceFamily", Category = "Family")]
         public static string CreateInPlaceFamily(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2369,6 +2392,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Opens a family document for editing
         /// </summary>
+        [MCPMethod("openFamilyDocument", Category = "Family")]
         public static string OpenFamilyDocument(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2468,6 +2492,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Saves changes to a family document
         /// </summary>
+        [MCPMethod("saveFamilyDocument", Category = "Family")]
         public static string SaveFamilyDocument(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2547,6 +2572,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Closes a family document
         /// </summary>
+        [MCPMethod("closeFamilyDocument", Category = "Family")]
         public static string CloseFamilyDocument(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2600,6 +2626,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Removes unused families from the project
         /// </summary>
+        [MCPMethod("purgeUnusedFamilies", Category = "Family")]
         public static string PurgeUnusedFamilies(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2716,6 +2743,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Removes unused family types
         /// </summary>
+        [MCPMethod("purgeUnusedTypes", Category = "Family")]
         public static string PurgeUnusedTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2879,6 +2907,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Checks if a family is loaded in the project
         /// </summary>
+        [MCPMethod("isFamilyLoaded", Category = "Family")]
         public static string IsFamilyLoaded(UIApplication uiApp, JObject parameters)
         {
             try
@@ -2975,6 +3004,7 @@ namespace RevitMCPBridge2026
         /// <param name="uiApp">The Revit UI Application</param>
         /// <param name="parameters">JSON parameters containing sourceDocumentTitle (optional), targetDocumentTitle (optional), category (optional)</param>
         /// <returns>JSON response with list of missing families</returns>
+        [MCPMethod("getMissingFamilies", Category = "Family")]
         public static string GetMissingFamilies(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3118,6 +3148,7 @@ namespace RevitMCPBridge2026
         /// <param name="uiApp">The Revit UI Application</param>
         /// <param name="parameters">JSON parameters containing familyName, sourceDocumentTitle (optional), targetDocumentTitle (optional)</param>
         /// <returns>JSON response with transfer status</returns>
+        [MCPMethod("transferFamilyToDocument", Category = "Family")]
         public static string TransferFamilyToDocument(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3335,6 +3366,7 @@ namespace RevitMCPBridge2026
         /// <param name="uiApp">The Revit UI Application</param>
         /// <param name="parameters">JSON parameters containing familyNames (array), sourceDocumentTitle (optional), targetDocumentTitle (optional), category (optional)</param>
         /// <returns>JSON response with transfer status for each family</returns>
+        [MCPMethod("batchTransferFamilies", Category = "Family")]
         public static string BatchTransferFamilies(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3547,6 +3579,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Gets all text labels from a family document (must be active document)
         /// </summary>
+        [MCPMethod("getFamilyLabels", Category = "Family")]
         public static string GetFamilyLabels(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3659,6 +3692,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Edits a text label in a family document
         /// </summary>
+        [MCPMethod("editFamilyLabel", Category = "Family")]
         public static string EditFamilyLabel(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3782,6 +3816,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Adds a new parameter to a family document (Revit 2026 compatible)
         /// </summary>
+        [MCPMethod("addFamilyParameter", Category = "Family")]
         public static string AddFamilyParameter(UIApplication uiApp, JObject parameters)
         {
             try
@@ -3984,6 +4019,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Opens a family for editing from a placed instance (Edit Family mode)
         /// </summary>
+        [MCPMethod("editFamilyFromInstance", Category = "Family")]
         public static string EditFamilyFromInstance(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4104,6 +4140,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Loads a family document back into the project (after editing)
         /// </summary>
+        [MCPMethod("loadFamilyToProject", Category = "Family")]
         public static string LoadFamilyToProject(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4272,6 +4309,7 @@ namespace RevitMCPBridge2026
         /// - dryRun (optional): Preview only, don't make changes (default: false)
         /// </param>
         /// <returns>JSON response with replacement results</returns>
+        [MCPMethod("swapFamilyTypeByCategory", Category = "Family")]
         public static string SwapFamilyTypeByCategory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -4480,6 +4518,7 @@ namespace RevitMCPBridge2026
         /// Exports all families of a specified category to a folder as .rfa files.
         /// Organizes into subfolders by category if multiple categories are exported.
         /// </summary>
+        [MCPMethod("exportFamiliesToFolder", Category = "Family")]
         public static string ExportFamiliesToFolder(UIApplication uiApp, JObject parameters)
         {
             try

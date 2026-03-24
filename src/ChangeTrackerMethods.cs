@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -18,6 +18,7 @@ namespace RevitMCPBridge
         /// Get recent changes from the change log
         /// Parameters: count (optional, default 50), changeType (optional filter)
         /// </summary>
+        [MCPMethod("getRecentChanges", Category = "ChangeTracker")]
         public static string GetRecentChanges(UIApplication uiApp, JObject parameters)
         {
             try
@@ -62,6 +63,7 @@ namespace RevitMCPBridge
         /// Get changes since a specific time
         /// Parameters: since (ISO datetime string or seconds ago)
         /// </summary>
+        [MCPMethod("getChangesSince", Category = "ChangeTracker")]
         public static string GetChangesSince(UIApplication uiApp, JObject parameters)
         {
             try
@@ -121,6 +123,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the currently selected elements
         /// </summary>
+        [MCPMethod("getCurrentSelection", Category = "ChangeTracker")]
         public static string GetCurrentSelection(UIApplication uiApp, JObject parameters)
         {
             try
@@ -197,6 +200,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get information about the active view
         /// </summary>
+        [MCPMethod("getActiveViewInfo", Category = "ChangeTracker")]
         public static string GetActiveViewInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -271,6 +275,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get the last time any change occurred
         /// </summary>
+        [MCPMethod("getLastChangeTime", Category = "ChangeTracker")]
         public static string GetLastChangeTime(UIApplication uiApp, JObject parameters)
         {
             try
@@ -295,6 +300,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get change tracker statistics
         /// </summary>
+        [MCPMethod("getChangeStatistics", Category = "ChangeTracker")]
         public static string GetChangeStatistics(UIApplication uiApp, JObject parameters)
         {
             try
@@ -320,6 +326,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Clear the change log
         /// </summary>
+        [MCPMethod("clearChangeLog", Category = "ChangeTracker")]
         public static string ClearChangeLog(UIApplication uiApp, JObject parameters)
         {
             try
@@ -341,6 +348,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Subscribe to real-time changes (returns current state and sets up polling endpoint)
         /// </summary>
+        [MCPMethod("watchChanges", Category = "ChangeTracker")]
         public static string WatchChanges(UIApplication uiApp, JObject parameters)
         {
             try

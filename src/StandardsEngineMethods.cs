@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,6 +28,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// List all available project standards
         /// </summary>
+        [MCPMethod("getAvailableStandards", Category = "StandardsEngine")]
         public static string GetAvailableStandards(UIApplication uiApp, JObject parameters)
         {
             try
@@ -110,6 +111,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Compare current project against a standard and return compliance report
         /// </summary>
+        [MCPMethod("compareToStandard", Category = "StandardsEngine")]
         public static string CompareToStandard(UIApplication uiApp, JObject parameters)
         {
             try
@@ -209,6 +211,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Analyze current project and generate a custom standard based on its patterns
         /// </summary>
+        [MCPMethod("learnFromProject", Category = "StandardsEngine")]
         public static string LearnFromProject(UIApplication uiApp, JObject parameters)
         {
             try
@@ -280,6 +283,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Based on current project state and standards, predict what should be done next
         /// </summary>
+        [MCPMethod("predictNextSteps", Category = "StandardsEngine")]
         public static string PredictNextSteps(UIApplication uiApp, JObject parameters)
         {
             try

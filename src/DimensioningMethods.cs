@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -16,6 +16,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a linear dimension between two reference points
         /// </summary>
+        [MCPMethod("createLinearDimension", Category = "Dimensioning")]
         public static string CreateLinearDimension(UIApplication uiApp, JObject parameters)
         {
             try
@@ -140,6 +141,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create an aligned dimension (follows element geometry)
         /// </summary>
+        [MCPMethod("createAlignedDimension", Category = "Dimensioning")]
         public static string CreateAlignedDimension(UIApplication uiApp, JObject parameters)
         {
             try
@@ -211,6 +213,7 @@ namespace RevitMCPBridge
         /// Batch dimension walls in a view with improved continuous string support
         /// Creates ONE dimension string per wall group (horizontal/vertical) instead of individual dimensions
         /// </summary>
+        [MCPMethod("batchDimensionWalls", Category = "Dimensioning")]
         public static string BatchDimensionWalls(UIApplication uiApp, JObject parameters)
         {
             try
@@ -644,6 +647,7 @@ namespace RevitMCPBridge
             }
         }
 
+        [MCPMethod("batchDimensionDoors", Category = "Dimensioning")]
         public static string BatchDimensionDoors(UIApplication uiApp, JObject parameters)
         {
             try
@@ -838,6 +842,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all dimensions in a view
         /// </summary>
+        [MCPMethod("getDimensionsInView", Category = "Dimensioning")]
         public static string GetDimensionsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -905,6 +910,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete a dimension by ID
         /// </summary>
+        [MCPMethod("deleteDimension", Category = "Dimensioning")]
         public static string DeleteDimension(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1123,6 +1129,7 @@ namespace RevitMCPBridge
         /// PHASE 1B: Create custom dimension string with specified reference points
         /// Enables Tier 2 dimensioning with window/door centers
         /// </summary>
+        [MCPMethod("createDimensionString", Category = "Dimensioning")]
         public static string CreateDimensionString(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1307,6 +1314,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Batch dimension grids - creates continuous dimension strings for grids
         /// </summary>
+        [MCPMethod("batchDimensionGrids", Category = "Dimensioning")]
         public static string BatchDimensionGrids(UIApplication uiApp, JObject parameters)
         {
             try

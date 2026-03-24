@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -15,6 +15,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create a linear dimension between two points or element references in a view, specifying the dimension line location
         /// </summary>
+        [MCPMethod("createlineardimension", Category = "New")]
         public static string Createlineardimension(UIApplication uiApp, JObject parameters)
         {
             try

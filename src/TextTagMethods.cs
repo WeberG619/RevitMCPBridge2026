@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -18,6 +18,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Place a text note
         /// </summary>
+        [MCPMethod("placeTextNote", Category = "TextTag")]
         public static string PlaceTextNote(UIApplication uiApp, JObject parameters)
         {
             try
@@ -190,6 +191,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Modify text note
         /// </summary>
+        [MCPMethod("modifyTextNote", Category = "TextTag")]
         public static string ModifyTextNote(UIApplication uiApp, JObject parameters)
         {
             try
@@ -250,6 +252,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Place a wall tag
         /// </summary>
+        [MCPMethod("placeWallTag", Category = "TextTag")]
         public static string PlaceWallTag(UIApplication uiApp, JObject parameters)
         {
             try
@@ -311,6 +314,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Place a door tag
         /// </summary>
+        [MCPMethod("placeDoorTag", Category = "TextTag")]
         public static string PlaceDoorTag(UIApplication uiApp, JObject parameters)
         {
             try
@@ -372,6 +376,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Place a leader note
         /// </summary>
+        [MCPMethod("placeLeaderNote", Category = "TextTag")]
         public static string PlaceLeaderNote(UIApplication uiApp, JObject parameters)
         {
             try
@@ -443,6 +448,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all text notes in a view
         /// </summary>
+        [MCPMethod("getTextNotesInView", Category = "TextTag")]
         public static string GetTextNotesInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -481,6 +487,7 @@ namespace RevitMCPBridge
         /// Get all text notes on a sheet by checking OwnerViewId property
         /// This works for sheets where FilteredElementCollector(doc, viewId) fails
         /// </summary>
+        [MCPMethod("getTextNotesOnSheet", Category = "TextTag")]
         public static string GetTextNotesOnSheet(UIApplication uiApp, JObject parameters)
         {
             try
@@ -545,6 +552,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all tags in a view
         /// </summary>
+        [MCPMethod("getTagsInView", Category = "TextTag")]
         public static string GetTagsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -606,6 +614,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all text note types
         /// </summary>
+        [MCPMethod("getTextNoteTypes", Category = "TextTag")]
         public static string GetTextNoteTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -640,6 +649,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete text note
         /// </summary>
+        [MCPMethod("deleteTextNote", Category = "TextTag")]
         public static string DeleteTextNote(UIApplication uiApp, JObject parameters)
         {
             try
@@ -675,6 +685,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete tag
         /// </summary>
+        [MCPMethod("deleteTag", Category = "TextTag")]
         public static string DeleteTag(UIApplication uiApp, JObject parameters)
         {
             try
@@ -710,6 +721,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Tag all elements by category in a view
         /// </summary>
+        [MCPMethod("tagAllByCategory", Category = "TextTag")]
         public static string TagAllByCategory(UIApplication uiApp, JObject parameters)
         {
             try
@@ -829,6 +841,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Modify tag properties
         /// </summary>
+        [MCPMethod("modifyTag", Category = "TextTag")]
         public static string ModifyTag(UIApplication uiApp, JObject parameters)
         {
             try
@@ -898,6 +911,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Gets detailed information about a specific tag including position
         /// </summary>
+        [MCPMethod("getTagInfo", Category = "TextTag")]
         public static string GetTagInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -943,6 +957,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Change the type of a tag (e.g., from "Room Tag With Area" to "Room Tag")
         /// </summary>
+        [MCPMethod("changeTagType", Category = "TextTag")]
         public static string ChangeTagType(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1036,6 +1051,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all tags that reference a specific element (to find duplicates)
         /// </summary>
+        [MCPMethod("getTagsForElement", Category = "TextTag")]
         public static string GetTagsForElement(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1151,6 +1167,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get available room tag types in the project
         /// </summary>
+        [MCPMethod("getRoomTagTypes", Category = "TextTag")]
         public static string GetRoomTagTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1193,6 +1210,7 @@ namespace RevitMCPBridge
         /// Required: viewId, viewX (horizontal position in view), viewY (vertical position in view), text
         /// Optional: textTypeId, textContext, alignment
         /// </param>
+        [MCPMethod("placeTextNoteInView", Category = "TextTag")]
         public static string PlaceTextNoteInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1380,6 +1398,7 @@ namespace RevitMCPBridge
         /// Get the view coordinate system bounds for placing annotations.
         /// Returns the min/max coordinates in view-relative space.
         /// </summary>
+        [MCPMethod("getViewAnnotationBounds", Category = "TextTag")]
         public static string GetViewAnnotationBounds(UIApplication uiApp, JObject parameters)
         {
             try

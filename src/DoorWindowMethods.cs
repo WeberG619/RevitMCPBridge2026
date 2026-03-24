@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -266,6 +266,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get door/window information
         /// </summary>
+        [MCPMethod("getDoorWindowInfo", Category = "DoorWindow")]
         public static string GetDoorWindowInfo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -318,6 +319,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Modify door/window properties
         /// </summary>
+        [MCPMethod("modifyDoorWindowProperties", Category = "DoorWindow")]
         public static string ModifyDoorWindowProperties(UIApplication uiApp, JObject parameters)
         {
             try
@@ -407,6 +409,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Flip door/window orientation
         /// </summary>
+        [MCPMethod("flipDoorWindow", Category = "DoorWindow")]
         public static string FlipDoorWindow(UIApplication uiApp, JObject parameters)
         {
             try
@@ -459,6 +462,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all doors in a view
         /// </summary>
+        [MCPMethod("getDoorsInView", Category = "DoorWindow")]
         public static string GetDoorsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -508,6 +512,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all windows in a view
         /// </summary>
+        [MCPMethod("getWindowsInView", Category = "DoorWindow")]
         public static string GetWindowsInView(UIApplication uiApp, JObject parameters)
         {
             try
@@ -558,6 +563,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all door types
         /// </summary>
+        [MCPMethod("getDoorTypes", Category = "DoorWindow")]
         public static string GetDoorTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -593,6 +599,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get all window types
         /// </summary>
+        [MCPMethod("getWindowTypes", Category = "DoorWindow")]
         public static string GetWindowTypes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -628,6 +635,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Delete door/window
         /// </summary>
+        [MCPMethod("deleteDoorWindow", Category = "DoorWindow")]
         public static string DeleteDoorWindow(UIApplication uiApp, JObject parameters)
         {
             try
@@ -661,6 +669,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create door schedule data
         /// </summary>
+        [MCPMethod("getDoorSchedule", Category = "DoorWindow")]
         public static string GetDoorSchedule(UIApplication uiApp, JObject parameters)
         {
             try
@@ -700,6 +709,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create window schedule data
         /// </summary>
+        [MCPMethod("getWindowSchedule", Category = "DoorWindow")]
         public static string GetWindowSchedule(UIApplication uiApp, JObject parameters)
         {
             try
@@ -847,6 +857,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get ALL furniture in the entire model
         /// </summary>
+        [MCPMethod("getFurniture", Category = "DoorWindow")]
         public static string GetFurniture(UIApplication uiApp, JObject parameters)
         {
             try
@@ -888,6 +899,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get ALL plumbing fixtures in the entire model
         /// </summary>
+        [MCPMethod("getPlumbingFixtures", Category = "DoorWindow")]
         public static string GetPlumbingFixtures(UIApplication uiApp, JObject parameters)
         {
             try
@@ -929,6 +941,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get ALL lighting fixtures in the entire model
         /// </summary>
+        [MCPMethod("getLightingFixtures", Category = "DoorWindow")]
         public static string GetLightingFixtures(UIApplication uiApp, JObject parameters)
         {
             try
@@ -969,6 +982,7 @@ namespace RevitMCPBridge
         /// <summary>
         /// Get ALL electrical fixtures in the entire model
         /// </summary>
+        [MCPMethod("getElectricalFixtures", Category = "DoorWindow")]
         public static string GetElectricalFixtures(UIApplication uiApp, JObject parameters)
         {
             try

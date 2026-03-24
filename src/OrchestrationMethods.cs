@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -30,6 +30,7 @@ namespace RevitMCPBridge
         /// - corridorWidth: Minimum corridor width in inches (default 44)
         /// - scale: View scale (default 96 = 1/8" = 1'-0")
         /// </summary>
+        [MCPMethod("createLifeSafetyLegend", Category = "Orchestration")]
         public static string CreateLifeSafetyLegend(UIApplication uiApp, JObject parameters)
         {
             try
@@ -238,6 +239,7 @@ namespace RevitMCPBridge
         /// - rowSpacing: Space between rows in feet (default 3)
         /// - scale: View scale (default 48 = 1/4" = 1'-0")
         /// </summary>
+        [MCPMethod("createAreaCalculationLegend", Category = "Orchestration")]
         public static string CreateAreaCalculationLegend(UIApplication uiApp, JObject parameters)
         {
             try
@@ -404,6 +406,7 @@ namespace RevitMCPBridge
         ///   - verify: (optional) Verification to run after step
         ///   - continueOnFailure: (optional) Continue if step fails (default false)
         /// </summary>
+        [MCPMethod("executeWorkflow", Category = "Orchestration")]
         public static string ExecuteWorkflow(UIApplication uiApp, JObject parameters)
         {
             try
@@ -496,6 +499,7 @@ namespace RevitMCPBridge
         ///   - "missing_dimensions" - Walls without dimensions
         ///   - "empty_text" - Text notes with no content
         /// </summary>
+        [MCPMethod("reviewViewForIssues", Category = "Orchestration")]
         public static string ReviewViewForIssues(UIApplication uiApp, JObject parameters)
         {
             try
@@ -674,6 +678,7 @@ namespace RevitMCPBridge
         /// - modifications: Array of { elementId, newText } objects
         /// - verifyAfter: Verify each modification (default true)
         /// </summary>
+        [MCPMethod("batchModifyTextNotes", Category = "Orchestration")]
         public static string BatchModifyTextNotes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -788,6 +793,7 @@ namespace RevitMCPBridge
         /// - maxRetries: (optional) Max retry attempts (default 2)
         /// - locationTolerance: (optional) Acceptable distance from target (default 1.0 ft)
         /// </summary>
+        [MCPMethod("smartPlaceElement", Category = "Orchestration")]
         public static string SmartPlaceElement(UIApplication uiApp, JObject parameters)
         {
             try

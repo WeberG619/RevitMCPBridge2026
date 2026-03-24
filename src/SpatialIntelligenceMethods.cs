@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -6,6 +6,7 @@ using Autodesk.Revit.UI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RevitMCPBridge.Helpers;
+using RevitMCPBridge;
 
 namespace RevitMCPBridge2026
 {
@@ -23,6 +24,7 @@ namespace RevitMCPBridge2026
         /// <summary>
         /// Get the bounding box of any element in sheet or model coordinates
         /// </summary>
+        [MCPMethod("getElementBoundingBox", Category = "SpatialIntelligence")]
         public static string GetElementBoundingBox(UIApplication uiApp, JObject parameters)
         {
             try
@@ -84,6 +86,7 @@ namespace RevitMCPBridge2026
         /// Get all viewports on a sheet with their bounding boxes and positions
         /// Critical for understanding sheet layout
         /// </summary>
+        [MCPMethod("getViewportBoundingBoxes", Category = "SpatialIntelligence")]
         public static string GetViewportBoundingBoxes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -184,6 +187,7 @@ namespace RevitMCPBridge2026
         /// Get all annotations in a view with their bounding boxes
         /// Includes text notes, tags, keynotes, dimensions, symbols
         /// </summary>
+        [MCPMethod("getAnnotationBoundingBoxes", Category = "SpatialIntelligence")]
         public static string GetAnnotationBoundingBoxes(UIApplication uiApp, JObject parameters)
         {
             try
@@ -293,6 +297,7 @@ namespace RevitMCPBridge2026
         /// Get complete sheet layout including titleblock zones, viewports, and annotations
         /// This is the master method for understanding a sheet's spatial organization
         /// </summary>
+        [MCPMethod("getSheetLayout", Category = "SpatialIntelligence")]
         public static string GetSheetLayout(UIApplication uiApp, JObject parameters)
         {
             try
@@ -512,6 +517,7 @@ namespace RevitMCPBridge2026
         /// Find empty rectangular spaces on a sheet that can fit a given size
         /// This is key for intelligent placement
         /// </summary>
+        [MCPMethod("findEmptySpaceOnSheet", Category = "SpatialIntelligence")]
         public static string FindEmptySpaceOnSheet(UIApplication uiApp, JObject parameters)
         {
             try
@@ -682,6 +688,7 @@ namespace RevitMCPBridge2026
         /// Check if placing an element at a location would cause overlap
         /// Returns detailed overlap information
         /// </summary>
+        [MCPMethod("checkForOverlaps", Category = "SpatialIntelligence")]
         public static string CheckForOverlaps(UIApplication uiApp, JObject parameters)
         {
             try
@@ -781,6 +788,7 @@ namespace RevitMCPBridge2026
         /// Get all annotations within a specified rectangular region
         /// Useful for understanding what's in an area before placing
         /// </summary>
+        [MCPMethod("getAnnotationsInRegion", Category = "SpatialIntelligence")]
         public static string GetAnnotationsInRegion(UIApplication uiApp, JObject parameters)
         {
             try
@@ -885,6 +893,7 @@ namespace RevitMCPBridge2026
         /// Place an annotation in a logical zone with automatic positioning
         /// Finds the best location within the zone that avoids overlaps
         /// </summary>
+        [MCPMethod("placeAnnotationInZone", Category = "SpatialIntelligence")]
         public static string PlaceAnnotationInZone(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1065,6 +1074,7 @@ namespace RevitMCPBridge2026
         /// Place an element relative to another element
         /// Positions: above, below, left, right, with specified offset
         /// </summary>
+        [MCPMethod("placeRelativeTo", Category = "SpatialIntelligence")]
         public static string PlaceRelativeTo(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1206,6 +1216,7 @@ namespace RevitMCPBridge2026
         /// Automatically arrange a group of annotations in a column or row with equal spacing
         /// Great for organizing keynote legends, note lists, etc.
         /// </summary>
+        [MCPMethod("autoArrangeAnnotations", Category = "SpatialIntelligence")]
         public static string AutoArrangeAnnotations(UIApplication uiApp, JObject parameters)
         {
             try
@@ -1339,6 +1350,7 @@ namespace RevitMCPBridge2026
         /// Suggest optimal placement location for an annotation near a model element
         /// Considers existing annotations and finds clear space
         /// </summary>
+        [MCPMethod("suggestPlacementLocation", Category = "SpatialIntelligence")]
         public static string SuggestPlacementLocation(UIApplication uiApp, JObject parameters)
         {
             try
