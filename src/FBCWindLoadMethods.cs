@@ -91,6 +91,17 @@ namespace RevitMCPBridge
                     elements.AddRange(roofs);
                 }
 
+                // Apply free-tier element cap
+                int totalElementCount = elements.Count;
+                int elementCap = Services.ComplianceLicenseHelper.GetElementCap();
+                string upgradeNote = null;
+
+                if (elements.Count > elementCap)
+                {
+                    elements = elements.Take(elementCap).ToList();
+                    upgradeNote = Services.ComplianceLicenseHelper.GetUpgradeNote(totalElementCount);
+                }
+
                 // Evaluate each element
                 var results = new List<object>();
                 int passed = 0, failed = 0, unknown = 0;
@@ -121,15 +132,28 @@ namespace RevitMCPBridge
                     }
                 }
 
-                return ResponseBuilder.Success()
+                var builder = ResponseBuilder.Success()
                     .With("county", county)
                     .With("windSpeed_mph", windSpeed)
                     .With("exposureCategory", exposureCategory)
                     .With("riskCategory", riskCategory)
                     .With("hvhz", engine.IsHVHZ(county))
-                    .With("summary", new { total = results.Count, passed, failed, unknown })
-                    .With("elements", results)
-                    .Build();
+                    .With("tier", Services.ComplianceLicenseHelper.GetTier())
+                    .With("summary", new
+                    {
+                        total = results.Count,
+                        totalInModel = totalElementCount,
+                        truncated = upgradeNote != null,
+                        passed,
+                        failed,
+                        unknown
+                    })
+                    .With("elements", results);
+
+                if (upgradeNote != null)
+                    builder = builder.With("upgrade_note", upgradeNote);
+
+                return builder.Build();
             }
             catch (Exception ex)
             {
