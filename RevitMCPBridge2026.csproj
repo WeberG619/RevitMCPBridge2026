@@ -10,7 +10,7 @@
     <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
     <AssemblyName>RevitMCPBridge2026</AssemblyName>
     <RootNamespace>RevitMCPBridge</RootNamespace>
-    <NoWarn>MSB3277</NoWarn>
+    <NoWarn>MSB3277;CA1416</NoWarn>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
 
