@@ -30,7 +30,7 @@ from pathlib import Path
 
 # Configuration
 DLL_SOURCE = r"D:\RevitMCPBridge2026\bin\Release\RevitMCPBridge2026.dll"
-DLL_DEST = r"C:\Users\rick\AppData\Roaming\Autodesk\Revit\Addins\2026\RevitMCPBridge2026.dll"
+DLL_DEST = r"C:\Users\weber\AppData\Roaming\Autodesk\Revit\Addins\2026\RevitMCPBridge2026.dll"
 REVIT_PATH_2026 = r"C:\Program Files\Autodesk\Revit 2026\Revit.exe"
 REVIT_PATH_2025 = r"C:\Program Files\Autodesk\Revit 2025\Revit.exe"
 MCP_PIPE = r"\\.\pipe\RevitMCPBridge2026"

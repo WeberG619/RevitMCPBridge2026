@@ -492,7 +492,7 @@ namespace RevitMCPBridge
                     docToClose.Save();
                 }
 
-                docToClose.Close(!save);
+                docToClose.Close(save);
 
                 return JsonConvert.SerializeObject(new
                 {

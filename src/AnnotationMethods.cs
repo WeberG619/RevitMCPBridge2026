@@ -1571,12 +1571,52 @@ namespace RevitMCPBridge2026
                 XYZ min = new XYZ(minArray[0], minArray[1], 0);
                 XYZ max = new XYZ(maxArray[0], maxArray[1], 0);
 
-                // Optional callout type ID
+                // Optional callout type ID — auto-discover when not supplied (Revit API requires non-null)
                 ElementId calloutTypeId = null;
                 if (parameters["calloutTypeId"] != null)
                 {
                     int typeIdInt = parameters["calloutTypeId"].ToObject<int>();
                     calloutTypeId = new ElementId(typeIdInt);
+                }
+                else
+                {
+                    // Pick first ViewFamilyType matching the parent view's family that supports callouts
+                    var parentFamily = parentView.ViewType;
+                    ViewFamily targetFamily = ViewFamily.Detail;
+                    if (parentFamily == ViewType.FloorPlan || parentFamily == ViewType.AreaPlan ||
+                        parentFamily == ViewType.CeilingPlan || parentFamily == ViewType.EngineeringPlan)
+                    {
+                        targetFamily = ViewFamily.Detail;
+                    }
+                    else if (parentFamily == ViewType.Section || parentFamily == ViewType.Elevation ||
+                             parentFamily == ViewType.Detail)
+                    {
+                        targetFamily = ViewFamily.Detail;
+                    }
+
+                    var vft = new FilteredElementCollector(doc)
+                        .OfClass(typeof(ViewFamilyType))
+                        .Cast<ViewFamilyType>()
+                        .FirstOrDefault(v => v.ViewFamily == targetFamily);
+
+                    if (vft == null)
+                    {
+                        // Last resort: any Detail ViewFamilyType
+                        vft = new FilteredElementCollector(doc)
+                            .OfClass(typeof(ViewFamilyType))
+                            .Cast<ViewFamilyType>()
+                            .FirstOrDefault(v => v.ViewFamily == ViewFamily.Detail);
+                    }
+
+                    if (vft == null)
+                    {
+                        return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                        {
+                            success = false,
+                            error = "No Detail ViewFamilyType found in project to use for callout — load a callout/detail view template family first, or pass calloutTypeId explicitly"
+                        });
+                    }
+                    calloutTypeId = vft.Id;
                 }
 
                 using (var trans = new Transaction(doc, "Create Callout"))

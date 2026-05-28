@@ -772,6 +772,198 @@ namespace RevitMCPBridge
         }
 
         /// <summary>
+        /// Create or update a Basic Wall type with a requested total thickness.
+        /// </summary>
+        [MCPMethod("createBasicWallType", Category = "Wall", Description = "Create or update a Basic Wall type with a requested total thickness")]
+        public static string CreateBasicWallType(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+
+                var newTypeName = parameters["newTypeName"]?.ToString();
+                if (string.IsNullOrWhiteSpace(newTypeName))
+                    return ResponseBuilder.Error("newTypeName is required", "MISSING_PARAMETER").Build();
+
+                var widthFt = parameters["widthFt"] != null
+                    ? parameters["widthFt"].ToObject<double>()
+                    : parameters["widthInches"] != null
+                        ? parameters["widthInches"].ToObject<double>() / 12.0
+                        : 0.0;
+
+                if (widthFt <= 0)
+                    return ResponseBuilder.Error("widthFt or widthInches must be greater than zero", "INVALID_PARAMETER").Build();
+
+                WallType sourceType = null;
+                if (parameters["sourceTypeId"] != null)
+                {
+                    sourceType = doc.GetElement(new ElementId(parameters["sourceTypeId"].ToObject<int>())) as WallType;
+                }
+
+                if (sourceType == null && parameters["sourceTypeName"] != null)
+                {
+                    var sourceTypeName = parameters["sourceTypeName"].ToString();
+                    sourceType = new FilteredElementCollector(doc)
+                        .OfClass(typeof(WallType))
+                        .Cast<WallType>()
+                        .FirstOrDefault(wt => wt.Name == sourceTypeName && wt.Kind == WallKind.Basic);
+                }
+
+                if (sourceType == null)
+                {
+                    sourceType = new FilteredElementCollector(doc)
+                        .OfClass(typeof(WallType))
+                        .Cast<WallType>()
+                        .FirstOrDefault(wt => wt.Kind == WallKind.Basic);
+                }
+
+                if (sourceType == null)
+                    return ResponseBuilder.Error("No Basic Wall source type found", "TYPE_NOT_FOUND").Build();
+
+                WallType targetType = null;
+
+                using (var trans = new Transaction(doc, "Create Basic Wall Type"))
+                {
+                    trans.Start();
+                    var failureOptions = trans.GetFailureHandlingOptions();
+                    failureOptions.SetFailuresPreprocessor(new WarningSwallower());
+                    trans.SetFailureHandlingOptions(failureOptions);
+
+                    targetType = new FilteredElementCollector(doc)
+                        .OfClass(typeof(WallType))
+                        .Cast<WallType>()
+                        .FirstOrDefault(wt => wt.Name == newTypeName && wt.Kind == WallKind.Basic);
+
+                    if (targetType == null)
+                    {
+                        targetType = sourceType.Duplicate(newTypeName) as WallType;
+                    }
+
+                    var structure = targetType.GetCompoundStructure();
+                    if (structure == null || structure.LayerCount == 0)
+                    {
+                        trans.RollBack();
+                        return ResponseBuilder.Error("Target wall type has no editable compound structure", "INVALID_STRUCTURE").Build();
+                    }
+
+                    var layers = structure.GetLayers();
+                    var adjustableLayerIndex = 0;
+                    var maxLayerWidth = double.MinValue;
+                    var fixedWidth = 0.0;
+
+                    for (var i = 0; i < layers.Count; i++)
+                    {
+                        if (layers[i].Width > maxLayerWidth)
+                        {
+                            maxLayerWidth = layers[i].Width;
+                            adjustableLayerIndex = i;
+                        }
+                    }
+
+                    for (var i = 0; i < layers.Count; i++)
+                    {
+                        if (i != adjustableLayerIndex)
+                            fixedWidth += layers[i].Width;
+                    }
+
+                    var adjustableWidth = widthFt - fixedWidth;
+                    if (adjustableWidth <= 0)
+                    {
+                        trans.RollBack();
+                        return ResponseBuilder.Error($"Requested width {widthFt} ft is not greater than fixed layer width {fixedWidth} ft", "INVALID_WIDTH").Build();
+                    }
+
+                    structure.SetLayerWidth(adjustableLayerIndex, adjustableWidth);
+                    targetType.SetCompoundStructure(structure);
+
+                    trans.Commit();
+                }
+
+                return ResponseBuilder.Success()
+                    .With("wallTypeId", (int)targetType.Id.Value)
+                    .With("wallTypeName", targetType.Name)
+                    .With("width", targetType.Width)
+                    .With("widthInches", targetType.Width * 12.0)
+                    .With("sourceTypeId", (int)sourceType.Id.Value)
+                    .With("sourceTypeName", sourceType.Name)
+                    .Build();
+            }
+            catch (Exception ex)
+            {
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
+        /// <summary>
+        /// Create a rectangular opening hosted by a wall.
+        /// </summary>
+        [MCPMethod("createWallOpening", Category = "Wall", Description = "Create a rectangular opening hosted by a wall")]
+        public static string CreateWallOpening(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+
+                var wallId = new ElementId(parameters["wallId"].ToObject<int>());
+                var wall = doc.GetElement(wallId) as Wall;
+                if (wall == null)
+                    return ResponseBuilder.Error("Wall not found", "ELEMENT_NOT_FOUND").Build();
+
+                XYZ p1;
+                XYZ p2;
+
+                if (parameters["startPoint"] != null && parameters["endPoint"] != null)
+                {
+                    var start = parameters["startPoint"].ToObject<double[]>();
+                    var end = parameters["endPoint"].ToObject<double[]>();
+                    p1 = new XYZ(start[0], start[1], start[2]);
+                    p2 = new XYZ(end[0], end[1], end[2]);
+                }
+                else
+                {
+                    var center = parameters["centerPoint"].ToObject<double[]>();
+                    var width = parameters["width"]?.ToObject<double>() ?? 3.0;
+                    var sillHeight = parameters["sillHeight"]?.ToObject<double>() ?? 0.0;
+                    var height = parameters["height"]?.ToObject<double>() ?? 7.0;
+
+                    var locationCurve = wall.Location as LocationCurve;
+                    var line = locationCurve?.Curve as Line;
+                    if (line == null)
+                        return ResponseBuilder.Error("Wall has no straight location curve", "INVALID_WALL").Build();
+
+                    var direction = (line.GetEndPoint(1) - line.GetEndPoint(0)).Normalize();
+                    var centerPoint = new XYZ(center[0], center[1], center.Length > 2 ? center[2] : 0.0);
+                    var halfWidth = width / 2.0;
+                    p1 = centerPoint - direction * halfWidth + XYZ.BasisZ * sillHeight;
+                    p2 = centerPoint + direction * halfWidth + XYZ.BasisZ * (sillHeight + height);
+                }
+
+                using (var trans = new Transaction(doc, "Create Wall Opening"))
+                {
+                    trans.Start();
+                    var failureOptions = trans.GetFailureHandlingOptions();
+                    failureOptions.SetFailuresPreprocessor(new WarningSwallower());
+                    trans.SetFailureHandlingOptions(failureOptions);
+
+                    var opening = doc.Create.NewOpening(wall, p1, p2);
+
+                    trans.Commit();
+
+                    return ResponseBuilder.Success()
+                        .With("openingId", (int)opening.Id.Value)
+                        .With("wallId", (int)wall.Id.Value)
+                        .With("startPoint", new[] { p1.X, p1.Y, p1.Z })
+                        .With("endPoint", new[] { p2.X, p2.Y, p2.Z })
+                        .Build();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
+        /// <summary>
         /// Flip wall orientation
         /// </summary>
         [MCPMethod("flipWall", Category = "Wall", Description = "Flip a wall's interior/exterior face")]
