@@ -234,6 +234,61 @@ namespace RevitMCPBridge
             }
         }
 
+        [MCPMethod("openCloudModel", Category = "Document",
+            Description = "Open a BIM Collaborate Pro / cloud-hosted model by region + project GUID + model GUID (handles cld:// paths that openDocument's File.Exists check rejects)")]
+        public static string OpenCloudModel(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                // Region: "US", "EMEA", etc. Defaults to US (Weber's BCP region).
+                var region = parameters["region"]?.ToString();
+                if (string.IsNullOrWhiteSpace(region))
+                    region = ModelPathUtils.CloudRegionUS;
+
+                var projGuidStr = parameters["projectGuid"]?.ToString();
+                var modelGuidStr = parameters["modelGuid"]?.ToString();
+                if (string.IsNullOrWhiteSpace(projGuidStr) || string.IsNullOrWhiteSpace(modelGuidStr))
+                    return ResponseBuilder.Error("projectGuid and modelGuid are both required", "MISSING_PARAMETER").Build();
+
+                if (!Guid.TryParse(projGuidStr, out var projGuid))
+                    return ResponseBuilder.Error($"projectGuid is not a valid GUID: {projGuidStr}", "INVALID_PARAMETER").Build();
+                if (!Guid.TryParse(modelGuidStr, out var modelGuid))
+                    return ResponseBuilder.Error($"modelGuid is not a valid GUID: {modelGuidStr}", "INVALID_PARAMETER").Build();
+
+                // Build the cloud model path — this is the call openDocument can't make.
+                var modelPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(region, projGuid, modelGuid);
+
+                var openOptions = new OpenOptions();
+                if (parameters["detachFromCentral"]?.Value<bool>() == true)
+                    openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets;
+                if (parameters["audit"]?.Value<bool>() == true)
+                    openOptions.Audit = true;
+
+                var uiDoc = uiApp.OpenAndActivateDocument(modelPath, openOptions, false);
+                if (uiDoc == null || uiDoc.Document == null)
+                    return ResponseBuilder.Error("OpenAndActivateDocument returned null — check region, GUIDs, Autodesk sign-in, and network (see rvtcfg IPv6 note)", "OPEN_FAILED").Build();
+
+                var doc = uiDoc.Document;
+                return JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    documentTitle = doc.Title,
+                    pathName = doc.PathName,
+                    isWorkshared = doc.IsWorkshared,
+                    isModified = doc.IsModified,
+                    region = region,
+                    projectGuid = projGuid.ToString(),
+                    modelGuid = modelGuid.ToString(),
+                    message = $"Cloud model '{doc.Title}' opened and activated"
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error opening cloud model");
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
         #endregion
 
         #region Save Document
