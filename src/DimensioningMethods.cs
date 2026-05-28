@@ -731,82 +731,104 @@ namespace RevitMCPBridge
                             var wallCurve = wallLocationCurve.Curve;
                             var wallDirection = (wallCurve.GetEndPoint(1) - wallCurve.GetEndPoint(0)).Normalize();
 
-                            // Door direction is perpendicular to wall
-                            var doorDirection = new XYZ(-wallDirection.Y, wallDirection.X, 0);
-
-                            // Calculate door jamb points (left and right sides of opening)
+                            // Jambs are separated ALONG the wall run; the dimension line is
+                            // offset perpendicular to the wall (into the room). The old code had
+                            // both of these swapped, so the computed jamb points never landed
+                            // near the actual opening.
+                            var perpDirection = new XYZ(-wallDirection.Y, wallDirection.X, 0);
                             var halfWidth = doorWidth / 2.0;
-                            var leftJamb = doorPoint - (doorDirection * halfWidth);
-                            var rightJamb = doorPoint + (doorDirection * halfWidth);
 
-                            // Create offset for dimension line (perpendicular to door, towards room)
-                            var offsetDirection = wallDirection;
-                            var offsetVector = offsetDirection * offset;
-
-                            // Create dimension line
-                            var dimLineStart = leftJamb + offsetVector;
-                            var dimLineEnd = rightJamb + offsetVector;
+                            // Dimension line: parallel to the wall, pulled off by `offset`, and
+                            // extended just past both jambs so the witness lines land cleanly.
+                            var lineCenter = doorPoint + (perpDirection * offset);
+                            var dimLineStart = lineCenter - (wallDirection * (halfWidth + 1.0));
+                            var dimLineEnd = lineCenter + (wallDirection * (halfWidth + 1.0));
                             var dimLine = Line.CreateBound(dimLineStart, dimLineEnd);
 
-                            // Get geometry references for door opening
-                            var options = new Options { ComputeReferences = true, View = view };
+                            // Preferred path: ask the door family for its own jamb references.
+                            // FamilyInstanceReferenceType.Left/Right are exactly the reference
+                            // planes Revit itself dimensions a door opening to.
+                            var jambRefs = new List<Reference>();
+                            Reference leftRef = door.GetReferences(FamilyInstanceReferenceType.Left)?.FirstOrDefault();
+                            Reference rightRef = door.GetReferences(FamilyInstanceReferenceType.Right)?.FirstOrDefault();
 
-                            // Try to get references from wall opening
-                            var wallGeom = hostWall.get_Geometry(options);
-
-                            if (wallGeom != null)
+                            if (leftRef != null && rightRef != null)
                             {
-                                List<Reference> jambRefs = new List<Reference>();
-
-                                // Look for edges near the door jambs
-                                foreach (GeometryObject geomObj in wallGeom)
+                                jambRefs.Add(leftRef);
+                                jambRefs.Add(rightRef);
+                            }
+                            else
+                            {
+                                // Fallback: derive jamb references from the host wall solid.
+                                // Match by HORIZONTAL (XY) distance only and only against VERTICAL
+                                // edges. The old bug compared a floor-level jamb point against each
+                                // edge's 3D midpoint, which sits at mid-wall height (~4 ft up) — so
+                                // the distance check could never pass for a door of any width.
+                                var leftJambXY = doorPoint - (wallDirection * halfWidth);
+                                var rightJambXY = doorPoint + (wallDirection * halfWidth);
+                                var options = new Options { ComputeReferences = true, View = view };
+                                var wallGeom = hostWall.get_Geometry(options);
+                                if (wallGeom != null)
                                 {
-                                    if (geomObj is Solid solid)
+                                    Reference foundLeft = null, foundRight = null;
+                                    foreach (GeometryObject geomObj in wallGeom)
                                     {
+                                        if (!(geomObj is Solid solid)) continue;
                                         foreach (Edge edge in solid.Edges)
                                         {
                                             var curve = edge.AsCurve();
-                                            if (curve != null)
+                                            if (curve == null) continue;
+
+                                            var span = curve.GetEndPoint(1) - curve.GetEndPoint(0);
+                                            if (span.GetLength() < 1e-6) continue;
+                                            // Only the vertical jamb returns, not horizontal edges.
+                                            if (Math.Abs(span.Normalize().Z) < 0.9) continue;
+
+                                            var p = curve.GetEndPoint(0);
+                                            var pXY = new XYZ(p.X, p.Y, 0);
+                                            if (foundLeft == null &&
+                                                pXY.DistanceTo(new XYZ(leftJambXY.X, leftJambXY.Y, 0)) < 0.25)
                                             {
-                                                var mid = curve.Evaluate(0.5, true);
-
-                                                // Check if edge is near left or right jamb
-                                                if (mid.DistanceTo(leftJamb) < 0.5) // Within 6 inches
-                                                {
-                                                    jambRefs.Add(edge.Reference);
-                                                }
-                                                else if (mid.DistanceTo(rightJamb) < 0.5)
-                                                {
-                                                    jambRefs.Add(edge.Reference);
-                                                }
-
-                                                if (jambRefs.Count >= 2) break;
+                                                foundLeft = edge.Reference;
                                             }
+                                            else if (foundRight == null &&
+                                                     pXY.DistanceTo(new XYZ(rightJambXY.X, rightJambXY.Y, 0)) < 0.25)
+                                            {
+                                                foundRight = edge.Reference;
+                                            }
+
+                                            if (foundLeft != null && foundRight != null) break;
                                         }
+                                        if (foundLeft != null && foundRight != null) break;
                                     }
-                                    if (jambRefs.Count >= 2) break;
-                                }
-
-                                if (jambRefs.Count >= 2)
-                                {
-                                    var refArray = new ReferenceArray();
-                                    refArray.Append(jambRefs[0]);
-                                    refArray.Append(jambRefs[1]);
-
-                                    // Create the dimension
-                                    var dimension = doc.Create.NewDimension(view, dimLine, refArray);
-
-                                    if (dimension != null)
+                                    if (foundLeft != null && foundRight != null)
                                     {
-                                        dimensionIds.Add(dimension.Id.Value);
-                                        dimensionedCount++;
+                                        jambRefs.Add(foundLeft);
+                                        jambRefs.Add(foundRight);
                                     }
+                                }
+                            }
+
+                            if (jambRefs.Count >= 2)
+                            {
+                                var refArray = new ReferenceArray();
+                                refArray.Append(jambRefs[0]);
+                                refArray.Append(jambRefs[1]);
+
+                                var dimension = doc.Create.NewDimension(view, dimLine, refArray);
+                                if (dimension != null)
+                                {
+                                    dimensionIds.Add(dimension.Id.Value);
+                                    dimensionedCount++;
                                 }
                                 else
                                 {
-                                    // Fallback: Create dimension using model curves if needed
-                                    skippedDoors.Add($"Door {door.Id.Value}: Could not find jamb references (width: {doorWidth})");
+                                    skippedDoors.Add($"Door {door.Id.Value}: NewDimension returned null (width: {doorWidth})");
                                 }
+                            }
+                            else
+                            {
+                                skippedDoors.Add($"Door {door.Id.Value}: no jamb references available — family exposes neither Left/Right refs nor matchable wall jamb edges (width: {doorWidth})");
                             }
                         }
                         catch (Exception ex)
