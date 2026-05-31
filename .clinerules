@@ -1,0 +1,58 @@
+# Cline Rules — RevitMCPBridge2026
+
+You are working in Weber's Revit MCP Bridge project. This is a C# .NET addin for Autodesk Revit 2026 that exposes Revit operations as MCP methods over a Windows named pipe.
+
+## Hard rules (never violate)
+
+1. **Named pipe is `RevitMCPBridge2026`** — never use HTTP.
+2. **Points are arrays `[x,y,z]`, not objects `{x:,y:,z:}`** — every MCP method parameter expecting a point uses array form.
+3. **All Revit element modifications must be inside a Transaction** — never call `Set*` or `doc.Create.*` outside `using (var trans = new Transaction(doc, "...")) { trans.Start(); ... trans.Commit(); }`.
+4. **Use `ParameterValidator` for new methods** — not raw JObject indexing. See `WallMethods.CreateWallByPoints` for the pattern.
+5. **Use `ElementLookup` for resolving IDs/names** — not raw `FilteredElementCollector`. See `ElementLookup.GetLevel(doc, id)`, `ElementLookup.GetWallType(doc, name)`, etc.
+6. **Use `ResponseBuilder.Success()` / `.Error()` / `.FromException()`** — never hand-roll JSON in methods.
+7. **Build before claiming done** — run `dotnet build RevitMCPBridge2026.csproj` and confirm 0 errors. Warnings are OK.
+8. **Do not commit if build failed.**
+9. **Do not modify the .csproj manually** — let MSBuild and the existing project structure handle file inclusion.
+10. **Do not use Unicode/emoji in comments or strings** — keeps grep output clean and matches Weber's style.
+
+## Project layout
+
+- `src/*.cs` — Static method classes (WallMethods, DoorWindowMethods, RoomMethods, etc.) each grouping related MCP methods
+- `src/Helpers/` — ElementLookup, ResponseBuilder, GeometryHelper, TransactionHelper, MethodDispatchWrapper
+- `src/Validation/` — ParameterValidator
+- `tests/RevitMCPBridge.Tests/Unit/` — xUnit tests, one file per src method class
+- `RevitMCPBridge2026.csproj` — main project file
+- `RevitMCPBridge2026.addin` — Revit addin manifest
+
+## When asked to add a new MCP method
+
+1. Identify the right `src/*.cs` file by category (Wall, Door, Room, View, Sheet, etc.)
+2. Look at the most recent method in that file to match the current style — NOT the oldest method
+3. Use the modern pattern: `ParameterValidator` + `ElementLookup` + `ResponseBuilder`
+4. Add the `[MCPMethod(...)]` attribute with `Category` and `Description`
+5. Wrap in try/catch returning `ResponseBuilder.FromException(ex).Build()`
+6. Add a unit test in the matching `tests/.../Unit/<Name>MethodsTests.cs`
+7. Run `dotnet build` — must pass with 0 errors
+8. Run tests filtered to your method: `dotnet test --filter "FullyQualifiedName~<YourMethodName>"`
+
+## Common gotchas (load `cline-skills/revit-api.md` for full reference)
+
+- `levelId` and `wallId` are integers, not strings
+- Heights, widths, lengths are in **decimal feet** (10 = 10 feet, 7.5 = 7'-6")
+- Wall creation: `Wall.Create(doc, line, wallTypeId, levelId, height, offset, flip, structural)`
+- Door placement requires `FamilySymbol.Activate()` before use if not already active
+- `LocationCurve.Evaluate(fraction, true)` for points along a wall (0.0 = start, 1.0 = end)
+- Always check for null on `doc.GetElement(id)` before casting
+
+## Build/test commands
+
+```bash
+dotnet build /mnt/d/RevitMCPBridge2026/RevitMCPBridge2026.csproj --configuration Release --verbosity minimal
+dotnet test /mnt/d/RevitMCPBridge2026/tests/RevitMCPBridge.Tests/RevitMCPBridge.Tests.csproj --filter "FullyQualifiedName~<filter>"
+```
+
+## When in doubt
+
+- Read 2-3 existing similar methods before writing new code
+- Match the established pattern — do not invent new patterns
+- Ask Weber before introducing new dependencies, new helper classes, or new MCP categories
