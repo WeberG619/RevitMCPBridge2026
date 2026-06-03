@@ -3324,12 +3324,20 @@ namespace RevitMCPBridge
                 double x = parameters["x"] != null ? double.Parse(parameters["x"].ToString()) : 0.35;
                 double y = parameters["y"] != null ? double.Parse(parameters["y"].ToString()) : 0.85;
 
+                // Optional resolution (DPI). Controls placed physical size: sizeInches = pixels / resolution.
+                // Without this, Revit ignores the file's embedded DPI and forces a fixed small DPI,
+                // making rasters land hugely oversized. Accept "resolution" or "dpi".
+                double resolution = 0;
+                if (parameters["resolution"] != null) resolution = double.Parse(parameters["resolution"].ToString());
+                else if (parameters["dpi"] != null) resolution = double.Parse(parameters["dpi"].ToString());
+
                 using (var trans = new Transaction(doc, "Import Image"))
                 {
                     trans.Start();
 
                     // Create ImageType from file
                     var imageTypeOptions = new ImageTypeOptions(imagePath, false, ImageTypeSource.Import);
+                    if (resolution > 0) { try { imageTypeOptions.Resolution = resolution; } catch { } }
                     var imageType = ImageType.Create(doc, imageTypeOptions);
 
                     // Create placement options
@@ -3354,6 +3362,7 @@ namespace RevitMCPBridge
                         .With("viewName", view.Name)
                         .With("imagePath", imagePath)
                         .With("position", new { x, y })
+                        .With("resolution", resolution)
                         .With("size", new
                         {
                             widthFeet,
