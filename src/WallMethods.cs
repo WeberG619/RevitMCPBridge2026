@@ -1351,6 +1351,7 @@ namespace RevitMCPBridge
                     return ResponseBuilder.Error("No Basic Wall source type found", "TYPE_NOT_FOUND").Build();
 
                 WallType targetType = null;
+                bool replacedExisting = false;
                 var layerInfo = new List<object>();
                 double total = 0;
 
@@ -1363,8 +1364,11 @@ namespace RevitMCPBridge
 
                     targetType = new FilteredElementCollector(doc).OfClass(typeof(WallType)).Cast<WallType>()
                         .FirstOrDefault(wt => wt.Name == newTypeName && wt.Kind == WallKind.Basic);
+                    replacedExisting = targetType != null;
                     if (targetType == null)
                         targetType = sourceType.Duplicate(newTypeName) as WallType;
+                    if (targetType == null)
+                        return ResponseBuilder.Error($"Failed to duplicate source type '{sourceType.Name}'", "OPERATION_FAILED").Build();
 
                     var layers = new List<CompoundStructureLayer>();
                     int firstStruct = -1, lastStruct = -1;
@@ -1375,7 +1379,19 @@ namespace RevitMCPBridge
                         double widthFt = l["thicknessFt"] != null ? l["thicknessFt"].ToObject<double>()
                             : l["thicknessInches"] != null ? l["thicknessInches"].ToObject<double>() / 12.0
                             : 0.0;
-                        if (fn == MaterialFunctionAssignment.Membrane) widthFt = 0.0;
+                        if (fn == MaterialFunctionAssignment.Membrane)
+                        {
+                            widthFt = 0.0; // membranes must be zero-width
+                        }
+                        else if (widthFt <= 0)
+                        {
+                            // Zero/negative width makes the structure invalid and
+                            // SetCompoundStructure would throw a cryptic
+                            // ArgumentException mid-transaction
+                            return ResponseBuilder.Error(
+                                $"layers[{i}] ({fn}): thickness must be > 0 — pass thicknessInches or thicknessFt (only membrane layers may be zero-width)",
+                                "INVALID_PARAMETER").Build();
+                        }
                         var matName = l["materialName"]?.ToString();
                         var matId = EnsureMaterialId(doc, matName);
                         layers.Add(new CompoundStructureLayer(widthFt, fn, matId));
@@ -1402,11 +1418,33 @@ namespace RevitMCPBridge
                         ? parameters["interiorShellCount"].ToObject<int>()
                         : (lastStruct < 0 ? 0 : (layers.Count - 1 - lastStruct));
 
-                    // Must leave at least one core layer between the shells.
-                    if (extShell + intShell <= layers.Count - 1)
+                    if (extShell < 0 || intShell < 0)
+                        return ResponseBuilder.Error(
+                            $"exteriorShellCount/interiorShellCount must be >= 0 (got {extShell}/{intShell})",
+                            "INVALID_PARAMETER").Build();
+
+                    // Must leave at least one core layer between the shells —
+                    // error instead of silently leaving every layer in the core.
+                    if (extShell + intShell > layers.Count - 1)
+                        return ResponseBuilder.Error(
+                            $"Shell layers ({extShell} exterior + {intShell} interior) must leave at least one core layer out of {layers.Count} total",
+                            "INVALID_PARAMETER").Build();
+
+                    if (extShell > 0) cs.SetNumberOfShellLayers(ShellLayerType.Exterior, extShell);
+                    if (intShell > 0) cs.SetNumberOfShellLayers(ShellLayerType.Interior, intShell);
+
+                    // Validate before touching the wall type so the caller gets
+                    // the per-layer error map instead of a raw Revit exception
+                    IDictionary<int, CompoundStructureError> csErrors;
+                    IDictionary<int, int> twoLayerErrors;
+                    if (!cs.IsValid(doc, out csErrors, out twoLayerErrors))
                     {
-                        if (extShell > 0) cs.SetNumberOfShellLayers(ShellLayerType.Exterior, extShell);
-                        if (intShell > 0) cs.SetNumberOfShellLayers(ShellLayerType.Interior, intShell);
+                        var details = csErrors != null
+                            ? string.Join("; ", csErrors.Select(kv => $"layers[{kv.Key}]: {kv.Value}"))
+                            : "unknown";
+                        return ResponseBuilder.Error(
+                            $"Compound structure is invalid: {details}",
+                            "INVALID_STRUCTURE").Build();
                     }
 
                     targetType.SetCompoundStructure(cs);
@@ -1434,6 +1472,7 @@ namespace RevitMCPBridge
                 return ResponseBuilder.Success()
                     .With("wallTypeId", (int)targetType.Id.Value)
                     .With("wallTypeName", targetType.Name)
+                    .With("replacedExisting", replacedExisting)
                     .With("totalThicknessInches", Math.Round(total * 12.0, 4))
                     .With("layerCount", layerInfo.Count)
                     .With("layers", layerInfo)
