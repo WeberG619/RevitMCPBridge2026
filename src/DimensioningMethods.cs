@@ -1213,32 +1213,16 @@ namespace RevitMCPBridge
                         switch (refType)
                         {
                             case "wall_face":
-                                // Get wall face reference
+                                // Get wall face reference (falls back to the wall
+                                // centerline reference only if no face is found)
                                 var wall = element as Wall;
                                 if (wall != null)
                                 {
                                     string side = refPoint["side"]?.ToString()?.ToLower() ?? "exterior";
-                                    var faces = wall.GetMaterialIds(side == "exterior");
-                                    if (faces.Count > 0)
-                                    {
-                                        // Get the appropriate face
-                                        var faceRef = wall.get_Geometry(new Options())
-                                            .OfType<Solid>()
-                                            .Where(s => s != null && s.Faces.Size > 0)
-                                            .SelectMany(s => s.Faces.Cast<PlanarFace>())
-                                            .FirstOrDefault();
-
-                                        if (faceRef != null)
-                                        {
-                                            reference = faceRef.Reference;
-                                        }
-                                    }
-
-                                    // Fallback: use wall reference directly
-                                    if (reference == null)
-                                    {
-                                        reference = new Reference(wall);
-                                    }
+                                    reference = GetWallFaceReferenceForDimension(
+                                        wall,
+                                        new Options { ComputeReferences = true, View = view },
+                                        side == "exterior");
                                 }
                                 break;
 
