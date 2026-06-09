@@ -21,6 +21,26 @@ namespace RevitMCPBridge
         private static string _activeGroupName;
         private static readonly List<string> _checkpointHistory = new List<string>();
 
+        /// <summary>
+        /// Force-close the active group. A failed Assimilate/RollBack (e.g. the
+        /// owning document was closed mid-group) must never leave the static
+        /// group open — that wedges "already active" for the rest of the
+        /// Revit session.
+        /// </summary>
+        private static void CleanupActiveGroup()
+        {
+            try
+            {
+                if (_activeTransactionGroup != null && _activeTransactionGroup.HasStarted())
+                    _activeTransactionGroup.RollBack();
+            }
+            catch { }
+            try { _activeTransactionGroup?.Dispose(); } catch { }
+            _activeTransactionGroup = null;
+            _activeGroupName = null;
+            _checkpointHistory.Clear();
+        }
+
         #region Start Transaction Group
 
         /// <summary>
@@ -49,8 +69,20 @@ namespace RevitMCPBridge
 
                 var groupName = parameters["name"]?.ToString() ?? $"AI Operation {DateTime.Now:HH:mm:ss}";
 
-                _activeTransactionGroup = new TransactionGroup(doc, groupName);
-                _activeTransactionGroup.Start();
+                // Assign the field only after a successful Start: if Start
+                // throws, a half-initialized field would report "already
+                // active" forever.
+                var group = new TransactionGroup(doc, groupName);
+                try
+                {
+                    group.Start();
+                }
+                catch
+                {
+                    group.Dispose();
+                    throw;
+                }
+                _activeTransactionGroup = group;
                 _activeGroupName = groupName;
                 _checkpointHistory.Clear();
                 _checkpointHistory.Add($"Started: {groupName}");
@@ -110,6 +142,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error committing transaction group");
+                CleanupActiveGroup();
                 return ResponseBuilder.FromException(ex).Build();
             }
         }
@@ -155,6 +188,7 @@ namespace RevitMCPBridge
             catch (Exception ex)
             {
                 Log.Error(ex, "Error rolling back transaction group");
+                CleanupActiveGroup();
                 return ResponseBuilder.FromException(ex).Build();
             }
         }
