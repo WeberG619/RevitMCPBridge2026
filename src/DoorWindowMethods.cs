@@ -238,6 +238,20 @@ namespace RevitMCPBridge
                         level,
                         Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
 
+                    // Set sill height if specified (FEET, matching
+                    // modifyDoorWindowProperties) — this param was advertised
+                    // but previously ignored
+                    bool sillSet = false;
+                    if (parameters["sillHeight"] != null)
+                    {
+                        var sillParam = window.get_Parameter(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
+                        if (sillParam != null && !sillParam.IsReadOnly)
+                        {
+                            sillParam.Set(double.Parse(parameters["sillHeight"].ToString()));
+                            sillSet = true;
+                        }
+                    }
+
                     // Get ID before commit in case of rollback
                     var windowId = window.Id.Value;
                     var windowTypeName = windowType.Name;
@@ -249,12 +263,14 @@ namespace RevitMCPBridge
                         return ResponseBuilder.Error($"Transaction failed with status: {commitResult}", "TRANSACTION_FAILED").Build();
                     }
 
-                    return ResponseBuilder.Success()
+                    var response = ResponseBuilder.Success()
                         .With("windowId", (int)windowId)
                         .With("windowType", windowTypeName)
                         .With("wallId", (int)wallId.Value)
-                        .With("level", level.Name)
-                        .Build();
+                        .With("level", level.Name);
+                    if (sillSet)
+                        response = response.With("sillHeight", double.Parse(parameters["sillHeight"].ToString()));
+                    return response.Build();
                 }
             }
             catch (Exception ex)
