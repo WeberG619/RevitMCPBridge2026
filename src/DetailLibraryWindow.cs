@@ -330,6 +330,46 @@ namespace RevitMCPBridge
     /// <summary>
     /// External event handler for importing details - runs in valid Revit API context
     /// </summary>
+    /// <summary>
+    /// General-purpose ExternalEvent handler: runs queued actions in a valid
+    /// Revit API context. Queued (not slot-set) because Raise coalesces while
+    /// an event is pending.
+    /// </summary>
+    public class RevitUiActionHandler : IExternalEventHandler
+    {
+        private readonly object _sync = new object();
+        private readonly Queue<Action<UIApplication>> _pending = new Queue<Action<UIApplication>>();
+
+        public void Enqueue(Action<UIApplication> action)
+        {
+            lock (_sync) { _pending.Enqueue(action); }
+        }
+
+        public void Execute(UIApplication app)
+        {
+            List<Action<UIApplication>> batch;
+            lock (_sync)
+            {
+                batch = new List<Action<UIApplication>>(_pending);
+                _pending.Clear();
+            }
+
+            foreach (var action in batch)
+            {
+                try { action(app); }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Revit action failed: {ex.Message}");
+                }
+            }
+        }
+
+        public string GetName()
+        {
+            return "Detail Library Revit Action";
+        }
+    }
+
     public class DetailImportHandler : IExternalEventHandler
     {
         public List<string> FilesToImport { get; set; } = new List<string>();
@@ -2110,6 +2150,12 @@ namespace RevitMCPBridge
         private SchedulePreviewHandler _schedulePreviewHandler;
         private string _pendingSchedulePreviewCache;
 
+        // General-purpose action runner: this window is modeless, so any
+        // Revit API work (OpenDocumentFile, LoadFamily, Transactions) must
+        // run inside an ExternalEvent, never in a click handler.
+        private ExternalEvent _actionEvent;
+        private RevitUiActionHandler _actionHandler;
+
         // UI Controls
         private TreeView CategoryTree;
         private ListView DetailList;
@@ -2162,6 +2208,10 @@ namespace RevitMCPBridge
             _schedulePreviewHandler = new SchedulePreviewHandler();
             _schedulePreviewHandler.OnComplete = OnSchedulePreviewComplete;
             _schedulePreviewEvent = ExternalEvent.Create(_schedulePreviewHandler);
+
+            // Set up the general-purpose Revit action runner
+            _actionHandler = new RevitUiActionHandler();
+            _actionEvent = ExternalEvent.Create(_actionHandler);
 
             // Window properties
             var profileName = _settings.ActiveProfile?.Name ?? "Default";
@@ -4935,11 +4985,18 @@ namespace RevitMCPBridge
         /// </summary>
         private void ImportLegendsOrSchedules(List<DetailFile> files, string viewType)
         {
+            StatusText.Text = $"Importing {files.Count} {viewType.ToLower()}(s)...";
+
+            // Modeless window: OpenDocumentFile/Transaction must run inside
+            // the ExternalEvent, not in this click-handler call chain
+            RunInRevitContext(app => ImportLegendsOrSchedulesInContext(app, files, viewType));
+        }
+
+        private void ImportLegendsOrSchedulesInContext(UIApplication app, List<DetailFile> files, string viewType)
+        {
             int imported = 0;
             int failed = 0;
             var errors = new List<string>();
-
-            StatusText.Text = $"Importing {files.Count} {viewType.ToLower()}(s)...";
 
             foreach (var file in files)
             {
@@ -4947,7 +5004,7 @@ namespace RevitMCPBridge
                 try
                 {
                     // Open the source RVT file
-                    sourceDoc = _uiApp.Application.OpenDocumentFile(file.FullPath);
+                    sourceDoc = app.Application.OpenDocumentFile(file.FullPath);
                     if (sourceDoc == null)
                     {
                         failed++;
@@ -5019,20 +5076,37 @@ namespace RevitMCPBridge
                 }
             }
 
-            // Show results
-            var message = $"{viewType} Import Complete\n\n" +
-                         $"✅ Imported: {imported}\n" +
-                         $"❌ Failed: {failed}";
-
-            if (errors.Count > 0)
+            // Show results (back on the UI dispatcher — we're on Revit's thread)
+            Dispatcher.BeginInvoke(new Action(() =>
             {
-                message += "\n\nErrors:\n" + string.Join("\n", errors.Take(5));
+                var message = $"{viewType} Import Complete\n\n" +
+                             $"✅ Imported: {imported}\n" +
+                             $"❌ Failed: {failed}";
+
+                if (errors.Count > 0)
+                {
+                    message += "\n\nErrors:\n" + string.Join("\n", errors.Take(5));
+                }
+
+                MessageBox.Show(message, "Import Complete", MessageBoxButton.OK,
+                    failed > 0 ? MessageBoxImage.Warning : MessageBoxImage.Information);
+
+                StatusText.Text = $"Imported {imported} {viewType.ToLower()}(s), {failed} failed";
+            }));
+        }
+
+        /// <summary>
+        /// Queue an action to run in a valid Revit API context.
+        /// </summary>
+        private void RunInRevitContext(Action<UIApplication> action)
+        {
+            if (_actionHandler == null || _actionEvent == null)
+            {
+                MessageBox.Show("Import system not initialized.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
-
-            MessageBox.Show(message, "Import Complete", MessageBoxButton.OK,
-                failed > 0 ? MessageBoxImage.Warning : MessageBoxImage.Information);
-
-            StatusText.Text = $"Imported {imported} {viewType.ToLower()}(s), {failed} failed";
+            _actionHandler.Enqueue(action);
+            _actionEvent.Raise();
         }
 
         /// <summary>
@@ -5040,80 +5114,97 @@ namespace RevitMCPBridge
         /// </summary>
         private void ImportFamilies(List<DetailFile> families)
         {
+            StatusText.Text = $"Loading {families.Count} families...";
+
+            // Modeless window: LoadFamily must run inside the ExternalEvent
+            RunInRevitContext(app => ImportFamiliesInContext(families));
+        }
+
+        private void ImportFamiliesInContext(List<DetailFile> families)
+        {
             int loaded = 0;
             int skipped = 0;
             int failed = 0;
             var errors = new List<string>();
             var loadedNames = new List<string>();
 
-            StatusText.Text = $"Loading {families.Count} families...";
-
-            foreach (var family in families)
+            // LoadFamily requires an open transaction in the target document
+            using (var trans = new Transaction(_doc, "Load Families"))
             {
-                try
+                trans.Start();
+
+                foreach (var family in families)
                 {
-                    // Check if family is already loaded
-                    var existingFamily = new FilteredElementCollector(_doc)
-                        .OfClass(typeof(Family))
-                        .Cast<Family>()
-                        .FirstOrDefault(f => f.Name == Path.GetFileNameWithoutExtension(family.Name));
+                    try
+                    {
+                        // Check if family is already loaded
+                        var existingFamily = new FilteredElementCollector(_doc)
+                            .OfClass(typeof(Family))
+                            .Cast<Family>()
+                            .FirstOrDefault(f => f.Name == Path.GetFileNameWithoutExtension(family.Name));
 
-                    if (existingFamily != null)
-                    {
-                        skipped++;
-                        continue;
-                    }
+                        if (existingFamily != null)
+                        {
+                            skipped++;
+                            continue;
+                        }
 
-                    // Load the family
-                    Family loadedFamily = null;
-                    if (_doc.LoadFamily(family.FullPath, out loadedFamily))
-                    {
-                        loaded++;
-                        loadedNames.Add(family.Name);
-                    }
-                    else
-                    {
-                        // Try with overwrite option
-                        var options = new FamilyLoadOptions();
-                        if (_doc.LoadFamily(family.FullPath, options, out loadedFamily))
+                        // Load the family
+                        Family loadedFamily = null;
+                        if (_doc.LoadFamily(family.FullPath, out loadedFamily))
                         {
                             loaded++;
                             loadedNames.Add(family.Name);
                         }
                         else
                         {
-                            failed++;
-                            errors.Add($"{family.Name}: Failed to load");
+                            // Try with overwrite option
+                            var options = new FamilyLoadOptions();
+                            if (_doc.LoadFamily(family.FullPath, options, out loadedFamily))
+                            {
+                                loaded++;
+                                loadedNames.Add(family.Name);
+                            }
+                            else
+                            {
+                                failed++;
+                                errors.Add($"{family.Name}: Failed to load");
+                            }
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        failed++;
+                        errors.Add($"{family.Name}: {ex.Message}");
+                    }
                 }
-                catch (Exception ex)
+
+                trans.CommitAndCheck();
+            }
+
+            // Show results (back on the UI dispatcher — we're on Revit's thread)
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                var message = $"Family Import Complete\n\n" +
+                             $"✅ Loaded: {loaded}\n" +
+                             $"⏭ Skipped (already loaded): {skipped}\n" +
+                             $"❌ Failed: {failed}";
+
+                if (loaded > 0 && loaded <= 10)
                 {
-                    failed++;
-                    errors.Add($"{family.Name}: {ex.Message}");
+                    message += "\n\nLoaded:\n" + string.Join("\n", loadedNames);
                 }
-            }
 
-            // Show results
-            var message = $"Family Import Complete\n\n" +
-                         $"✅ Loaded: {loaded}\n" +
-                         $"⏭ Skipped (already loaded): {skipped}\n" +
-                         $"❌ Failed: {failed}";
+                if (errors.Count > 0)
+                {
+                    message += "\n\nErrors:\n" + string.Join("\n", errors.Take(5));
+                }
 
-            if (loaded > 0 && loaded <= 10)
-            {
-                message += "\n\nLoaded:\n" + string.Join("\n", loadedNames);
-            }
+                MessageBox.Show(message, "Import Complete", MessageBoxButton.OK,
+                    failed > 0 ? MessageBoxImage.Warning : MessageBoxImage.Information);
 
-            if (errors.Count > 0)
-            {
-                message += "\n\nErrors:\n" + string.Join("\n", errors.Take(5));
-            }
-
-            MessageBox.Show(message, "Import Complete", MessageBoxButton.OK,
-                failed > 0 ? MessageBoxImage.Warning : MessageBoxImage.Information);
-
-            StatusText.Text = $"Loaded {loaded} families, {skipped} skipped, {failed} failed";
+                StatusText.Text = $"Loaded {loaded} families, {skipped} skipped, {failed} failed";
+            }));
         }
 
         /// <summary>
@@ -5782,38 +5873,48 @@ namespace RevitMCPBridge
                 selectWindow.DialogResult = true;
                 selectWindow.Close();
 
-                // Extract each selected view
-                int extracted = 0;
-                int failed = 0;
+                // Snapshot the work list, then run the Revit side
+                // (NewProjectDocument + Transactions) in the ExternalEvent —
+                // this is a modeless window's click handler
+                var extractTargets = selectedItems
+                    .Select(item => new { ViewId = (ElementId)item.Tag, ViewName = item.Content.ToString() })
+                    .ToList();
 
-                foreach (var item in selectedItems)
+                RunInRevitContext(app =>
                 {
-                    var viewId = (ElementId)item.Tag;
-                    var viewName = item.Content.ToString();
-                    var category = GetCategoryForDetailName(viewName);
-                    // Always extract to Details library (since we're extracting drafting views)
-                    var targetFolder = Path.Combine(_libraryPaths[LibraryContentType.Details], category);
+                    int extracted = 0;
+                    int failed = 0;
 
-                    if (!Directory.Exists(targetFolder))
-                        Directory.CreateDirectory(targetFolder);
-
-                    var targetPath = Path.Combine(targetFolder, SanitizeFileName(viewName) + ".rvt");
-
-                    try
+                    foreach (var target in extractTargets)
                     {
-                        ExtractViewToFile(_doc, viewId, targetPath);
-                        extracted++;
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Failed to extract {viewName}: {ex.Message}");
-                        failed++;
-                    }
-                }
+                        var category = GetCategoryForDetailName(target.ViewName);
+                        // Always extract to Details library (since we're extracting drafting views)
+                        var targetFolder = Path.Combine(_libraryPaths[LibraryContentType.Details], category);
 
-                RefreshLibrary();
-                MessageBox.Show($"Extracted {extracted} details." + (failed > 0 ? $" Failed: {failed}" : ""),
-                    "Extract Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                        if (!Directory.Exists(targetFolder))
+                            Directory.CreateDirectory(targetFolder);
+
+                        var targetPath = Path.Combine(targetFolder, SanitizeFileName(target.ViewName) + ".rvt");
+
+                        try
+                        {
+                            ExtractViewToFile(_doc, target.ViewId, targetPath);
+                            extracted++;
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Failed to extract {target.ViewName}: {ex.Message}");
+                            failed++;
+                        }
+                    }
+
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        RefreshLibrary();
+                        MessageBox.Show($"Extracted {extracted} details." + (failed > 0 ? $" Failed: {failed}" : ""),
+                            "Extract Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }));
+                });
             };
 
             buttonPanel.Children.Add(extractBtn);
