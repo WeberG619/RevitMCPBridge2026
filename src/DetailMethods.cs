@@ -131,10 +131,11 @@ namespace RevitMCPBridge2026
                 var centerPt = parameters["center"];
                 XYZ center = new XYZ(centerPt["x"].ToObject<double>(), centerPt["y"].ToObject<double>(), centerPt["z"]?.ToObject<double>() ?? 0);
                 double radius = parameters["radius"].ToObject<double>();
+                // Angles in DEGREES (matches createDetailArcVA / createFamilyModelArc)
                 double startAngle = parameters["startAngle"]?.ToObject<double>() ?? 0;
-                double endAngle = parameters["endAngle"]?.ToObject<double>() ?? 2 * Math.PI;
+                double endAngle = parameters["endAngle"]?.ToObject<double>() ?? 360.0;
 
-                Arc arc = Arc.Create(center, radius, startAngle, endAngle, XYZ.BasisX, XYZ.BasisY);
+                Arc arc = Arc.Create(center, radius, startAngle * Math.PI / 180.0, endAngle * Math.PI / 180.0, XYZ.BasisX, XYZ.BasisY);
 
                 using (var trans = new Transaction(doc, "Create Detail Arc"))
                 {
@@ -415,10 +416,11 @@ namespace RevitMCPBridge2026
                                 centerPt["z"]?.ToObject<double>() ?? 0
                             );
                             double radius = curveData["radius"].ToObject<double>();
+                            // Angles in DEGREES (bridge-wide convention)
                             double startAngle = curveData["startAngle"]?.ToObject<double>() ?? 0;
-                            double endAngle = curveData["endAngle"]?.ToObject<double>() ?? 2 * Math.PI;
+                            double endAngle = curveData["endAngle"]?.ToObject<double>() ?? 360.0;
 
-                            newCurve = Arc.Create(center, radius, startAngle, endAngle, XYZ.BasisX, XYZ.BasisY);
+                            newCurve = Arc.Create(center, radius, startAngle * Math.PI / 180.0, endAngle * Math.PI / 180.0, XYZ.BasisX, XYZ.BasisY);
                         }
                         else
                         {
@@ -6717,9 +6719,10 @@ namespace RevitMCPBridge2026
                                 {
                                     var center = ParsePoint(op["center"]);
                                     double radius = op["radius"].ToObject<double>();
+                                    // Angles in DEGREES (bridge-wide convention)
                                     double startAngle = op["startAngle"]?.ToObject<double>() ?? 0;
-                                    double endAngle = op["endAngle"]?.ToObject<double>() ?? Math.PI * 2;
-                                    var arc = Arc.Create(center, radius, startAngle, endAngle, XYZ.BasisX, XYZ.BasisY);
+                                    double endAngle = op["endAngle"]?.ToObject<double>() ?? 360.0;
+                                    var arc = Arc.Create(center, radius, startAngle * Math.PI / 180.0, endAngle * Math.PI / 180.0, XYZ.BasisX, XYZ.BasisY);
                                     var detailArc = doc.Create.NewDetailCurve(view, arc);
                                     ApplyLineStyle(detailArc, op, lineStyleCache, doc);
                                     results.Add(new { index = i, op = opType, id = (long)detailArc.Id.Value, success = true });

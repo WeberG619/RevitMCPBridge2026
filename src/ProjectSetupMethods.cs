@@ -348,8 +348,9 @@ namespace RevitMCPBridge
 
                 var center = parameters["center"].ToObject<double[]>();
                 var radius = parameters["radius"].ToObject<double>();
+                // Angles in DEGREES (bridge-wide convention)
                 var startAngle = parameters["startAngle"]?.ToObject<double>() ?? 0;
-                var endAngle = parameters["endAngle"]?.ToObject<double>() ?? Math.PI;
+                var endAngle = parameters["endAngle"]?.ToObject<double>() ?? 180.0;
                 var name = parameters["name"]?.ToString();
 
                 using (var trans = new Transaction(doc, "Create Arc Grid"))
@@ -360,7 +361,7 @@ namespace RevitMCPBridge
                     trans.SetFailureHandlingOptions(failureOptions);
 
                     var centerPoint = new XYZ(center[0], center[1], center[2]);
-                    var arc = Arc.Create(centerPoint, radius, startAngle, endAngle, XYZ.BasisX, XYZ.BasisY);
+                    var arc = Arc.Create(centerPoint, radius, startAngle * Math.PI / 180.0, endAngle * Math.PI / 180.0, XYZ.BasisX, XYZ.BasisY);
 
                     var grid = Grid.Create(doc, arc);
 

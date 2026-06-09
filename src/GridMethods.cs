@@ -85,8 +85,9 @@ namespace RevitMCPBridge
 
                 var centerPoint = parameters["centerPoint"]?.ToObject<double[]>();
                 var radius = parameters["radius"]?.Value<double>() ?? 10.0;
+                // Angles in DEGREES (bridge-wide convention)
                 var startAngle = parameters["startAngle"]?.Value<double>() ?? 0;
-                var endAngle = parameters["endAngle"]?.Value<double>() ?? Math.PI;
+                var endAngle = parameters["endAngle"]?.Value<double>() ?? 180.0;
                 var name = parameters["name"]?.ToString();
 
                 if (centerPoint == null)
@@ -102,7 +103,7 @@ namespace RevitMCPBridge
                     trans.SetFailureHandlingOptions(failureOptions);
 
                     var center = new XYZ(centerPoint[0], centerPoint[1], 0);
-                    var arc = Arc.Create(center, radius, startAngle, endAngle, XYZ.BasisX, XYZ.BasisY);
+                    var arc = Arc.Create(center, radius, startAngle * Math.PI / 180.0, endAngle * Math.PI / 180.0, XYZ.BasisX, XYZ.BasisY);
 
                     var grid = Grid.Create(doc, arc);
 
