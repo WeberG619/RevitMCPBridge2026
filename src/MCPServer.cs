@@ -577,6 +577,34 @@ namespace RevitMCPBridge
         /// </summary>
         private const int MaxRequestSizeBytes = 1_048_576;
 
+        /// <summary>
+        /// ReadLine with an enforced size cap. StreamReader.ReadLine buffers
+        /// the entire line into memory before returning, so checking
+        /// message.Length afterwards cannot stop a client that streams
+        /// gigabytes without a newline from exhausting Revit's memory.
+        /// On overflow the rest of the line is read and DISCARDED (no
+        /// buffering), so the connection stays usable for the next message.
+        /// </summary>
+        private static string ReadLineBounded(StreamReader reader, int maxChars, out bool oversized)
+        {
+            oversized = false;
+            var sb = new System.Text.StringBuilder(256);
+            int ch;
+            while ((ch = reader.Read()) != -1)
+            {
+                if (ch == '\n') return sb.ToString();
+                if (ch == '\r') continue;
+                if (sb.Length >= maxChars)
+                {
+                    oversized = true;
+                    while ((ch = reader.Read()) != -1 && ch != '\n') { }
+                    return sb.ToString();
+                }
+                sb.Append((char)ch);
+            }
+            return sb.Length > 0 ? sb.ToString() : null;
+        }
+
         private async Task HandleClient(NamedPipeServerStream pipeServer, CancellationToken cancellationToken)
         {
             Interlocked.Increment(ref _currentConnections);
@@ -592,8 +620,9 @@ namespace RevitMCPBridge
                     {
                         try
                         {
-                            // Use synchronous ReadLine to avoid async deadlock
-                            var message = reader.ReadLine();
+                            // Use synchronous bounded read to avoid async deadlock
+                            // AND cap memory while the line is still arriving
+                            var message = ReadLineBounded(reader, MaxRequestSizeBytes, out bool oversized);
 
                             // Null means client disconnected cleanly
                             if (message == null)
@@ -602,21 +631,20 @@ namespace RevitMCPBridge
                                 break;
                             }
 
-                            // Skip empty keepalive messages
-                            if (string.IsNullOrWhiteSpace(message))
-                                continue;
-
-                            // Reject oversized requests
-                            if (message.Length > MaxRequestSizeBytes)
+                            // Reject oversized requests (overflow already discarded)
+                            if (oversized)
                             {
-                                Log.Warning("Rejecting oversized request: {Size} bytes (max {Max})",
-                                    message.Length, MaxRequestSizeBytes);
+                                Log.Warning("Rejecting oversized request: more than {Max} bytes", MaxRequestSizeBytes);
                                 var rejectResponse = Helpers.ResponseBuilder.Error(
-                                    $"Request too large: {message.Length} bytes exceeds {MaxRequestSizeBytes} byte limit",
+                                    $"Request too large: exceeds {MaxRequestSizeBytes} byte limit",
                                     "REQUEST_TOO_LARGE").Build();
                                 await writer.WriteLineAsync(rejectResponse);
                                 continue;
                             }
+
+                            // Skip empty keepalive messages
+                            if (string.IsNullOrWhiteSpace(message))
+                                continue;
 
                             Log.Debug("Received message ({Size} bytes)", message.Length);
                             MessageReceived?.Invoke(this, message);
