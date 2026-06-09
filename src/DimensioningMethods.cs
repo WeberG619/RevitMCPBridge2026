@@ -3272,6 +3272,10 @@ namespace RevitMCPBridge
 
                 var wallDir = (wallCurve.GetEndPoint(1) - wallCurve.GetEndPoint(0)).Normalize();
                 var wallNormal = new XYZ(-wallDir.Y, wallDir.X, 0);
+                // The hand-rotated normal points at the exterior face only for
+                // unflipped walls; flipping swaps the faces without reversing
+                // the location curve.
+                if (wall.Flipped) wallNormal = wallNormal.Negate();
 
                 Reference bestRef = null;
                 double bestDot = -2;
