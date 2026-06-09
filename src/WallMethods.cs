@@ -1152,12 +1152,19 @@ namespace RevitMCPBridge
         /// <summary>
         /// Change the type of an existing wall
         /// </summary>
-        [MCPMethod("modifyWallType", Category = "Wall", Description = "Modify wall type properties (layers, function, etc.)")]
+        [MCPMethod("modifyWallType", Category = "Wall", Description = "Change which wall type a wall instance uses (requires wallId and newTypeId). To author or edit type layers, use createCompoundWallType.")]
         public static string ModifyWallType(UIApplication uiApp, JObject parameters)
         {
             try
             {
                 var doc = uiApp.ActiveUIDocument.Document;
+
+                if (parameters["wallId"] == null || parameters["newTypeId"] == null)
+                {
+                    return ResponseBuilder.Error(
+                        "wallId and newTypeId are required. This method changes which type a wall instance uses; to author or edit type layers, use createCompoundWallType.",
+                        "INVALID_PARAMETER").Build();
+                }
 
                 var wallId = new ElementId(int.Parse(parameters["wallId"].ToString()));
                 var newTypeId = new ElementId(int.Parse(parameters["newTypeId"].ToString()));
