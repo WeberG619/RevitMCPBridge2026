@@ -1281,7 +1281,9 @@ namespace RevitMCPBridge2026
                 double z = double.Parse(locationData["z"]?.ToString() ?? "0");
                 var location = new XYZ(x, y, z);
 
-                // Optional rotation (in radians)
+                // Optional rotation in DEGREES (bridge-wide convention; the
+                // ElementMethods registration of this same method name also
+                // takes degrees — keep both consistent)
                 double rotation = parameters["rotation"] != null ? double.Parse(parameters["rotation"].ToString()) : 0.0;
 
                 // Get the family symbol
@@ -1327,7 +1329,7 @@ namespace RevitMCPBridge2026
                     {
                         // Rotate around Z axis at the instance location
                         var axis = Line.CreateBound(location, location + XYZ.BasisZ);
-                        ElementTransformUtils.RotateElement(doc, instance.Id, axis, rotation);
+                        ElementTransformUtils.RotateElement(doc, instance.Id, axis, rotation * Math.PI / 180.0);
                     }
 
                     trans.Commit();

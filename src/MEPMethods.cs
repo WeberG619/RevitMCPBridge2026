@@ -1677,7 +1677,8 @@ namespace RevitMCPBridge2026
                         if (locPoint != null)
                         {
                             XYZ axis = XYZ.BasisZ;
-                            locPoint.Rotate(Line.CreateUnbound(location, axis), rotation);
+                            // rotation arrives in degrees (bridge-wide convention); Rotate wants radians
+                            locPoint.Rotate(Line.CreateUnbound(location, axis), rotation * Math.PI / 180.0);
                         }
                     }
 
@@ -1825,7 +1826,8 @@ namespace RevitMCPBridge2026
                         if (locPoint != null)
                         {
                             XYZ axis = XYZ.BasisZ;
-                            locPoint.Rotate(Line.CreateUnbound(location, axis), rotation);
+                            // rotation arrives in degrees (bridge-wide convention); Rotate wants radians
+                            locPoint.Rotate(Line.CreateUnbound(location, axis), rotation * Math.PI / 180.0);
                         }
                     }
 
@@ -2406,7 +2408,8 @@ namespace RevitMCPBridge2026
                         if (locPoint != null)
                         {
                             XYZ axis = XYZ.BasisZ;
-                            locPoint.Rotate(Line.CreateUnbound(location, axis), rotation);
+                            // rotation arrives in degrees (bridge-wide convention); Rotate wants radians
+                            locPoint.Rotate(Line.CreateUnbound(location, axis), rotation * Math.PI / 180.0);
                         }
                     }
 
@@ -2603,7 +2606,8 @@ namespace RevitMCPBridge2026
                         if (locPoint != null)
                         {
                             XYZ axis = XYZ.BasisZ;
-                            locPoint.Rotate(Line.CreateUnbound(location, axis), rotation);
+                            // rotation arrives in degrees (bridge-wide convention); Rotate wants radians
+                            locPoint.Rotate(Line.CreateUnbound(location, axis), rotation * Math.PI / 180.0);
                         }
                     }
 

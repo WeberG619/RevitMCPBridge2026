@@ -149,7 +149,8 @@ namespace RevitMCPBridge2026
                     {
                         double rotation = parameters["rotation"].ToObject<double>();
                         XYZ axis = XYZ.BasisZ;
-                        ElementTransformUtils.RotateElement(doc, column.Id, Line.CreateBound(point, point + axis), rotation);
+                        // rotation arrives in degrees (bridge-wide convention); RotateElement wants radians
+                        ElementTransformUtils.RotateElement(doc, column.Id, Line.CreateBound(point, point + axis), rotation * Math.PI / 180.0);
                     }
 
                     trans.Commit();
@@ -333,7 +334,8 @@ namespace RevitMCPBridge2026
                             XYZ point = locPoint.Point;
                             XYZ axis = XYZ.BasisZ;
                             Line rotationAxis = Line.CreateBound(point, point + axis);
-                            locPoint.Rotate(rotationAxis, rotation);
+                            // rotation arrives in degrees (bridge-wide convention); Rotate wants radians
+                            locPoint.Rotate(rotationAxis, rotation * Math.PI / 180.0);
                         }
                     }
 
@@ -777,7 +779,8 @@ namespace RevitMCPBridge2026
                     {
                         double rotation = parameters["rotation"].ToObject<double>();
                         XYZ axis = XYZ.BasisZ;
-                        ElementTransformUtils.RotateElement(doc, foundation.Id, Line.CreateBound(point, point + axis), rotation);
+                        // rotation arrives in degrees (bridge-wide convention); RotateElement wants radians
+                        ElementTransformUtils.RotateElement(doc, foundation.Id, Line.CreateBound(point, point + axis), rotation * Math.PI / 180.0);
                     }
 
                     trans.Commit();

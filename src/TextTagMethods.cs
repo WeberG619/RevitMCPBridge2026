@@ -150,10 +150,11 @@ namespace RevitMCPBridge
                         };
                     }
 
-                    // Set rotation if specified
+                    // Set rotation if specified — degrees in (bridge-wide
+                    // convention), TextNoteOptions.Rotation wants radians
                     if (parameters["rotation"] != null)
                     {
-                        options.Rotation = double.Parse(parameters["rotation"].ToString());
+                        options.Rotation = double.Parse(parameters["rotation"].ToString()) * Math.PI / 180.0;
                     }
 
                     var textNote = TextNote.Create(doc, viewId, point, text, options);
