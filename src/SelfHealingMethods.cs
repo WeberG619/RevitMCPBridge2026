@@ -616,12 +616,18 @@ namespace RevitMCPBridge
 
                 var force = parameters["force"]?.ToObject<bool>() ?? false;
 
-                // Check what would be deleted
+                // Check what would be deleted: preview the delete inside a
+                // transaction and roll it back. Outside a transaction
+                // doc.Delete throws, which would silently disable this check.
                 var dependentIds = new List<ElementId>();
                 try
                 {
-                    dependentIds = doc.Delete(elementId).ToList();
-                    // This is a preview - we need to roll back
+                    using (var previewTrans = new Transaction(doc, "Preview Delete (rolled back)"))
+                    {
+                        previewTrans.Start();
+                        dependentIds = doc.Delete(elementId).ToList();
+                        previewTrans.RollBack();
+                    }
                 }
                 catch { }
 
