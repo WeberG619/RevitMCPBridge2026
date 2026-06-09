@@ -337,9 +337,11 @@ namespace RevitMCPBridge
         }
 
         /// <summary>
-        /// Create an arc grid
+        /// Create an arc grid.
+        /// NOT registered as an MCP method: GridMethods.CreateArcGrid owns the
+        /// createArcGrid name (this duplicate registration made the effective
+        /// parameter shape depend on reflection order — center vs centerPoint).
         /// </summary>
-        [MCPMethod("createArcGrid", Category = "ProjectSetup")]
         public static string CreateArcGrid(UIApplication uiApp, JObject parameters)
         {
             try

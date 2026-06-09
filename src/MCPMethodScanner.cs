@@ -125,7 +125,10 @@ namespace RevitMCPBridge
 
             if (conflicts.Count > 0)
             {
-                Log.Warning("[MCPMethodScanner] {Count} name conflicts (last wins): {Conflicts}",
+                // Error-level: a conflict means two [MCPMethod] attributes share
+                // a name and the effective implementation (and parameter shape)
+                // depends on reflection order — fix the duplicate, don't ignore.
+                Log.Error("[MCPMethodScanner] {Count} duplicate [MCPMethod] name registrations (last wins, BUILD-ORDER DEPENDENT — rename one): {Conflicts}",
                     conflicts.Count, string.Join(", ", conflicts));
             }
 

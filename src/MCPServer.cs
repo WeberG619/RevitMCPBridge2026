@@ -1444,7 +1444,9 @@ namespace RevitMCPBridge
                         return await ExecuteInRevitContext(uiApp => ProjectSetupMethods.CreateGrid(uiApp, parameters));
 
                     case "createArcGrid":
-                        return await ExecuteInRevitContext(uiApp => ProjectSetupMethods.CreateArcGrid(uiApp, parameters));
+                        // GridMethods owns createArcGrid (accepts both 'centerPoint'
+                        // and the former ProjectSetup shape's 'center')
+                        return await ExecuteInRevitContext(uiApp => GridMethods.CreateArcGrid(uiApp, parameters));
 
                     case "getGrids":
                         return await ExecuteInRevitContext(uiApp => ProjectSetupMethods.GetGrids(uiApp, parameters));

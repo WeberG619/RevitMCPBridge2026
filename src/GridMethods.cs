@@ -83,7 +83,11 @@ namespace RevitMCPBridge
             {
                 var doc = uiApp.ActiveUIDocument.Document;
 
-                var centerPoint = parameters["centerPoint"]?.ToObject<double[]>();
+                // Accept both param names: 'centerPoint' (this method's
+                // original shape) and 'center' (the shape of the former
+                // duplicate registration in ProjectSetupMethods)
+                var centerPoint = parameters["centerPoint"]?.ToObject<double[]>()
+                    ?? parameters["center"]?.ToObject<double[]>();
                 var radius = parameters["radius"]?.Value<double>() ?? 10.0;
                 // Angles in DEGREES (bridge-wide convention)
                 var startAngle = parameters["startAngle"]?.Value<double>() ?? 0;
@@ -102,7 +106,7 @@ namespace RevitMCPBridge
                     failureOptions.SetFailuresPreprocessor(new WarningSwallower());
                     trans.SetFailureHandlingOptions(failureOptions);
 
-                    var center = new XYZ(centerPoint[0], centerPoint[1], 0);
+                    var center = new XYZ(centerPoint[0], centerPoint[1], centerPoint.Length > 2 ? centerPoint[2] : 0);
                     var arc = Arc.Create(center, radius, startAngle * Math.PI / 180.0, endAngle * Math.PI / 180.0, XYZ.BasisX, XYZ.BasisY);
 
                     var grid = Grid.Create(doc, arc);

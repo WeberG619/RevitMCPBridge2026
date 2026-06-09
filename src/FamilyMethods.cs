@@ -1252,9 +1252,15 @@ namespace RevitMCPBridge2026
         #region Family Instances
 
         /// <summary>
-        /// Places a family instance at a location
+        /// Places a family instance at a location.
+        /// Registered as placeFamilyInstanceSimple: this name was ALSO
+        /// registered by ElementMethods.PlaceFamilyInstance with a different
+        /// parameter shape (familyTypeId + location array vs familySymbolId +
+        /// location object), and the scanner's last-wins overwrite made the
+        /// effective API depend on reflection order. ElementMethods keeps the
+        /// canonical placeFamilyInstance name.
         /// </summary>
-        [MCPMethod("placeFamilyInstance", Category = "Family")]
+        [MCPMethod("placeFamilyInstanceSimple", Category = "Family", Description = "Place a family instance (simple variant: familySymbolId, location {x,y,z}, levelId required, rotation in degrees)")]
         public static string PlaceFamilyInstance(UIApplication uiApp, JObject parameters)
         {
             try
