@@ -21,6 +21,12 @@ namespace RevitMCPBridge
         private CancellationTokenSource _cancellationTokenSource;
         private Task _serverTask;
         private bool _isRunning;
+
+        // The pipe instance currently blocked in WaitForConnection. Stop()
+        // disposes it to unblock the accept loop — cancelling the token alone
+        // cannot interrupt a synchronous WaitForConnection, which previously
+        // left a zombie listener racing the next Start() for connections.
+        private NamedPipeServerStream _listeningPipe;
 #if REVIT2025
         private readonly string _pipeName = "RevitMCPBridge2025";
 #else
@@ -518,6 +524,11 @@ namespace RevitMCPBridge
             try
             {
                 _cancellationTokenSource?.Cancel();
+
+                // Unblock the synchronous WaitForConnection so the accept
+                // loop can observe the cancellation
+                try { _listeningPipe?.Dispose(); } catch { }
+
                 _serverTask?.Wait(5000);
                 _isRunning = false;
                 Log.Information("MCP Server stopped");
@@ -544,8 +555,11 @@ namespace RevitMCPBridge
                         PipeTransmissionMode.Byte, PipeOptions.None);
 
                     Log.Debug("Waiting for client connection...");
-                    // Use synchronous WaitForConnection wrapped in Task.Run
+                    // Use synchronous WaitForConnection wrapped in Task.Run.
+                    // Track the instance so Stop() can dispose it to unblock us.
+                    _listeningPipe = pipeServer;
                     await Task.Run(() => pipeServer.WaitForConnection(), cancellationToken);
+                    _listeningPipe = null;
                     Log.Information("Client connected to MCP Server");
 
                     // Handle this client in a separate task so we can immediately accept new connections
@@ -561,12 +575,20 @@ namespace RevitMCPBridge
                 }
                 catch (Exception ex)
                 {
+                    // Stop() disposes the listening pipe to break WaitForConnection;
+                    // that surfaces here as an exception, not a clean cancel
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        Log.Information("Server stopping; listener closed");
+                        break;
+                    }
                     Log.Error(ex, "Server error");
                     ErrorOccurred?.Invoke(this, ex.Message);
                     await Task.Delay(1000, cancellationToken);
                 }
                 finally
                 {
+                    _listeningPipe = null;
                     pipeServer?.Dispose();
                 }
             }
