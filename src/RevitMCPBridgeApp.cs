@@ -185,6 +185,10 @@ namespace RevitMCPBridge
                 // start. First Idling always comes — start there if the event was missed.
                 application.Idling += OnFirstIdleStartServer;
 
+                // Weber rule: whenever a view becomes active, zoom to fit — agent-created
+                // geometry kept landing outside the view's stale zoom, invisible to the user.
+                application.ViewActivated += OnViewActivatedZoomFit;
+
                 // Create ribbon tab - MCP Bridge gets its own tab!
                 try
                 {
@@ -1036,6 +1040,21 @@ namespace RevitMCPBridge
                 return bmp;
             }
             catch { return null; }
+        }
+
+        /// <summary>Zoom the newly active view to fit (skip schedules) so the current work is
+        /// always on screen — applies to manual switches and bridge/agent view changes alike.</summary>
+        private static void OnViewActivatedZoomFit(object sender, Autodesk.Revit.UI.Events.ViewActivatedEventArgs e)
+        {
+            try
+            {
+                var v = e.CurrentActiveView;
+                if (v == null || v is Autodesk.Revit.DB.ViewSchedule) return;
+                var uidoc = new UIDocument(e.Document);
+                foreach (var uiv in uidoc.GetOpenUIViews())
+                    if (uiv.ViewId == v.Id) { uiv.ZoomToFit(); break; }
+            }
+            catch { }
         }
 
         /// <summary>Late-load fallback: if ApplicationInitialized fired before this add-in loaded
