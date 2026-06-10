@@ -300,6 +300,21 @@ namespace RevitMCPBridge
             var stat = new StackPanel { Orientation = Orientation.Horizontal };
             stat.Children.Add(Dot(OkClr));
             stat.Children.Add(new TextBlock { Text = "Ready", Foreground = OkClr, FontSize = 12, VerticalAlignment = VerticalAlignment.Center });
+            // Working indicator (Weber): visibly MOVES while the model thinks/acts; if the
+            // panel ever truly freezes, the rotation stops — text alone can't show liveness.
+            _busySpin = new System.Windows.Shapes.Ellipse
+            {
+                Width = 13, Height = 13, StrokeThickness = 2.5, Stroke = OkClr,
+                StrokeDashArray = new DoubleCollection { 4.5, 2.5 },
+                Margin = new Thickness(8, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center,
+                RenderTransformOrigin = new System.Windows.Point(0.5, 0.5), Visibility = System.Windows.Visibility.Collapsed
+            };
+            var spinRot = new RotateTransform();
+            _busySpin.RenderTransform = spinRot;
+            spinRot.BeginAnimation(RotateTransform.AngleProperty,
+                new System.Windows.Media.Animation.DoubleAnimation(0, 360, TimeSpan.FromSeconds(1.1))
+                { RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever });
+            stat.Children.Add(_busySpin);
             DockPanel.SetDock(stat, Dock.Left); statusRow.Children.Add(stat);
             string rvtVer = "Revit " + (uiApp?.Application?.VersionNumber ?? "");
             var verChip = Chip(rvtVer.Trim(), TextSec, BgElev); DockPanel.SetDock(verChip, Dock.Right); statusRow.Children.Add(verChip);
@@ -884,6 +899,12 @@ namespace RevitMCPBridge
         // deterministically from scripts instead of brittle UI automation
         private static string _lastQuestion = "", _lastAnswer = null;
         private static bool _chatBusy;
+        private static System.Windows.Shapes.Ellipse _busySpin;   // liveness spinner — UI-thread animated, so a real freeze visibly stops it
+
+        private static void SetBusySpin(bool on)
+        {
+            try { _busySpin?.Dispatcher.Invoke(() => _busySpin.Visibility = on ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed); } catch { }
+        }
 
         /// <summary>Submit a question exactly as if typed into the chat box (bridge: copilotAsk).</summary>
         public static string AskFromBridge(string question)
@@ -915,6 +936,7 @@ namespace RevitMCPBridge
         private static async void AskModelAsync(string question)
         {
             _lastQuestion = question; _lastAnswer = null; _chatBusy = true;
+            SetBusySpin(true);
             try
             {
                 // Code-enforced safety: if a destructive action is awaiting confirmation,
@@ -1017,7 +1039,7 @@ namespace RevitMCPBridge
                 UpdateCostText();   // refresh the live spend meter
             }
             catch (Exception ex) { Log.Debug($"AskModelAsync: {ex.Message}"); }
-            finally { _chatBusy = false; }
+            finally { _chatBusy = false; SetBusySpin(false); }
         }
 
         private static string StripThink(string s) =>
