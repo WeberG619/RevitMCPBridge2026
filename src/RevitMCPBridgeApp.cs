@@ -1067,6 +1067,18 @@ namespace RevitMCPBridge
         {
             try
             {
+                // KNOWN-NOISE startup dialogs (broken third-party add-ins like Dynamo Player /
+                // Generative Design failing to load) — always dismiss, regardless of auto-handle
+                // mode. They block ApplicationInitialized and every automation run; the user has
+                // no action to take on them.
+                if ((e.DialogId ?? "").Contains("External_Tool_Failure"))
+                {
+                    try { e.OverrideResult(8); }        // TaskDialogResult.Close
+                    catch { try { e.OverrideResult(1); } catch { } }
+                    Log.Information($"Auto-dismissed known-noise dialog: {e.DialogId}");
+                    return;
+                }
+
                 var record = new DialogRecord
                 {
                     Timestamp = DateTime.Now,
