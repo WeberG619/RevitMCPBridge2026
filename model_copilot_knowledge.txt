@@ -1,0 +1,40 @@
+- Views: use VIEW TEMPLATES to control appearance consistently; duplicate-with-detailing for variants; control extent with crop regions + scope boxes. Don't override view graphics one-off.
+- Phasing: for renovations use Existing / Demolished / New phases + phase filters — never separate models for demo vs new.
+- Worksets: only for multi-user (workshared) models; unnecessary for single-user.
+- Dimensions: string them and use EQ for equal spacing; dimension to wall FACES for architectural plans, not centerlines.
+- Schedules are LIVE: edit data in the schedule or on the element and it syncs both ways; use calculated values, filters, and sorting/grouping rather than manual edits.
+- Families: load from the library; avoid in-place families unless the geometry is truly unique; use SHARED parameters so data can be scheduled and tagged.
+- Annotations (text, tags, dimensions, keynotes) are VIEW-SPECIFIC — they live in a view, never in model space; place them in the right view at the right scale.
+- Sheets: use a title block; place views on a guide grid for alignment; keep sheet numbering consistent.
+- Keynotes: use a keynote .txt file + keynote tags for consistency across the set.
+- Levels & grids first: set them before modeling; host elements to the correct level.
+- Details: use drafting views for typical details; pull detail components from the library instead of drawing lines.
+- MEP/structural coordination: use Copy/Monitor + Interference Check (clash) rather than eyeballing.
+- CAD: LINK CAD, don't import; clean the CAD first; never explode CAD in the model.
+- Model hygiene: purge unused, audit periodically, keep file size down.
+- Rooms: place rooms in enclosed regions; use room-bounding elements and room separators; tag rooms for schedules.
+- Hosted vs free: doors/windows/most lights REQUIRE a host (wall/ceiling) — place them with the host tools, never at a bare point; furniture/equipment place freely.
+- Curtain walls: a door in a curtain wall is a PANEL swap (curtain-wall door type), not a hosted door — never place a regular door family on a curtain wall.
+- Units: all tool coordinates/lengths are decimal FEET; report lengths to the user in feet-inches (e.g. 38'-4"), never decimal.
+- Marks must be UNIQUE within a category — Revit warns on duplicates; use sequential numbering, never the same Mark on many elements.
+- Set the view SCALE before annotating — annotation sizes are scale-dependent and move when the scale changes.
+- New projects start from the firm's master template (wall types, schedules, details preloaded) — never a blank file.
+- Floor-plan reading — LINE LANGUAGE: dashed lines = something ABOVE the cut plane (beams, upper cabinets, overhead garage doors on tracks) — NEVER walls. Thin solid = counters/fixtures/porch edges — not walls. Only thick wall bands/double-lines become walls. Full reference: D:\_CLAUDE-TOOLS\floorplan\LINE_LANGUAGE.md + SYMBOLS.md.
+- Walls are CONTINUOUS through openings: doors/windows/garage doors are INSERTS into the wall at their stopping points, never gaps in the wall. Rooms always CLOSE (a garage with 3 doors still has 4 walls). One drawing line = one wall, corner to corner; never stack overlapping walls.
+- Perimeter = exterior types all the way around, continuously — an interior wall type never appears on the building shell. Construction system is per-project judgment: CMU only when masonry is indicated (block hatch, FL style) = 8" always; wood-frame plans = EXT 2x6 stud + INT 2x4 (4.5"); metal stud for commercial. When ambiguous, ASK.
+- Scale from drawings: best = printed dimension lines; good = printed room sizes cross-checked; known objects: a standard TUB is 5'-0" long (reliable), beds are NOT reliable. Sanity-check the resulting footprint against printed labels before trusting any scale.
+- RENAME anything (level, view, sheet, room, type): set_parameter on that element id with parameter "Name" and the new name — get the id first (getLevels for levels, getViews for views). There is no separate rename tool.
+- PROJECT INFO (project name, number, client, address): run_method "setProjectInfo" with params like {"name":"..."} or {"number":"..."} — set_parameter does NOT reach project information.
+- FILTERED SELECTION ('select the walls longer than X', 'select doors on level 2'): read the elements first (getWalls/getDoors), filter the ids by the condition yourself, then select_elements(element_ids). NEVER claim a selection happened without calling a selection tool — selection only changes when select_elements or select_category runs.
+- ONE wall between two points = create_wall(x1,y1,x2,y2). A rectangle of 4 walls = create_walls(width,depth). Never force a single wall through create_walls.
+- MODEL-WIDE questions ("how many walls", "the longest wall", "all the doors") use the whole-model reads: getWalls, getDoors, getRooms — NEVER the view-scoped ones (getWallsInView/getElementsInView); the active view may be a sheet or another level and will hide elements that exist.
+- Lengths/areas come from the tool result FIELDS (length, area) — report them verbatim, never recompute from coordinates yourself.
+- EXTERIOR FACE RULE (hard): exterior wall faces always point OUT of the room/building, never toward the inside. createRoomWalls/create_walls enforce it automatically; after building any other enclosure (perimeter trace, multiple create_wall calls), run_method "orientWallsExteriorOut" with the new wall ids to enforce it.
+- select_elements ids MUST come from a tool result you just read in THIS conversation (getWalls/getDoors/...). Worked example — "select the walls longer than 25 feet": run_method "getWalls" {} → take walls[i].wallId where length > 25 → select_elements(those ids). Never pass a remembered or guessed id.
+- Dimensioning ONE wall's length: dimension_walls needs 2+ walls, so for a single wall use find_method("dimension") and run_method with a suitable method (e.g. createLinearDimension between the wall's endpoints in the active view).
+- "The wall near (x, y)" / "at point": call find_wall with x and y — it returns the nearest wall with its exact length; report that length verbatim.
+- NEVER draw on top of earlier work: if a wall (or other element) already exists where you are about to create one, REUSE the existing element — the bridge blocks duplicate walls (errorCode DUPLICATE_WALL gives you the existing id; use that id for doors/edits). Only pass allowDuplicate:true when the user explicitly asks for stacked/overlapping geometry.
+- RENAME A LEVEL: the level ELEMENT id comes from getLevels — do NOT rename the floor-plan VIEW that happens to share the level's name (views are renamed only when the user says view/plan/sheet).
+- "Delete all the text notes": getTextNotes (model-wide) gives every note's id — delete those ids. select_category is ACTIVE-VIEW scoped and will miss notes in other views.
+- Dimension ONE wall's length: dimension_walls with just that wall id (it routes to dimensionWallLength automatically).
+- "Delete all the X" (text notes/walls/doors/rooms): call delete_category(category) — it reads the elements itself and asks the user to confirm. Never collect delete ids yourself when a whole category is meant.

@@ -44,6 +44,21 @@ namespace RevitMCPBridge
             set => _autoHandleDialogs = value;
         }
 
+        /// <summary>Dialogs sensed + handled during the current Copilot tool call — read back so the LLM
+        /// can SEE what popped up and which button was clicked. Cleared at the start of each tool call.</summary>
+        public static readonly List<string> AgentDialogLog = new List<string>();
+
+        /// <summary>Pick the SAFE button for a given dialog message instead of blindly clicking OK.</summary>
+        private static int ChooseDialogResult(string message)
+        {
+            var m = (message ?? "").ToLowerInvariant();
+            // Never let an agent operation save the model or overwrite, regardless of default
+            if ((m.Contains("save") && m.Contains("change")) || m.Contains("overwrite") || m.Contains("already exists"))
+                return 2; // No
+            // Warnings / "do you want to continue" / unresolved refs / duplicates: proceed
+            return _defaultDialogResult; // 1 = OK/Yes/Continue
+        }
+
         public static int DefaultDialogResult
         {
             get => _defaultDialogResult;
@@ -154,6 +169,13 @@ namespace RevitMCPBridge
                 // Subscribe to dialog events for automatic handling
                 application.DialogBoxShowing += OnDialogBoxShowing;
                 Log.Information("Dialog handler subscribed");
+
+                // Model Copilot panel: ExternalEvent for its model edits + summary invalidation
+                // so model-wide answers never come from a stale snapshot.
+                ElementInfoPanel.InitExternalEvent();
+                application.ControlledApplication.DocumentChanged +=
+                    (s, e) => ElementInfoPanel.InvalidateModelSummary();
+                Log.Information("Model Copilot panel events initialized");
 
                 // Create ribbon tab - MCP Bridge gets its own tab!
                 try
@@ -284,6 +306,19 @@ namespace RevitMCPBridge
 
             // Add separator
             panel.AddSeparator();
+
+            // Model Copilot button — the in-Revit AI assistant (chat + tools, local LLM)
+            var copilotButtonData = new PushButtonData(
+                "OpenModelCopilot",
+                "Model\nCopilot",
+                Assembly.GetExecutingAssembly().Location,
+                "RevitMCPBridge.Commands.OpenCopilotCommand")
+            {
+                ToolTip = "Open the Model Copilot AI assistant",
+                LongDescription = "Chat with the local AI about your model — read, edit, coordinate, check code, export. Works with or without a selection."
+            };
+            var copilotButton = panel.AddItem(copilotButtonData) as PushButton;
+            try { copilotButton.LargeImage = CreateButtonIcon("copilot", 32); copilotButton.Image = CreateButtonIcon("copilot", 16); } catch { }
 
             // SketchPad button - Draw to Revit!
             var sketchPadButtonData = new PushButtonData(
@@ -995,11 +1030,12 @@ namespace RevitMCPBridge
 
                     if (_autoHandleDialogs)
                     {
-                        // Override with default result
-                        taskArgs.OverrideResult(_defaultDialogResult);
-                        record.ResultClicked = _defaultDialogResult;
-                        record.ResultName = _defaultDialogResult == 1 ? "OK/Yes" :
-                                           (_defaultDialogResult == 2 ? "No" : "Cancel");
+                        // Safe-button choice (never save/overwrite from an agent op), not blind default
+                        int pick = ChooseDialogResult(taskArgs.Message);
+                        taskArgs.OverrideResult(pick);
+                        record.ResultClicked = pick;
+                        record.ResultName = pick == 1 ? "OK/Yes" : (pick == 2 ? "No" : "Cancel");
+                        try { AgentDialogLog.Add($"TaskDialog: \"{taskArgs.Message}\" → clicked {record.ResultName}"); } catch { }
 
                         Log.Information($"Auto-handled TaskDialog with result: {record.ResultName}");
                     }
@@ -1013,11 +1049,11 @@ namespace RevitMCPBridge
 
                     if (_autoHandleDialogs)
                     {
-                        // Override with default result
-                        msgArgs.OverrideResult(_defaultDialogResult);
-                        record.ResultClicked = _defaultDialogResult;
-                        record.ResultName = _defaultDialogResult == 1 ? "OK/Yes" :
-                                           (_defaultDialogResult == 2 ? "No" : "Cancel");
+                        int pick = ChooseDialogResult(msgArgs.Message);
+                        msgArgs.OverrideResult(pick);
+                        record.ResultClicked = pick;
+                        record.ResultName = pick == 1 ? "OK/Yes" : (pick == 2 ? "No" : "Cancel");
+                        try { AgentDialogLog.Add($"MessageBox: \"{msgArgs.Message}\" → clicked {record.ResultName}"); } catch { }
 
                         Log.Information($"Auto-handled MessageBox with result: {record.ResultName}");
                     }

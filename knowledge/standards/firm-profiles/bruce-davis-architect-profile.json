@@ -8,7 +8,7 @@
 
   "detection": {
     "pathPatterns": ["BD-Architect", "BDA", "Bruce Davis"],
-    "titleBlockFamilies": [],
+    "titleBlockFamilies": ["24 x 36 Border- BD", "24 x 36 Cover- BD"],
     "projectNumberPrefix": "BDA",
     "projectInfoPatterns": {
       "author": "Bruce Davis",
@@ -69,7 +69,29 @@
     "convention": "To be extracted"
   },
 
-  "titleBlocks": [],
+  "titleBlocks": [
+    {
+      "name": "24 x 36 Border- BD",
+      "size": "24x36",
+      "use": "Standard sheet border",
+      "source": "D:\\BDArchitect-DetailLibrary-2025\\family_exports\\Title Blocks\\24 x 36 Border- BD.rfa"
+    },
+    {
+      "name": "24 x 36 Cover- BD",
+      "size": "24x36",
+      "use": "Cover sheet (carries BD logo)",
+      "source": "D:\\BDArchitect-DetailLibrary-2025\\family_exports\\Title Blocks\\24 x 36 Cover- BD.rfa"
+    }
+  ],
+
+  "cover": {
+    "client": "Bruce Davis Architect",
+    "preparedFor": "PREPARED BY BIM OPS STUDIO FOR BRUCE DAVIS ARCHITECT",
+    "titleBlock": "24 x 36 Border- BD",
+    "coverTitleBlock": "24 x 36 Cover- BD",
+    "logoSource": "embedded in '24 x 36 Cover- BD' title block family; extract to PNG for the Open/Close center-logo swap",
+    "logoPath": null
+  },
 
   "projectTypes": [
     "healthcare",

@@ -1,0 +1,28 @@
+• Build a room: create_walls(width, depth). Then add_door(wall_id, 0.5) with a wall id from the result; add_window(wall_id, 0.7) if asked. Done in 2-3 tool calls.
+• Number elements uniquely: set_marks(prefix, category) — e.g. set_marks("D-", "Doors"). NEVER set the same Mark on many elements (that warns about duplicates).
+• Fix / clean up a messy model: first READ the issues (get_warnings, find_duplicates, and the untagged-room count). Then FIX what is safe: tag_untagged("Rooms") to tag untagged rooms; fix_marks(category) to fix duplicate/blank marks. Report before/after counts.
+• Bring in a PDF floor plan: analyze_pdf(path) FIRST to find which page is the floor plan and its scale; THEN import_pdf(path, page) to attach it. Do not import a page blindly.
+• Bring in a detail: find_detail(query) (it returns only version-compatible details), pick one, then import_detail(path).
+• Make a door/window/room schedule: create_schedule(category) — it adds the right fields automatically; then export_schedule for a CSV.
+• Make a sheet with a view: create_sheet(number, name); then place_view(sheet_id, view_id) using the sheet id from the result.
+• Create drawing views: create_section(x1,y1,x2,y2) along the cut line; create_elevation(x,y,direction); create_callout(x1,y1,x2,y2); create_3d_view().
+• Select things: select_category("Doors") selects ALL of a category; select_element(ids) for specific elements; find_cad then select_element for DWGs.
+• Dimension exterior walls: dimension_walls — ALWAYS to the exterior core-finish face, NEVER the wall centerline (firm standard).
+• Place a column/beam/stair: place_column(x,y); create_beam(x1,y1,x2,y2); create_stair(x,y,direction) (needs a level above — create_level first if there is none).
+• When a single tool fits the request, call it directly. Only chain when the goal truly needs multiple steps. After a build/edit, the result is read back automatically — check it before saying done.
+• Put a plan on a sheet end-to-end: duplicate_view() (work on the copy), set_view_scale(48) BEFORE annotating, then create_sheet("A-101","First Floor Plan"), then place_view(sheet_id, view_id) with the ids from those results.
+• Need a component (chair, fixture, equipment): load_family("office chair") → read its 'types' from the result → place_family(family_type_id, x, y). Doors/windows are HOSTED — use add_door/add_window on a wall instead of place_family.
+• Full model health report: get_warnings + find_duplicates("Walls") + run_code_check, then ONE combined report grouped Critical/Major/Minor with next steps. Don't stop after the first check.
+• Trace a PDF plan into the model: analyze_pdf(path) → import_pdf(path, page) → look at the view → create_walls matching the plan's overall dimensions → add_door/add_window where shown.
+• Annotate the active view: place_keynote(element_id); create_revision_cloud(x1,y1,x2,y2) around the changed area; place_spot_elevation(element_id, x, y). All land in the ACTIVE view.
+• Stairs: create_stair(x, y, direction) needs a level ABOVE the active one — if there is none, create_level("Level 2", 10) first, then the stair.
+• Ducts/pipes/fixtures need an MEP-enabled project — if the tool answers "no system types", say the project has no MEP systems loaded instead of retrying.
+• Answer a code/product question not in the model: web_search(query) and cite what you found. Find a file: search_files(keyword) → read_file(path) for text files.
+• Deliverables: export_sheets_pdf("all" or a sheet keyword); export_schedule(name) for CSV/Excel; write_report(format, title, content) for a standalone report file.
+• When a request is given as "step N of M", do ONLY that step now — the other steps are handled separately; end with one short confirmation including new element ids.
+• TRUST the VERIFY note in each tool result: it is the live model read back in code. VERIFY FAILED = the step did not happen — never report success on it.
+• Door/window in "the north/front/longest wall": find_wall(side) first → use the returned wall id with add_door/add_window. find_wall("center") gives the plan/room center coordinates.
+• "Fix any duplicate or blank marks" (no category given): fix_marks with NO arguments — it sweeps every category in the model and reports per-category counts. Never assume one category.
+• "Select the largest/smallest/longest X": read the candidates first (find_method getRooms/getWalls gives areas/lengths), pick the ONE winner, then select_element([that single id]). NEVER select_category for superlatives — the user wants exactly one element selected.
+• "Change ALL the <doors/windows/...> to <type>": find_types(category, name text) to get the type id, then change_type(category=..., type_id=...) — one call swaps the whole category. For ONE element use change_type(element_id, type_id) with the INSTANCE id (never the type id).
+- Import a floor plan image into the model: (1) run the floorplan engine (D:\_CLAUDE-TOOLS\floorplan, `python3 -m floorplan investigate <image>`) to read walls — blue=exterior red=interior overlay for user approval; (2) after approval, `python3 -m floorplan push <plan.json> --version 2025` creates walls from the BOS template types + a faded to-scale underlay; (3) verify with a read-back (getWallsInView) and show the user; user corrections (moved/retyped/deleted walls) are the ground truth — record them.

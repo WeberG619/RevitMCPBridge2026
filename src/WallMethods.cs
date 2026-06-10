@@ -66,6 +66,28 @@ namespace RevitMCPBridge
                     return ResponseBuilder.Error("No valid wall type found in document", "NO_WALL_TYPE").Build();
                 }
 
+                // DUPLICATE GUARD (hard rule): never draw a wall ON TOP of an existing one on the
+                // same level — earlier work (user's or a prior agent pass) must be reused, not
+                // double-drawn. allowDuplicate:true bypasses ONLY for intentional stacking.
+                bool allowDuplicate = parameters["allowDuplicate"]?.ToObject<bool>() ?? false;
+                if (!allowDuplicate)
+                {
+                    var dup = FindWallOnSegment(doc,
+                        new XYZ(startPoint[0], startPoint[1], 0), new XYZ(endPoint[0], endPoint[1], 0), level.Elevation);
+                    if (dup != null)
+                    {
+                        return JsonConvert.SerializeObject(new
+                        {
+                            success = false,
+                            errorCode = "DUPLICATE_WALL",
+                            existingWallId = (int)dup.Id.Value,
+                            existingWallType = dup.Name,
+                            error = "A wall already runs along this line on this level (id " + dup.Id.Value + ", '" + dup.Name +
+                                    "'). NOT drawing on top of it — reuse or modify the existing wall instead, or pass allowDuplicate:true only if stacking is intentional."
+                        });
+                    }
+                }
+
                 using (var trans = new Transaction(doc, "Create Wall"))
                 {
                     trans.Start();
@@ -2408,6 +2430,40 @@ namespace RevitMCPBridge
                 layerCount = layers.Count,
                 layers = layers
             };
+        }
+        /// <summary>An existing wall that the proposed segment a→b would lie ON TOP of, on the
+        /// same level (base elevation within 1 ft): nearly collinear (<~3°), laterally within
+        /// 4", sharing ≥1 ft of run. Parallel walls further apart (legit double walls) pass.</summary>
+        internal static Wall FindWallOnSegment(Document doc, XYZ a, XYZ b, double baseElevation)
+        {
+            const double LATERAL_TOL = 0.35, MIN_OVERLAP = 1.0, ELEV_TOL = 1.0;
+            try
+            {
+                double dX = b.X - a.X, dY = b.Y - a.Y;
+                double len = Math.Sqrt(dX * dX + dY * dY);
+                if (len < 1e-6) return null;
+                double ux = dX / len, uy = dY / len;
+                foreach (var w in new FilteredElementCollector(doc).OfClass(typeof(Wall)).Cast<Wall>())
+                {
+                    var line = (w.Location as LocationCurve)?.Curve as Line;
+                    if (line == null) continue;
+                    var lvl = doc.GetElement(w.LevelId) as Level;
+                    if (lvl != null && Math.Abs(lvl.Elevation - baseElevation) > ELEV_TOL) continue;
+                    var p2 = line.GetEndPoint(0); var q = line.GetEndPoint(1);
+                    double eX = q.X - p2.X, eY = q.Y - p2.Y;
+                    double elen = Math.Sqrt(eX * eX + eY * eY);
+                    if (elen < 1e-6) continue;
+                    double vx = eX / elen, vy = eY / elen;
+                    if (Math.Abs(ux * vy - uy * vx) > 0.05) continue;
+                    if (Math.Abs((a.X - p2.X) * vy - (a.Y - p2.Y) * vx) > LATERAL_TOL) continue;
+                    double tA = (a.X - p2.X) * vx + (a.Y - p2.Y) * vy;
+                    double tB = (b.X - p2.X) * vx + (b.Y - p2.Y) * vy;
+                    double lo = Math.Max(Math.Min(tA, tB), 0), hi = Math.Min(Math.Max(tA, tB), elen);
+                    if (hi - lo >= MIN_OVERLAP) return w;
+                }
+            }
+            catch { }
+            return null;
         }
 
         #endregion

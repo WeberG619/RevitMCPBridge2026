@@ -141,6 +141,65 @@ namespace RevitMCPBridge
         /// <summary>
         /// Create an aligned dimension (follows element geometry)
         /// </summary>
+        [MCPMethod("dimensionWallLength", Category = "Dimensioning",
+            Description = "Dimension ONE wall's length: aligned dimension between the wall's two end faces, offset beside the wall. Params: wallId; viewId (optional, default active view); offsetFeet (optional, default 4).")]
+        public static string DimensionWallLength(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument?.Document;
+                if (doc == null) return JsonConvert.SerializeObject(new { success = false, error = "No active document" });
+                if (parameters?["wallId"] == null) return JsonConvert.SerializeObject(new { success = false, error = "wallId is required" });
+
+                var wall = doc.GetElement(new ElementId(int.Parse(parameters["wallId"].ToString()))) as Wall;
+                if (wall == null) return JsonConvert.SerializeObject(new { success = false, error = "Wall not found" });
+
+                View view = parameters["viewId"] != null
+                    ? doc.GetElement(new ElementId(int.Parse(parameters["viewId"].ToString()))) as View
+                    : doc.ActiveView;
+                if (view == null) return JsonConvert.SerializeObject(new { success = false, error = "View not found" });
+
+                var line = (wall.Location as LocationCurve)?.Curve as Line;
+                if (line == null) return JsonConvert.SerializeObject(new { success = false, error = "Wall has no straight location line" });
+                var dir = (line.GetEndPoint(1) - line.GetEndPoint(0)).Normalize();
+                double offset = parameters["offsetFeet"]?.ToObject<double>() ?? 4.0;
+
+                // the wall's two END faces = planar faces whose normal is parallel to the wall direction
+                var opts = new Options { ComputeReferences = true, DetailLevel = ViewDetailLevel.Fine };
+                var endFaces = new List<PlanarFace>();
+                foreach (GeometryObject go in wall.get_Geometry(opts))
+                    if (go is Solid solid)
+                        foreach (Face f in solid.Faces)
+                            if (f is PlanarFace pf && Math.Abs(pf.FaceNormal.DotProduct(dir)) > 0.99)
+                                endFaces.Add(pf);
+                if (endFaces.Count < 2)
+                    return JsonConvert.SerializeObject(new { success = false, error = "Could not find the wall's end faces (joined ends?) — found " + endFaces.Count });
+                var fStart = endFaces.OrderBy(f => f.Origin.DotProduct(dir)).First();
+                var fEnd = endFaces.OrderByDescending(f => f.Origin.DotProduct(dir)).First();
+
+                var perp = new XYZ(-dir.Y, dir.X, 0);
+                var dimLine = Line.CreateBound(line.GetEndPoint(0) + perp * offset, line.GetEndPoint(1) + perp * offset);
+                var refs = new ReferenceArray();
+                refs.Append(fStart.Reference);
+                refs.Append(fEnd.Reference);
+
+                using (var trans = new Transaction(doc, "Dimension wall length"))
+                {
+                    trans.Start();
+                    var fo = trans.GetFailureHandlingOptions();
+                    try { fo.SetFailuresPreprocessor(new WarningSwallower()); trans.SetFailureHandlingOptions(fo); } catch { }
+                    var dim = doc.Create.NewDimension(view, dimLine, refs);
+                    trans.Commit();
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = true, dimensionId = (int)dim.Id.Value, wallId = (int)wall.Id.Value,
+                        value = dim.ValueString, message = "Dimensioned wall " + wall.Id.Value + " (" + dim.ValueString + ") in view '" + view.Name + "'."
+                    });
+                }
+            }
+            catch (Exception ex) { return JsonConvert.SerializeObject(new { success = false, error = ex.Message }); }
+        }
+
         [MCPMethod("createAlignedDimension", Category = "Dimensioning")]
         public static string CreateAlignedDimension(UIApplication uiApp, JObject parameters)
         {

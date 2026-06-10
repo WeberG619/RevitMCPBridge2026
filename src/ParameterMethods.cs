@@ -1094,6 +1094,25 @@ namespace RevitMCPBridge2026
                 string paramName = parameters["parameterName"].ToString();
                 Parameter param = element.LookupParameter(paramName);
 
+                // "Name" is a PROPERTY on most elements (levels, views, sheets, types). Even when a
+                // "Name" parameter exists, it is often read-only — renames must use the property.
+                if (paramName.Equals("Name", StringComparison.OrdinalIgnoreCase)
+                    || paramName.EndsWith(" Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    string newName = parameters["value"].ToString();
+                    using (var tn = new Transaction(doc, "Rename element"))
+                    {
+                        tn.Start();
+                        element.Name = newName;
+                        tn.Commit();
+                    }
+                    return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                    {
+                        success = true, elementId = elementIdInt, parameterName = "Name", newValue = newName,
+                        message = "Element renamed to '" + newName + "'."
+                    });
+                }
+
                 if (param == null)
                 {
                     return Newtonsoft.Json.JsonConvert.SerializeObject(new
