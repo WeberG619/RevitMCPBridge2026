@@ -1043,7 +1043,7 @@ namespace RevitMCPBridge2026
                     storageType,
                     isReadOnly = param.IsReadOnly,
                     hasValue = param.HasValue,
-                    unit = param.GetUnitTypeId()?.TypeId
+                    unit = SafeUnitId(param)
                 });
             }
             catch (Exception ex)
@@ -1272,7 +1272,7 @@ namespace RevitMCPBridge2026
                         isReadOnly = param.IsReadOnly,
                         isShared = param.IsShared,
                         hasValue = param.HasValue,
-                        unit = param.GetUnitTypeId()?.TypeId,
+                        unit = SafeUnitId(param),
                         parameterType = param.Definition.GetDataType()?.TypeId ?? "Unknown",
                         group = param.Definition.GetGroupTypeId()?.TypeId ?? "Unknown"
                     });
@@ -2025,7 +2025,7 @@ namespace RevitMCPBridge2026
 
                     // Storage type and value info (if we have a sample parameter)
                     storageType = sampleParameter?.StorageType.ToString(),
-                    unit = sampleParameter?.GetUnitTypeId()?.TypeId,
+                    unit = SafeUnitId(sampleParameter),
 
                     // Binding info (if found in project parameters)
                     hasBinding = foundBinding != null,
@@ -3191,7 +3191,7 @@ namespace RevitMCPBridge2026
                         hasValue = param.HasValue,
                         parameterType = param.Definition.GetDataType()?.TypeId ?? "Unknown",
                         group = param.Definition.GetGroupTypeId()?.TypeId ?? "Unknown",
-                        unit = param.GetUnitTypeId()?.TypeId
+                        unit = SafeUnitId(param)
                     });
                 }
                 else
@@ -3280,7 +3280,7 @@ namespace RevitMCPBridge2026
                     isReadOnly = param.IsReadOnly,
                     isShared = param.IsShared,
                     parameterType = param.Definition.GetDataType()?.TypeId ?? "Unknown",
-                    unit = param.GetUnitTypeId()?.TypeId
+                    unit = SafeUnitId(param)
                 };
 
                 return JsonConvert.SerializeObject(result);
@@ -3633,5 +3633,12 @@ namespace RevitMCPBridge2026
         }
 
         #endregion
-    }
+    
+        /// <summary>GetUnitTypeId throws on unitless params (text/integer/ElementId) — never let
+        /// a unit lookup kill a parameter read.</summary>
+        private static string SafeUnitId(Parameter p)
+        {
+            try { return p?.GetUnitTypeId()?.TypeId; } catch { return null; }
+        }
+}
 }
