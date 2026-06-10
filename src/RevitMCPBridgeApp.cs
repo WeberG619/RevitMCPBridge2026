@@ -326,7 +326,7 @@ namespace RevitMCPBridge
                 LongDescription = "Chat with the local AI about your model — read, edit, coordinate, check code, export. Works with or without a selection."
             };
             var copilotButton = panel.AddItem(copilotButtonData) as PushButton;
-            try { copilotButton.LargeImage = CreateButtonIcon("copilot", 32); copilotButton.Image = CreateButtonIcon("copilot", 16); } catch { }
+            try { copilotButton.LargeImage = LoadLogoBitmap(32) ?? CreateButtonIcon("copilot", 32); copilotButton.Image = LoadLogoBitmap(16) ?? CreateButtonIcon("copilot", 16); } catch { }
 
             // SketchPad button - Draw to Revit!
             var sketchPadButtonData = new PushButtonData(
@@ -1018,6 +1018,26 @@ namespace RevitMCPBridge
         }
 
         // Dialog handling event
+        /// <summary>Weber's logo for the Model Copilot ribbon button — copilot_logo.png beside the
+        /// DLL, decoded at icon size (the ribbon renders full-size bitmaps blank).</summary>
+        private BitmapSource LoadLogoBitmap(int size)
+        {
+            try
+            {
+                string p = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "copilot_logo.png");
+                if (!System.IO.File.Exists(p)) return null;
+                var bmp = new BitmapImage();
+                bmp.BeginInit();
+                bmp.CacheOption = BitmapCacheOption.OnLoad;
+                bmp.DecodePixelWidth = size;
+                bmp.DecodePixelHeight = size;
+                bmp.UriSource = new Uri(p);
+                bmp.EndInit(); bmp.Freeze();
+                return bmp;
+            }
+            catch { return null; }
+        }
+
         /// <summary>Late-load fallback: if ApplicationInitialized fired before this add-in loaded
         /// (security dialog left open during boot), bring the server up on the first Idling.</summary>
         private static void OnFirstIdleStartServer(object sender, IdlingEventArgs e)

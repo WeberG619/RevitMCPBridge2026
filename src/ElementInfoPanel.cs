@@ -301,7 +301,8 @@ namespace RevitMCPBridge
             stat.Children.Add(Dot(OkClr));
             stat.Children.Add(new TextBlock { Text = "Ready", Foreground = OkClr, FontSize = 12, VerticalAlignment = VerticalAlignment.Center });
             DockPanel.SetDock(stat, Dock.Left); statusRow.Children.Add(stat);
-            var verChip = Chip("Revit 2025", TextSec, BgElev); DockPanel.SetDock(verChip, Dock.Right); statusRow.Children.Add(verChip);
+            string rvtVer = "Revit " + (uiApp?.Application?.VersionNumber ?? "");
+            var verChip = Chip(rvtVer.Trim(), TextSec, BgElev); DockPanel.SetDock(verChip, Dock.Right); statusRow.Children.Add(verChip);
             _costText = new TextBlock { Foreground = TextMut, FontSize = 11, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 10, 0) };
             DockPanel.SetDock(_costText, Dock.Right); statusRow.Children.Add(_costText);
             header.Children.Add(statusRow);
