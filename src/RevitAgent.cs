@@ -1652,6 +1652,14 @@ namespace RevitMCPBridge
                             Log.Information("[Copilot tool] {Tool} args={Args} result={Result}", name, argLog, resLog);
                         }
                         catch { }
+                        // SHOW THE WORK (Weber): after each successful build/edit, fit the active
+                        // view to the model so the user always SEES what the Copilot just did.
+                        try
+                        {
+                            if (VerifyCreateTools.Contains(name) && result != null && result.Contains("\"success\":true"))
+                                RunMethod("zoomToFit", "{}");
+                        }
+                        catch { }
                         var toolMsg = new JObject { ["role"] = "tool", ["content"] = result };
                         if (tc["id"] != null) toolMsg["tool_call_id"] = tc["id"];   // OpenAI-compatible APIs require this
                         if (name != null) toolMsg["name"] = name;
