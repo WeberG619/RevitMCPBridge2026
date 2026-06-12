@@ -539,6 +539,186 @@ namespace RevitMCPBridge
             }
         }
 
+        // ---- FORM VOCABULARY (FORM.md): blend + revolve, modeled on createExtrusion above ----
+        // AUTHORED 2026-06-12. FamilyCreate signatures build-verified against RevitAPI.dll.
+        // Resolve the family doc WITHOUT requiring it be the active UI document (API-created
+        // family docs can't be activated programmatically) — find it among open docs by title.
+
+        /// <summary>The family Document to model in: the active doc if it's a family, else the open
+        /// family doc matching `familyTitle`, else the only/first open family doc. Null if none.</summary>
+        private static Document ResolveFamilyDoc(UIApplication uiApp, JObject parameters)
+        {
+            var active = uiApp.ActiveUIDocument?.Document;
+            if (active != null && active.IsFamilyDocument) return active;
+            var wanted = parameters["familyTitle"]?.ToString();
+            Document firstFam = null;
+            foreach (Document d in uiApp.Application.Documents)
+            {
+                if (!d.IsFamilyDocument) continue;
+                if (!string.IsNullOrEmpty(wanted) && d.Title == wanted) return d;
+                firstFam = firstFam ?? d;
+            }
+            return string.IsNullOrEmpty(wanted) ? firstFam : null;
+        }
+
+        /// <summary>Closed CurveArray from a profile JArray. Each point is {x,y} (or {x,z}); a point with
+        /// "arc":true is the MIDPOINT of an arc spanning its neighbouring line-vertices — so a smooth dome
+        /// is (apex){0,8}, (arc-mid){5.66,5.66, arc:true}, (base){8,0}, ... Point 0 must be a line vertex.</summary>
+        private static CurveArray BuildProfileLoop(JArray ptsJson, System.Func<JToken, XYZ> toXyz)
+        {
+            var pts = new System.Collections.Generic.List<XYZ>();
+            var isMid = new System.Collections.Generic.List<bool>();
+            foreach (var pt in ptsJson) { pts.Add(toXyz(pt)); isMid.Add(pt["arc"]?.Value<bool>() ?? false); }
+            var ca = new CurveArray();
+            int n = pts.Count, i = 0;
+            while (i < n)
+            {
+                int j = (i + 1) % n;
+                if (isMid[j])
+                {
+                    int k = (i + 2) % n;
+                    ca.Append(Arc.Create(pts[i], pts[k], pts[j]));   // end0, end1, pointOnArc(the mid)
+                    i += 2;
+                }
+                else { ca.Append(Line.CreateBound(pts[i], pts[j])); i += 1; }
+            }
+            return ca;
+        }
+
+        [MCPMethod("createBlend", Category = "FamilyEditor", Description = "Create a blend solid from a base profile up to a top profile in the family doc — a frustum/taper/cone, or a (near-)pyramid with a small top. Must be in the family editor.")]
+        public static string CreateBlend(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = ResolveFamilyDoc(uiApp, parameters);
+                if (doc == null)
+                    return JsonConvert.SerializeObject(new { success = false, error = "No family document found. Open/create a family (createNewFamily) and pass familyTitle, e.g. \"Family1\"." });
+
+                var baseProfile = parameters["baseProfilePoints"] as JArray;
+                var topProfile = parameters["topProfilePoints"] as JArray;
+                if (baseProfile == null || baseProfile.Count < 3)
+                    return JsonConvert.SerializeObject(new { success = false, error = "At least 3 baseProfilePoints required ([{x,y},...])" });
+                if (topProfile == null || topProfile.Count < 3)
+                    return JsonConvert.SerializeObject(new { success = false, error = "At least 3 topProfilePoints required (a small square ~= pyramid; a circle->small circle = cone)" });
+
+                var height = parameters["height"]?.Value<double>() ?? 1.0;
+                var isSolid = parameters["isSolid"]?.Value<bool>() ?? true;
+
+                using (var trans = new Transaction(doc, "Create Blend"))
+                {
+                    trans.Start();
+                    var sketchPlane = SketchPlane.Create(doc, Plane.CreateByNormalAndOrigin(XYZ.BasisZ, XYZ.Zero));
+
+                    CurveArray Loop(JArray pts, double z) =>
+                        BuildProfileLoop(pts, pt => new XYZ(pt["x"]?.Value<double>() ?? 0, pt["y"]?.Value<double>() ?? 0, z));
+
+                    // base on the sketch plane, top profile lifted by height. NewBlend(isSolid, topProfile, baseProfile, sketchPlane).
+                    // LIVE-TEST: confirm the top lands at `height`; if NewBlend flattens the top to the sketch
+                    // plane, set the blend's top-offset parameter by name ("Second End") once we can inspect it live.
+                    var baseLoop = Loop(baseProfile, 0);
+                    var topLoop = Loop(topProfile, height);
+                    var blend = doc.FamilyCreate.NewBlend(isSolid, topLoop, baseLoop, sketchPlane);
+
+                    trans.CommitAndCheck();
+                    return JsonConvert.SerializeObject(new { success = true, blendId = (int)blend.Id.Value, height, isSolid, message = "Blend created (verify height + top placement)" });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error creating blend");
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
+        [MCPMethod("createRevolve", Category = "FamilyEditor", Description = "Create a revolved solid in the family doc — spin a section profile around an axis. Dome/sphere = revolve a semicircle; column/vase = revolve a side profile. Profile drawn in the vertical plane; axis must not cross the profile.")]
+        public static string CreateRevolve(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = ResolveFamilyDoc(uiApp, parameters);
+                if (doc == null)
+                    return JsonConvert.SerializeObject(new { success = false, error = "No family document found. Open/create a family (createNewFamily) and pass familyTitle, e.g. \"Family1\"." });
+
+                var profilePoints = parameters["profilePoints"] as JArray;   // section in the x-z vertical plane: {x,z}
+                if (profilePoints == null || profilePoints.Count < 3)
+                    return JsonConvert.SerializeObject(new { success = false, error = "At least 3 profilePoints required ([{x,z},...]) — the section to revolve, in the vertical plane" });
+
+                var startAngleDeg = parameters["startAngle"]?.Value<double>() ?? 0.0;
+                var endAngleDeg = parameters["endAngle"]?.Value<double>() ?? 360.0;
+                var isSolid = parameters["isSolid"]?.Value<bool>() ?? true;
+
+                using (var trans = new Transaction(doc, "Create Revolve"))
+                {
+                    trans.Start();
+                    // vertical sketch plane (X-Z): normal = Y so the profile is drawn in x (radius) and z (height)
+                    var sketchPlane = SketchPlane.Create(doc, Plane.CreateByNormalAndOrigin(XYZ.BasisY, XYZ.Zero));
+
+                    var loop = BuildProfileLoop(profilePoints, pt => new XYZ(pt["x"]?.Value<double>() ?? 0, 0, pt["z"]?.Value<double>() ?? 0));
+                    var profile = new CurveArrArray();
+                    profile.Append(loop);
+
+                    // axis = the Z axis (vertical) in the sketch plane; the profile sits at x>=0 so it doesn't cross it
+                    var axis = Line.CreateBound(XYZ.Zero, new XYZ(0, 0, 1));
+                    double start = startAngleDeg * Math.PI / 180.0;
+                    double end = endAngleDeg * Math.PI / 180.0;
+
+                    var revolve = doc.FamilyCreate.NewRevolution(isSolid, profile, sketchPlane, axis, start, end);
+                    trans.CommitAndCheck();
+                    return JsonConvert.SerializeObject(new { success = true, revolveId = (int)revolve.Id.Value, startAngle = startAngleDeg, endAngle = endAngleDeg, isSolid, message = "Revolve created (verify axis/plane orientation)" });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error creating revolve");
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
+        [MCPMethod("createSweep", Category = "FamilyEditor", Description = "Create a swept solid in the family doc — run a closed cross-section profile along a path. Barrel vault = sweep an arch along a straight path; molding/curved wall = sweep along a curve. Path in the horizontal plane ([{x,y}]); profile is the closed cross-section (arc:true for smooth arch).")]
+        public static string CreateSweep(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = ResolveFamilyDoc(uiApp, parameters);
+                if (doc == null)
+                    return JsonConvert.SerializeObject(new { success = false, error = "No family document found (pass familyTitle)." });
+
+                var pathPoints = parameters["pathPoints"] as JArray;        // open path in the horizontal XY plane
+                var profilePoints = parameters["profilePoints"] as JArray;  // closed cross-section ([{x,z}], arc:true ok)
+                if (pathPoints == null || pathPoints.Count < 2)
+                    return JsonConvert.SerializeObject(new { success = false, error = "At least 2 pathPoints required ([{x,y},...]) — the sweep path" });
+                if (profilePoints == null || profilePoints.Count < 3)
+                    return JsonConvert.SerializeObject(new { success = false, error = "At least 3 profilePoints required ([{x,z},...]) — the cross-section to sweep" });
+
+                var isSolid = parameters["isSolid"]?.Value<bool>() ?? true;
+
+                using (var trans = new Transaction(doc, "Create Sweep"))
+                {
+                    trans.Start();
+                    // path lies in the horizontal plane; profile rides perpendicular to it.
+                    var pathPlane = SketchPlane.Create(doc, Plane.CreateByNormalAndOrigin(XYZ.BasisZ, XYZ.Zero));
+                    var pathPts = pathPoints.Select(pt => new XYZ(pt["x"]?.Value<double>() ?? 0, pt["y"]?.Value<double>() ?? 0, 0)).ToList();
+                    var path = new CurveArray();
+                    for (int i = 0; i < pathPts.Count - 1; i++) path.Append(Line.CreateBound(pathPts[i], pathPts[i + 1]));   // OPEN path
+
+                    // closed cross-section profile (arc-capable). Built in {x,z}; Revit orients it perpendicular to the path.
+                    var profLoop = BuildProfileLoop(profilePoints, pt => new XYZ(pt["x"]?.Value<double>() ?? 0, 0, pt["z"]?.Value<double>() ?? 0));
+                    var profArr = new CurveArrArray();
+                    profArr.Append(profLoop);
+                    SweepProfile sweepProfile = doc.Application.Create.NewCurveLoopsProfile(profArr);
+
+                    var sweep = doc.FamilyCreate.NewSweep(isSolid, path, pathPlane, sweepProfile, 0, ProfilePlaneLocation.Start);
+                    trans.CommitAndCheck();
+                    return JsonConvert.SerializeObject(new { success = true, sweepId = (int)sweep.Id.Value, isSolid, message = "Sweep created (verify profile orientation along the path)" });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error creating sweep");
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
         #endregion
 
         #region Load Family Into Project
@@ -646,10 +826,10 @@ namespace RevitMCPBridge
         {
             try
             {
-                var doc = uiApp.ActiveUIDocument?.Document;
-                if (doc == null || !doc.IsFamilyDocument)
+                var doc = ResolveFamilyDoc(uiApp, parameters);
+                if (doc == null)
                 {
-                    return JsonConvert.SerializeObject(new { success = false, error = "Not in family editor" });
+                    return JsonConvert.SerializeObject(new { success = false, error = "No family document found (pass familyTitle, e.g. \"Family1\")." });
                 }
 
                 var savePath = parameters["path"]?.ToString();
