@@ -550,9 +550,9 @@ namespace RevitMCPBridge
                 NamedPipeServerStream pipeServer = null;
                 try
                 {
-                    // SYNCHRONOUS pipe to avoid async deadlock in Revit's threading model
-                    pipeServer = new NamedPipeServerStream(_pipeName, PipeDirection.InOut, 254,
-                        PipeTransmissionMode.Byte, PipeOptions.None);
+                    // SYNCHRONOUS pipe to avoid async deadlock in Revit's threading model.
+                    // Access-controlled: only the current Windows user can connect.
+                    pipeServer = CreatePipeServer();
 
                     Log.Debug("Waiting for client connection...");
                     // Use synchronous WaitForConnection wrapped in Task.Run.
@@ -592,6 +592,46 @@ namespace RevitMCPBridge
                     pipeServer?.Dispose();
                 }
             }
+        }
+
+        /// <summary>
+        /// Create the listening pipe with an ACL that grants access ONLY to the current
+        /// Windows user. Without this, ANY local process (any user/service on the machine)
+        /// could connect and drive all 300+ bridge methods. Parameters (name, direction,
+        /// max instances, transmission mode, options) match the legacy constructor exactly.
+        /// If ACL creation fails in an unusual environment, we degrade LOUDLY to the old
+        /// unauthenticated pipe rather than killing the bridge.
+        /// </summary>
+        private NamedPipeServerStream CreatePipeServer()
+        {
+            try
+            {
+                var currentUser = System.Security.Principal.WindowsIdentity.GetCurrent().User;
+                if (currentUser != null)
+                {
+                    var pipeSecurity = new System.IO.Pipes.PipeSecurity();
+                    pipeSecurity.AddAccessRule(new System.IO.Pipes.PipeAccessRule(
+                        currentUser,
+                        System.IO.Pipes.PipeAccessRights.FullControl,
+                        System.Security.AccessControl.AccessControlType.Allow));
+
+                    return System.IO.Pipes.NamedPipeServerStreamAcl.Create(
+                        _pipeName, PipeDirection.InOut, 254,
+                        PipeTransmissionMode.Byte, PipeOptions.None,
+                        inBufferSize: 0, outBufferSize: 0,
+                        pipeSecurity);
+                }
+                Log.Warning("Pipe ACL: could not resolve current user SID — " +
+                            "falling back to UNAUTHENTICATED pipe (any local process can connect)");
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Pipe ACL creation failed — " +
+                                "falling back to UNAUTHENTICATED pipe (any local process can connect)");
+            }
+
+            return new NamedPipeServerStream(_pipeName, PipeDirection.InOut, 254,
+                PipeTransmissionMode.Byte, PipeOptions.None);
         }
 
         /// <summary>
