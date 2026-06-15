@@ -973,6 +973,12 @@ namespace RevitMCPBridge2026
                     }
                 }
 
+                // When true, disable auto-join at both ends so the member stays EXACTLY on the
+                // input line (Revit's auto-join trims/extends/repositions joined framing, which
+                // makes z nondeterministic for truss assemblies — proven 6/14). Gives clean square
+                // ends and deterministic placement. Default false (don't change existing callers).
+                bool disallowJoins = parameters["disallowJoins"]?.ToObject<bool>() ?? false;
+
                 using (var trans = new Transaction(doc, "Place Structural Framing"))
                 {
                     trans.Start();
@@ -990,6 +996,13 @@ namespace RevitMCPBridge2026
 
                     // Create framing element
                     FamilyInstance framing = doc.Create.NewFamilyInstance(framingLine, framingType, level, structuralUsage);
+
+                    if (disallowJoins)
+                    {
+                        doc.Regenerate();
+                        try { Autodesk.Revit.DB.Structure.StructuralFramingUtils.DisallowJoinAtEnd(framing, 0); } catch { }
+                        try { Autodesk.Revit.DB.Structure.StructuralFramingUtils.DisallowJoinAtEnd(framing, 1); } catch { }
+                    }
 
                     trans.CommitAndCheck();
 
