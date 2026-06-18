@@ -3606,6 +3606,107 @@ namespace RevitMCPBridge
         }
 
         /// <summary>
+        /// Apply character-range formatting (bold / italic / underline) to a text note WITHOUT
+        /// flattening the whole note. Assigning TextNote.Text inherits the first character's
+        /// formatting across the entire note; this method restores per-line/per-substring control
+        /// via the Revit FormattedText API.
+        ///
+        /// Params:
+        ///   textNoteId (int, required)
+        ///   resetBold / resetItalic / resetUnderline (bool) - clear that style across the whole note first
+        ///   boldSubstrings / italicSubstrings / underlineSubstrings (string[]) - apply style to every occurrence
+        ///   ranges (array of {start,length,bold?,italic?,underline?}) - apply by explicit character range
+        /// </summary>
+        [MCPMethod("setTextNoteFormatting", Category = "Sheet", Description = "Set bold/italic/underline on substrings or character ranges within a text note (per-line formatting)")]
+        public static string SetTextNoteFormatting(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+
+                if (parameters["textNoteId"] == null)
+                    return ResponseBuilder.Error("textNoteId is required", "MISSING_PARAMETER").Build();
+
+                var textNoteId = new ElementId(int.Parse(parameters["textNoteId"].ToString()));
+                var textNote = doc.GetElement(textNoteId) as TextNote;
+                if (textNote == null)
+                    return ResponseBuilder.Error("TextNote not found with ID: " + textNoteId.Value, "ELEMENT_NOT_FOUND").Build();
+
+                bool resetBold = parameters["resetBold"]?.ToObject<bool>() ?? false;
+                bool resetItalic = parameters["resetItalic"]?.ToObject<bool>() ?? false;
+                bool resetUnderline = parameters["resetUnderline"]?.ToObject<bool>() ?? false;
+
+                var boldSubs = parameters["boldSubstrings"]?.ToObject<List<string>>() ?? new List<string>();
+                var italicSubs = parameters["italicSubstrings"]?.ToObject<List<string>>() ?? new List<string>();
+                var underlineSubs = parameters["underlineSubstrings"]?.ToObject<List<string>>() ?? new List<string>();
+                var ranges = parameters["ranges"]?.ToObject<List<JObject>>() ?? new List<JObject>();
+
+                var applied = new List<object>();
+
+                using (var trans = new Transaction(doc, "Set TextNote Formatting"))
+                {
+                    trans.Start();
+                    var failureOptions = trans.GetFailureHandlingOptions();
+                    failureOptions.SetFailuresPreprocessor(new WarningSwallower());
+                    trans.SetFailureHandlingOptions(failureOptions);
+
+                    var ft = textNote.GetFormattedText();
+                    string plain = ft.GetPlainText();
+                    int len = plain.Length;
+
+                    if (resetBold) ft.SetBoldStatus(new TextRange(0, len), false);
+                    if (resetItalic) ft.SetItalicStatus(new TextRange(0, len), false);
+                    if (resetUnderline) ft.SetUnderlineStatus(new TextRange(0, len), false);
+
+                    Action<List<string>, string> applySubs = (subs, kind) =>
+                    {
+                        foreach (var sub in subs)
+                        {
+                            if (string.IsNullOrEmpty(sub)) continue;
+                            int idx = 0;
+                            while ((idx = plain.IndexOf(sub, idx, StringComparison.Ordinal)) >= 0)
+                            {
+                                if (kind == "bold") ft.SetBoldStatus(new TextRange(idx, sub.Length), true);
+                                else if (kind == "italic") ft.SetItalicStatus(new TextRange(idx, sub.Length), true);
+                                else if (kind == "underline") ft.SetUnderlineStatus(new TextRange(idx, sub.Length), true);
+                                applied.Add(new { kind, start = idx, length = sub.Length, text = sub });
+                                idx += sub.Length;
+                            }
+                        }
+                    };
+
+                    applySubs(boldSubs, "bold");
+                    applySubs(italicSubs, "italic");
+                    applySubs(underlineSubs, "underline");
+
+                    foreach (var r in ranges)
+                    {
+                        int start = r["start"]?.ToObject<int>() ?? 0;
+                        int rlen = r["length"]?.ToObject<int>() ?? 0;
+                        if (rlen <= 0 || start < 0 || start + rlen > len) continue;
+                        if (r["bold"] != null) ft.SetBoldStatus(new TextRange(start, rlen), r["bold"].ToObject<bool>());
+                        if (r["italic"] != null) ft.SetItalicStatus(new TextRange(start, rlen), r["italic"].ToObject<bool>());
+                        if (r["underline"] != null) ft.SetUnderlineStatus(new TextRange(start, rlen), r["underline"].ToObject<bool>());
+                        applied.Add(new { kind = "range", start, length = rlen });
+                    }
+
+                    textNote.SetFormattedText(ft);
+                    trans.CommitAndCheck();
+                }
+
+                return ResponseBuilder.Success()
+                    .With("textNoteId", (int)textNoteId.Value)
+                    .With("appliedCount", applied.Count)
+                    .With("applied", applied)
+                    .Build();
+            }
+            catch (Exception ex)
+            {
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
+        /// <summary>
         /// Export sheets to PDF files
         /// </summary>
         [MCPMethod("exportSheetsToPDF", Category = "Sheet", Description = "Export sheets to PDF files")]
