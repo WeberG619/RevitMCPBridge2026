@@ -583,6 +583,146 @@ namespace RevitMCPBridge
             }
         }
 
+        /// <summary>
+        /// Lay horizontal ceiling joists (rafter ties) across a roof's bearing span,
+        /// at a spacing o.c. Finds the two longest PARALLEL eaves (the bearing walls)
+        /// and spans joists between them at plate level. Pairs with layoutRoofRafters
+        /// to complete a stick-framed roof. Targets the main rectangular span.
+        /// Parameters:
+        /// - roofId: roof element id (required)
+        /// - spacing: joist spacing o.c. in INCHES (default 16)
+        /// - framingTypeId: (optional) structural framing FamilySymbol id; default = first loaded
+        /// </summary>
+        [MCPMethod("layoutCeilingJoists", Category = "Roof", Description = "Lay horizontal ceiling joists across the bearing span (between the two parallel bearing eaves) at a spacing o.c. Pairs with layoutRoofRafters. Returns joist count + member ids.")]
+        public static string LayoutCeilingJoists(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+                if (parameters["roofId"] == null)
+                    return ResponseBuilder.Error("roofId is required", "MISSING_PARAM").Build();
+                var roofId = new ElementId(int.Parse(parameters["roofId"].ToString()));
+                var roof = doc.GetElement(roofId) as RoofBase;
+                if (roof == null)
+                    return ResponseBuilder.Error("Roof not found", "NOT_FOUND").Build();
+
+                double spacingIn = parameters["spacing"]?.ToObject<double>() ?? 16.0;
+                double spacing = spacingIn / 12.0;
+                if (spacing < 0.1) spacing = 1.333;
+
+                FamilySymbol sym = null;
+                if (parameters["framingTypeId"] != null)
+                    sym = doc.GetElement(new ElementId(parameters["framingTypeId"].ToObject<int>())) as FamilySymbol;
+                if (sym == null)
+                    sym = new FilteredElementCollector(doc)
+                        .OfCategory(BuiltInCategory.OST_StructuralFraming)
+                        .OfClass(typeof(FamilySymbol)).Cast<FamilySymbol>().FirstOrDefault();
+                if (sym == null)
+                    return ResponseBuilder.Error("No structural framing family loaded.", "NO_FRAMING_TYPE").Build();
+
+                var level = doc.GetElement(roof.LevelId) as Level
+                            ?? new FilteredElementCollector(doc).OfClass(typeof(Level)).Cast<Level>().FirstOrDefault();
+
+                const double NZ_EPS = 0.001, Z_TOL = 0.02, EPS = 0.05;
+                var opts = new Options { ComputeReferences = true, DetailLevel = ViewDetailLevel.Fine };
+                var solids = new List<Solid>();
+                CollectSolids(roof.get_Geometry(opts), solids);
+                if (solids.Count == 0)
+                    return ResponseBuilder.Error("No solid geometry on roof", "NO_GEOMETRY").Build();
+
+                // gather each top face's lowest horizontal edge (= an eave) as a segment
+                var eaves = new List<(XYZ a, XYZ b, double len)>();
+                foreach (var solid in solids)
+                    foreach (Face f in solid.Faces)
+                        if (f is PlanarFace pf && pf.FaceNormal.Z > NZ_EPS)
+                        {
+                            XYZ ea = null, eb = null; double ez = double.MaxValue;
+                            foreach (CurveLoop loop in pf.GetEdgesAsCurveLoops())
+                                foreach (Curve c in loop)
+                                {
+                                    var s = c.GetEndPoint(0); var e = c.GetEndPoint(1);
+                                    if (Math.Abs(s.Z - e.Z) < Z_TOL)
+                                    {
+                                        double z = (s.Z + e.Z) * 0.5;
+                                        if (z < ez) { ez = z; ea = s; eb = e; }
+                                    }
+                                }
+                            if (ea != null && eb.DistanceTo(ea) > EPS)
+                                eaves.Add((ea, eb, eb.DistanceTo(ea)));
+                        }
+                if (eaves.Count < 2)
+                    return ResponseBuilder.Error("Need at least two eaves to span joists", "NO_SPAN").Build();
+
+                // pick the best PARALLEL, SEPARATED eave pair, maximizing min(length)
+                (XYZ a, XYZ b, double len) e1 = eaves[0], e2 = eaves[0];
+                double bestScore = -1;
+                for (int i = 0; i < eaves.Count; i++)
+                    for (int j = i + 1; j < eaves.Count; j++)
+                    {
+                        var di = (eaves[i].b - eaves[i].a).Normalize();
+                        var dj = (eaves[j].b - eaves[j].a).Normalize();
+                        if (Math.Abs(di.DotProduct(dj)) < 0.98) continue;   // not parallel
+                        var mid_i = (eaves[i].a + eaves[i].b) * 0.5;
+                        var mid_j = (eaves[j].a + eaves[j].b) * 0.5;
+                        if (mid_i.DistanceTo(mid_j) < EPS) continue;        // same line
+                        double score = Math.Min(eaves[i].len, eaves[j].len);
+                        if (score > bestScore) { bestScore = score; e1 = eaves[i]; e2 = eaves[j]; }
+                    }
+                if (bestScore < 0)
+                    return ResponseBuilder.Error("No parallel bearing eave pair found", "NO_SPAN").Build();
+
+                // march along the longer eave; project each station onto the other eave line
+                if (e2.len > e1.len) { var t = e1; e1 = e2; e2 = t; }
+                var a0 = e1.a; var dirA = (e1.b - e1.a).Normalize(); double lenA = e1.len;
+                var b0 = e2.a; var dirB = (e2.b - e2.a).Normalize();
+                double plateZ = Math.Min(a0.Z, b0.Z);
+
+                var memberIds = new List<int>();
+                int count = 0; double span0 = 0;
+                using (var trans = new Transaction(doc, "Layout Ceiling Joists"))
+                {
+                    trans.Start();
+                    var fo = trans.GetFailureHandlingOptions();
+                    fo.SetFailuresPreprocessor(new WarningSwallower());
+                    trans.SetFailureHandlingOptions(fo);
+                    if (!sym.IsActive) sym.Activate();
+
+                    for (double s = spacing * 0.5; s < lenA - EPS; s += spacing)
+                    {
+                        var Pa = a0 + dirA * s;
+                        var Pb = b0 + dirB * (Pa - b0).DotProduct(dirB);   // project onto eave-B line
+                        Pa = new XYZ(Pa.X, Pa.Y, plateZ);
+                        Pb = new XYZ(Pb.X, Pb.Y, plateZ);
+                        if (Pa.DistanceTo(Pb) < EPS) continue;
+                        var inst = doc.Create.NewFamilyInstance(Line.CreateBound(Pa, Pb), sym, level, StructuralType.Beam);
+                        try { StructuralFramingUtils.DisallowJoinAtEnd(inst, 0); } catch { }
+                        try { StructuralFramingUtils.DisallowJoinAtEnd(inst, 1); } catch { }
+                        memberIds.Add((int)inst.Id.Value);
+                        if (count == 0) span0 = Pa.DistanceTo(Pb);
+                        count++;
+                    }
+                    trans.Commit();
+                }
+
+                return JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    roofId = (int)roof.Id.Value,
+                    framingType = sym.Name,
+                    spacingInches = spacingIn,
+                    joistCount = count,
+                    bearingRun = lenA,
+                    spanLength = span0,
+                    plateElevation = plateZ,
+                    memberIds = memberIds
+                });
+            }
+            catch (Exception ex)
+            {
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
         // ---- roof framing interpreter helpers ----
 
         private static void CollectSolids(GeometryElement ge, List<Solid> solids)
