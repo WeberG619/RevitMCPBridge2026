@@ -723,6 +723,171 @@ namespace RevitMCPBridge
             }
         }
 
+        /// <summary>
+        /// Lay a SET of common wood trusses across a roof's bearing span (the FL
+        /// default roof system). Finds the two parallel bearing eaves, computes the
+        /// ridge height from the roof geometry, and steps gable trusses between them
+        /// at spacing o.c. — each built by the native createWoodTruss. Targets the
+        /// main rectangular span; hip step-down trusses are a future refinement.
+        /// Parameters:
+        /// - roofId: roof element id (required)
+        /// - spacing: truss spacing o.c. in INCHES (default 24)
+        /// - chordTypeId / webTypeId: (optional) structural framing FamilySymbol ids; default = first loaded
+        /// - panels: web panels per truss (default 8)
+        /// - shape: 'gable' (default) | 'flat' | 'mono'
+        /// </summary>
+        [MCPMethod("layoutRoofTrusses", Category = "Roof", Description = "Lay a set of common wood trusses across the bearing span at spacing o.c. (FL-default roof). Builds each via native createWoodTruss. Returns truss count + height/span.")]
+        public static string LayoutRoofTrusses(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+                if (parameters["roofId"] == null)
+                    return ResponseBuilder.Error("roofId is required", "MISSING_PARAM").Build();
+                var roofId = new ElementId(int.Parse(parameters["roofId"].ToString()));
+                var roof = doc.GetElement(roofId) as RoofBase;
+                if (roof == null)
+                    return ResponseBuilder.Error("Roof not found", "NOT_FOUND").Build();
+
+                double spacingIn = parameters["spacing"]?.ToObject<double>() ?? 24.0;
+                double spacing = spacingIn / 12.0;
+                if (spacing < 0.1) spacing = 2.0;
+                int panels = parameters["panels"]?.ToObject<int>() ?? 8;
+                string shape = parameters["shape"]?.ToObject<string>() ?? "gable";
+
+                // chord/web types: explicit or first loaded structural framing
+                FamilySymbol firstSF() => new FilteredElementCollector(doc)
+                    .OfCategory(BuiltInCategory.OST_StructuralFraming)
+                    .OfClass(typeof(FamilySymbol)).Cast<FamilySymbol>().FirstOrDefault();
+                var chord = parameters["chordTypeId"] != null
+                    ? doc.GetElement(new ElementId(parameters["chordTypeId"].ToObject<int>())) as FamilySymbol : firstSF();
+                var web = parameters["webTypeId"] != null
+                    ? doc.GetElement(new ElementId(parameters["webTypeId"].ToObject<int>())) as FamilySymbol : firstSF();
+                if (chord == null || web == null)
+                    return ResponseBuilder.Error("No structural framing family loaded for chords/webs.", "NO_FRAMING_TYPE").Build();
+
+                var level = doc.GetElement(roof.LevelId) as Level
+                            ?? new FilteredElementCollector(doc).OfClass(typeof(Level)).Cast<Level>().FirstOrDefault();
+
+                const double NZ_EPS = 0.001, Z_TOL = 0.02, EPS = 0.05;
+                var opts = new Options { ComputeReferences = true, DetailLevel = ViewDetailLevel.Fine };
+                var solids = new List<Solid>();
+                CollectSolids(roof.get_Geometry(opts), solids);
+                if (solids.Count == 0)
+                    return ResponseBuilder.Error("No solid geometry on roof", "NO_GEOMETRY").Build();
+
+                // eaves (lowest horizontal edge per top face) + ridge Z (max top-face vertex Z)
+                var eaves = new List<(XYZ a, XYZ b, double len)>();
+                double ridgeZ = double.MinValue;
+                foreach (var solid in solids)
+                    foreach (Face f in solid.Faces)
+                        if (f is PlanarFace pf && pf.FaceNormal.Z > NZ_EPS)
+                        {
+                            XYZ ea = null, eb = null; double ez = double.MaxValue;
+                            foreach (CurveLoop loop in pf.GetEdgesAsCurveLoops())
+                                foreach (Curve c in loop)
+                                {
+                                    var s = c.GetEndPoint(0); var e = c.GetEndPoint(1);
+                                    if (s.Z > ridgeZ) ridgeZ = s.Z;
+                                    if (e.Z > ridgeZ) ridgeZ = e.Z;
+                                    if (Math.Abs(s.Z - e.Z) < Z_TOL)
+                                    {
+                                        double z = (s.Z + e.Z) * 0.5;
+                                        if (z < ez) { ez = z; ea = s; eb = e; }
+                                    }
+                                }
+                            if (ea != null && eb.DistanceTo(ea) > EPS)
+                                eaves.Add((ea, eb, eb.DistanceTo(ea)));
+                        }
+                if (eaves.Count < 2)
+                    return ResponseBuilder.Error("Need at least two eaves to span trusses", "NO_SPAN").Build();
+
+                // best parallel, separated eave pair
+                (XYZ a, XYZ b, double len) e1 = eaves[0], e2 = eaves[0];
+                double bestScore = -1;
+                for (int i = 0; i < eaves.Count; i++)
+                    for (int j = i + 1; j < eaves.Count; j++)
+                    {
+                        var di = (eaves[i].b - eaves[i].a).Normalize();
+                        var dj = (eaves[j].b - eaves[j].a).Normalize();
+                        if (Math.Abs(di.DotProduct(dj)) < 0.98) continue;
+                        if (((eaves[i].a + eaves[i].b) * 0.5).DistanceTo((eaves[j].a + eaves[j].b) * 0.5) < EPS) continue;
+                        double score = Math.Min(eaves[i].len, eaves[j].len);
+                        if (score > bestScore) { bestScore = score; e1 = eaves[i]; e2 = eaves[j]; }
+                    }
+                if (bestScore < 0)
+                    return ResponseBuilder.Error("No parallel bearing eave pair found", "NO_SPAN").Build();
+
+                if (e2.len > e1.len) { var t = e1; e1 = e2; e2 = t; }
+                var a0 = e1.a; var dirA = (e1.b - e1.a).Normalize(); double lenA = e1.len;
+                var b0 = e2.a; var dirB = (e2.b - e2.a).Normalize();
+                double plateZ = Math.Min(a0.Z, b0.Z);
+                double height = ridgeZ - plateZ;
+                // true cross-span = perpendicular distance between the two bearing eaves
+                var mid1 = (e1.a + e1.b) * 0.5;
+                var toB = mid1 - b0;
+                double crossSpan = (toB - dirB * toB.DotProduct(dirB)).GetLength();
+                double bearingOffset = plateZ - level.Elevation;
+                if (height < EPS)
+                    return ResponseBuilder.Error("Computed truss height ~0; not a sloped roof?", "FLAT").Build();
+
+                int trussCount = 0, memberTotal = 0;
+                var failures = new List<string>();
+                for (double s = spacing * 0.5; s < lenA - EPS; s += spacing)
+                {
+                    var Pa = a0 + dirA * s;
+                    var Pb = b0 + dirB * (Pa - b0).DotProduct(dirB);
+                    var jo = new JObject
+                    {
+                        ["startPoint"] = new JObject { ["x"] = Pa.X, ["y"] = Pa.Y },
+                        ["endPoint"] = new JObject { ["x"] = Pb.X, ["y"] = Pb.Y },
+                        ["height"] = height,
+                        ["chordTypeId"] = (int)chord.Id.Value,
+                        ["webTypeId"] = (int)web.Id.Value,
+                        ["levelId"] = (int)level.Id.Value,
+                        ["bearingOffset"] = bearingOffset,
+                        ["shape"] = shape,
+                        ["panels"] = panels
+                    };
+                    var res = RevitMCPBridge2026.TrussBeamMethods.CreateWoodTruss(uiApp, jo);
+                    try
+                    {
+                        var jr = JObject.Parse(res);
+                        if (jr["success"]?.ToObject<bool>() == true)
+                        {
+                            trussCount++;
+                            var mids = jr["memberIds"] as JArray;
+                            if (mids != null) memberTotal += mids.Count;
+                        }
+                        else if (failures.Count < 3)
+                            failures.Add(jr["error"]?.ToString() ?? "unknown");
+                    }
+                    catch { if (failures.Count < 3) failures.Add("unparseable truss result"); }
+                }
+
+                return JsonConvert.SerializeObject(new
+                {
+                    success = true,
+                    roofId = (int)roof.Id.Value,
+                    chordType = chord.Name,
+                    webType = web.Name,
+                    spacingInches = spacingIn,
+                    trussCount = trussCount,
+                    memberTotal = memberTotal,
+                    trussHeight = height,
+                    span = crossSpan,
+                    bearingRun = lenA,
+                    plateElevation = plateZ,
+                    shape = shape,
+                    failuresSample = failures
+                });
+            }
+            catch (Exception ex)
+            {
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
         // ---- roof framing interpreter helpers ----
 
         private static void CollectSolids(GeometryElement ge, List<Solid> solids)
