@@ -419,7 +419,7 @@ namespace RevitMCPBridge
         /// - spacing: rafter spacing o.c. in INCHES (default 24)
         /// - framingTypeId: (optional) structural framing FamilySymbol id; default = first loaded
         /// </summary>
-        [MCPMethod("layoutRoofRafters", Category = "Roof", Description = "Lay common+jack rafters on every sloped roof face at a spacing o.c. (built on analyzeRoofFraming geometry). Returns per-face rafter counts + member ids.")]
+        [MCPMethod("layoutRoofRafters", Category = "Roof", Description = "Lay common+jack rafters on every sloped roof face at a spacing o.c. (built on analyzeRoofFraming geometry). Returns per-face rafter counts + member ids, plus a per-rafter cut list (length, plumbCutDegrees, seatCutDegrees). For a tabulated takeoff, run createMaterialTakeoff on the placed Structural Framing members.")]
         public static string LayoutRoofRafters(UIApplication uiApp, JObject parameters)
         {
             try
@@ -518,6 +518,11 @@ namespace RevitMCPBridge
 
                         int count = 0;
                         double firstLen = 0, lastLen = 0;
+                        double slopeDeg = Math.Acos(Math.Min(1.0, n.Z)) * 180.0 / Math.PI;
+                        // reuse: cut list rides this existing layout loop — length = true sloped length (hitDist),
+                        // plumbCut = roof slope, seatCut = complement. Hip-jack cheek cuts need analyzeRoofFraming
+                        // hip normals (not computed here yet); add that when jack-rafter cheek angles are required.
+                        var rafters = new List<object>();
                         for (double sdist = spacing * 0.5; sdist < eaveLen - EPS; sdist += spacing)
                         {
                             var P = eaveA + eaveDir * sdist;
@@ -547,6 +552,13 @@ namespace RevitMCPBridge
                             allMemberIds.Add((int)inst.Id.Value);
                             if (count == 0) firstLen = hitDist;
                             lastLen = hitDist;
+                            rafters.Add(new
+                            {
+                                id = (int)inst.Id.Value,
+                                length = Math.Round(hitDist, 4),
+                                plumbCutDegrees = Math.Round(slopeDeg, 2),
+                                seatCutDegrees = Math.Round(90.0 - slopeDeg, 2)
+                            });
                             count++;
                         }
 
@@ -558,7 +570,8 @@ namespace RevitMCPBridge
                             eaveLength = eaveLen,
                             firstRafterLength = firstLen,
                             lastRafterLength = lastLen,
-                            slopeDegrees = Math.Acos(Math.Min(1.0, n.Z)) * 180.0 / Math.PI
+                            slopeDegrees = Math.Round(slopeDeg, 2),
+                            rafters = rafters
                         });
                     }
 
