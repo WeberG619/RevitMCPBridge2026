@@ -136,6 +136,7 @@ namespace RevitMCPBridge2026
                 ElementId assetId;
                 string dupName = mat.Name + "_tex";
                 string diag;
+                string scaleUnit = null;
                 using (var trans = new Transaction(doc, "Set Material Image Texture"))
                 {
                     trans.Start();
@@ -167,14 +168,16 @@ namespace RevitMCPBridge2026
 
                         var bmpPath = bitmap.FindByName(UnifiedBitmap.UnifiedbitmapBitmap) as AssetPropertyString;
                         if (bmpPath != null && bmpPath.IsValidValue(imagePath)) bmpPath.Value = imagePath;
+                        // AssetPropertyDistance.Value is in the property's OWN unit (not feet) — convert,
+                        // so realWorldScale*Ft map to TRUE feet (a 50ft image feature lands at 50ft).
                         var scaleX = bitmap.FindByName(UnifiedBitmap.TextureRealWorldScaleX) as AssetPropertyDistance;
                         var scaleY = bitmap.FindByName(UnifiedBitmap.TextureRealWorldScaleY) as AssetPropertyDistance;
-                        if (scaleX != null) scaleX.Value = sx;   // internal units = feet
-                        if (scaleY != null) scaleY.Value = sy;
+                        if (scaleX != null) { scaleUnit = scaleX.GetUnitTypeId().TypeId; scaleX.Value = UnitUtils.Convert(sx, UnitTypeId.Feet, scaleX.GetUnitTypeId()); }
+                        if (scaleY != null) scaleY.Value = UnitUtils.Convert(sy, UnitTypeId.Feet, scaleY.GetUnitTypeId());
                         var offX = bitmap.FindByName(UnifiedBitmap.TextureRealWorldOffsetX) as AssetPropertyDistance;
                         var offY = bitmap.FindByName(UnifiedBitmap.TextureRealWorldOffsetY) as AssetPropertyDistance;
-                        if (offX != null) offX.Value = ox;
-                        if (offY != null) offY.Value = oy;
+                        if (offX != null) offX.Value = UnitUtils.Convert(ox, UnitTypeId.Feet, offX.GetUnitTypeId());
+                        if (offY != null) offY.Value = UnitUtils.Convert(oy, UnitTypeId.Feet, offY.GetUnitTypeId());
                         diag = bmpPath != null ? "bitmap bound" : "bitmap path slot missing";
                         scope.Commit(true);
                     }
@@ -187,6 +190,7 @@ namespace RevitMCPBridge2026
                     .With("imagePath", imagePath)
                     .With("realWorldScaleXFt", sx)
                     .With("realWorldScaleYFt", sy)
+                    .With("scaleUnit", scaleUnit)
                     .With("note", diag)
                     .Build();
             }
