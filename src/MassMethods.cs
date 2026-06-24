@@ -90,6 +90,119 @@ namespace RevitMCPBridge
         }
 
         /// <summary>
+        /// Extrude an arbitrary closed 2D profile (in a u-v plane) along a direction — the proper way to
+        /// model pediments/gables, cornices & moldings (a molding profile swept along a length), beams, etc.
+        /// profile = [[u,v],...] in the plane (origin + u*uAxis + v*vAxis); extruded along `direction` (default uAxis×vAxis).
+        /// </summary>
+        [MCPMethod("createExtrudedProfile", Category = "Mass", Description = "Extrude a closed 2D profile along a direction (pediments, cornices, moldings, gables)")]
+        public static string CreateExtrudedProfile(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+                if (parameters["origin"] == null || parameters["uAxis"] == null || parameters["vAxis"] == null
+                    || parameters["profile"] == null || parameters["length"] == null)
+                    return ResponseBuilder.Error("origin, uAxis, vAxis, profile [[u,v],...], length required", "VALIDATION_ERROR").Build();
+                var o3 = parameters["origin"].ToObject<double[]>();
+                var ua = parameters["uAxis"].ToObject<double[]>();
+                var va = parameters["vAxis"].ToObject<double[]>();
+                var prof = parameters["profile"].ToObject<double[][]>();
+                double length = parameters["length"].ToObject<double>();
+                if (prof.Length < 3) return ResponseBuilder.Error("profile needs >= 3 points", "VALIDATION_ERROR").Build();
+
+                XYZ o = new XYZ(o3[0], o3[1], o3[2]);
+                XYZ u = new XYZ(ua[0], ua[1], ua[2]).Normalize();
+                XYZ v = new XYZ(va[0], va[1], va[2]).Normalize();
+                XYZ dir = parameters["direction"] != null
+                    ? new XYZ(parameters["direction"][0].ToObject<double>(), parameters["direction"][1].ToObject<double>(), parameters["direction"][2].ToObject<double>()).Normalize()
+                    : u.CrossProduct(v).Normalize();
+
+                var pts = new List<XYZ>();
+                foreach (var p in prof) pts.Add(o + p[0] * u + p[1] * v);
+                var loop = new CurveLoop();
+                for (int i = 0; i < pts.Count; i++)
+                {
+                    var a = pts[i]; var b = pts[(i + 1) % pts.Count];
+                    if (a.DistanceTo(b) > 1e-7) loop.Append(Line.CreateBound(a, b));
+                }
+                var solid = GeometryCreationUtilities.CreateExtrusionGeometry(new List<CurveLoop> { loop }, dir, length);
+
+                using (var trans = new Transaction(doc, "Extruded Profile"))
+                {
+                    trans.Start();
+                    var ds = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_Mass));
+                    ds.SetShape(new GeometryObject[] { solid });
+                    ds.Name = parameters["name"]?.ToString() ?? "Extruded";
+                    trans.CommitAndCheck();
+                    return ResponseBuilder.Success().With("massId", ds.Id.Value)
+                        .With("profilePoints", prof.Length).With("length", length)
+                        .With("note", "extruded profile").Build();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
+        /// <summary>
+        /// Revolve an ARBITRARY [radius, z] profile 360° about the vertical axis — the proper way to
+        /// model turned classical elements: columns (base+shaft+capital), balusters, urns, moldings.
+        /// The profile is the OUTER silhouette (bottom→top); it is auto-closed along the axis.
+        /// </summary>
+        [MCPMethod("createRevolvedProfile", Category = "Mass", Description = "Revolve an arbitrary [radius,z] silhouette into a turned solid (columns, balusters, capitals, urns)")]
+        public static string CreateRevolvedProfile(UIApplication uiApp, JObject parameters)
+        {
+            try
+            {
+                var doc = uiApp.ActiveUIDocument.Document;
+                if (parameters["center"] == null || parameters["profile"] == null)
+                    return ResponseBuilder.Error("center [x,y,z] and profile [[r,z],...] required", "VALIDATION_ERROR").Build();
+                var c = parameters["center"].ToObject<double[]>();
+                var prof = parameters["profile"].ToObject<double[][]>();
+                if (prof.Length < 2)
+                    return ResponseBuilder.Error("profile needs >= 2 points", "VALIDATION_ERROR").Build();
+                double cx = c[0], cy = c[1], bz = c.Length > 2 ? c[2] : 0.0;
+                XYZ origin = new XYZ(cx, cy, bz);
+                XYZ rad = XYZ.BasisX, up = XYZ.BasisZ;
+                var frame = new Frame(origin, XYZ.BasisX, XYZ.BasisY, XYZ.BasisZ);
+
+                var pts = new List<XYZ>();
+                foreach (var p in prof) pts.Add(origin + Math.Max(0.0, p[0]) * rad + p[1] * up);
+
+                var loop = new CurveLoop();
+                for (int i = 0; i < pts.Count - 1; i++)
+                    if (pts[i].DistanceTo(pts[i + 1]) > 1e-7) loop.Append(Line.CreateBound(pts[i], pts[i + 1]));
+                XYZ axisTop = origin + prof[prof.Length - 1][1] * up;
+                XYZ axisBot = origin + prof[0][1] * up;
+                if (pts[pts.Count - 1].DistanceTo(axisTop) > 1e-7) loop.Append(Line.CreateBound(pts[pts.Count - 1], axisTop));
+                loop.Append(Line.CreateBound(axisTop, axisBot));
+                if (axisBot.DistanceTo(pts[0]) > 1e-7) loop.Append(Line.CreateBound(axisBot, pts[0]));
+
+                var solid = GeometryCreationUtilities.CreateRevolvedGeometry(
+                    frame, new List<CurveLoop> { loop }, 0.0, 2.0 * Math.PI);
+
+                using (var trans = new Transaction(doc, "Revolved Profile"))
+                {
+                    trans.Start();
+                    var ds = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_Mass));
+                    ds.SetShape(new GeometryObject[] { solid });
+                    ds.Name = parameters["name"]?.ToString() ?? "Turned";
+                    trans.CommitAndCheck();
+                    return ResponseBuilder.Success()
+                        .With("massId", ds.Id.Value)
+                        .With("profilePoints", prof.Length)
+                        .With("note", "turned solid of revolution")
+                        .Build();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ResponseBuilder.FromException(ex).Build();
+            }
+        }
+
+        /// <summary>
         /// Create a SMOOTH dome as a true solid of revolution (the proper way — not stacked slices).
         /// Revolves a quarter-ellipse profile 360° about the vertical axis through the center.
         /// </summary>
