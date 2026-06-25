@@ -432,9 +432,23 @@ namespace RevitMCPBridge
                     var b = new XYZ(pts[(i + 1) % pts.Length][0], pts[(i + 1) % pts.Length][1], baseZ);
                     if (a.DistanceTo(b) > 1e-6) curves.Add(Line.CreateBound(a, b));
                 }
-                var loop = CurveLoop.Create(curves);
-                var solid = GeometryCreationUtilities.CreateExtrusionGeometry(
-                    new List<CurveLoop> { loop }, XYZ.BasisZ, height);
+                var loops = new List<CurveLoop> { CurveLoop.Create(curves) };
+                // optional holes (inner rings) — cut openings, e.g. the blocks inside a unioned road network.
+                if (parameters["holes"] != null)
+                {
+                    foreach (var ring in parameters["holes"].ToObject<double[][][]>())
+                    {
+                        var hc = new List<Curve>();
+                        for (int i = 0; i < ring.Length; i++)
+                        {
+                            var a = new XYZ(ring[i][0], ring[i][1], baseZ);
+                            var b = new XYZ(ring[(i + 1) % ring.Length][0], ring[(i + 1) % ring.Length][1], baseZ);
+                            if (a.DistanceTo(b) > 1e-6) hc.Add(Line.CreateBound(a, b));
+                        }
+                        if (hc.Count >= 3) { try { loops.Add(CurveLoop.Create(hc)); } catch { } }
+                    }
+                }
+                var solid = GeometryCreationUtilities.CreateExtrusionGeometry(loops, XYZ.BasisZ, height);
 
                 using (var trans = new Transaction(doc, "Create Mass From Footprint"))
                 {
